@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Grid } from '@mui/material';
 import { Cuenta } from '@/types';
 
+
 interface AddCuentaModalProps {
   open: boolean;
   onClose: () => void;
@@ -10,6 +11,8 @@ interface AddCuentaModalProps {
 }
 
 const AddCuentaModal: React.FC<AddCuentaModalProps> = ({ open, onClose, onSave, initialData }) => {
+
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [cuentaData, setCuentaData] = useState<Cuenta>({
     clave_sistema: '',
     clave_modulo: '',
@@ -41,17 +44,58 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({ open, onClose, onSave, 
     }
   }, [initialData]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setCuentaData({
-      ...cuentaData,
-      [name]: value,
-    });
+  const validate = () => {
+    let tempErrors: { [key: string]: string } = {};
+    console.log("clave sistema: ",!!cuentaData.clave_sistema)
+    if (!cuentaData.clave_sistema) {
+      tempErrors.clave_sistema = "La clave del sistema es obligatoria";
+    }
+    if (!cuentaData.clave_modulo) {
+      tempErrors.clave_modulo = "La clave del modulo es obligatoria";
+    }
+    if (!cuentaData.cuenta ) {
+      tempErrors.cuenta = "La cuenta es obligatoria";
+    }
+    if (cuentaData.cuenta.length > 25){
+      tempErrors.cuenta = "Longitud de campo invalida max 25 caracteres [0-9]";
+    }
+    if (!/([0-9])\w+/g.test(cuentaData.cuenta)){
+      tempErrors.cuenta = "Solo numeros";
+    }
+    // @ts-ignore
+    if (cuentaData.tipo_ente?.toString().length > 2){
+      tempErrors.cuenta = "Longitud invalida para tipo ente";
+    }
+    // @ts-ignore
+    if (!/([0-9])\w+/g.test(cuentaData.tipo_ente?.toString())){
+      tempErrors.cuenta = "Solo numeros";
+    }
+    // @ts-ignore
+    if (cuentaData.ente?.toString().length > 6){
+      tempErrors.cuenta = "Longitud invalida para tipo ente";
+    }
+    // @ts-ignore
+    if (!/([0-9])\w+/g.test(cuentaData.ente?.toString())){
+      tempErrors.cuenta = "Solo numeros";
+    }
+
+    setErrors(tempErrors);
+    return Object.keys(tempErrors).length === 0;
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+      setCuentaData({
+        ...cuentaData,
+        [name]: value,
+      });
+    };
+
   const handleSave = () => {
-    onSave(cuentaData);
-    onClose();
+    if (validate()) {
+      onSave(cuentaData);
+      onClose();
+    }
   };
 
   return (
@@ -67,6 +111,8 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({ open, onClose, onSave, 
               value={cuentaData.clave_sistema}
               onChange={handleChange}
               required
+              error={!!errors.clave_sistema}
+              helperText={errors.clave_sistema}
             />
           </Grid>
           <Grid item xs={12}>
@@ -77,6 +123,8 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({ open, onClose, onSave, 
               value={cuentaData.clave_modulo}
               onChange={handleChange}
               required
+              error={!!errors.clave_modulo}
+              helperText={errors.clave_modulo}
             />
           </Grid>
           <Grid item xs={12}>
@@ -87,37 +135,44 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({ open, onClose, onSave, 
               value={cuentaData.cuenta}
               onChange={handleChange}
               required
+              error={!!errors.cuenta}
+              helperText={errors.cuenta}
             />
           </Grid>
           <Grid item xs={12}>
             <TextField
               fullWidth
-              label="Clave Regla"
-              name="clave_regla"
-              value={cuentaData.clave_regla}
+              label="Tipo ente"
+              name="tipo_ente"
+              value={cuentaData.tipo_ente}
               onChange={handleChange}
+              error={!!errors.tipo_ente}
+              helperText={errors.tipo_ente}
             />
           </Grid>
           <Grid item xs={12}>
             <TextField
               fullWidth
-              label="Descripción"
-              name="descripcion"
-              value={cuentaData.descripcion}
+              label="Ente"
+              name="ente"
+              value={cuentaData.ente}
               onChange={handleChange}
+              error={!!errors.ente}
+              helperText={errors.ente}
             />
           </Grid>
           <Grid item xs={12}>
             <TextField
               fullWidth
-              label="Clave Cuc"
-              name="reg_cuc_clave"
-              value={cuentaData.reg_cuc_clave}
+              label="Tipo conciliacion"
+              name="tipo_conciliacion"
+              value={cuentaData.tipo_conciliacion}
               onChange={handleChange}
               type="number"
+              error={!!errors.tipo_conciliacion}
+              helperText={errors.tipo_conciliacion}
             />
           </Grid>
-          {/* Se pueden agregar más campos según sea necesario */}
         </Grid>
       </DialogContent>
       <DialogActions>

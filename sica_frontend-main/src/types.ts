@@ -121,8 +121,6 @@ export interface ConfirmDialogProps {
   onClose: (confirmed: boolean) => void;
 }
 
-
-
 export interface ExtraccionParams {
   sistema: string;
   modulo: string;
@@ -131,7 +129,6 @@ export interface ExtraccionParams {
   fechaFin: string;
   borrarInformacion: boolean;
 }
-
 
 export interface TraductorParams {
   sistema: string;
@@ -181,9 +178,6 @@ export interface DetalleCuentaConsultas {
   importe_area: number;
   diferencia: number;
 }
-
-
-
 
 
 export interface CargaAOData {
