@@ -10,13 +10,14 @@ import ComboBox from '../../components/base/tabla/Combobox';
 import ConfirmDialog from '../../components/base/ConfirmDialog';
 
 const SistemasPage: React.FC = () => {
+  const originalObject = { sis_clave: '', sis_nombre: '' }
   const [sistemas, setSistemas] = useState<Sistema[]>([]);
   const [, setSelectedSistema] = useState<Sistema | null>(null);
   const [filterValue, setFilterValue] = useState<string>('ALL');
   const [loading, setLoading] = useState<boolean>(true);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const tableRef = useRef<any>(null);
-  const [editingSistema, setEditingSistema] = useState<Sistema | null>(null);
+  const [editingSistema, setEditingSistema] = useState<Sistema | null>(originalObject);
   const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
   const [editando, setEditando] = useState<boolean>(false);
   const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
@@ -53,7 +54,7 @@ const SistemasPage: React.FC = () => {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-
+    setEditingSistema(originalObject);
   };
 
   const handleSaveSistema = async (newSistema: Sistema) => {
@@ -75,7 +76,6 @@ const SistemasPage: React.FC = () => {
     } catch (error) {
       notify('Error al guardar el sistema', 'error');
     }
-    setEditingSistema(null);
 
     handleCloseModal();
   };
