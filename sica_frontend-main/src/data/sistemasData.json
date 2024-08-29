@@ -1,0 +1,39 @@
+[
+    {
+      "sis_clave": "FIDUCIA",
+      "sis_nombre": "SISTEMA DE FIDEICOMISOS"
+    },
+    {
+      "sis_clave": "CONFID",
+      "sis_nombre": "CONTABILIDAD FIDUCIARIA"
+    },
+    {
+      "sis_clave": "TAS",
+      "sis_nombre": "TECONOLOGIA ASESORIA Y SISTEMAS"
+    },
+    {
+      "sis_clave": "SIRAC",
+      "sis_nombre": "SISTEMA DE RECUPERACION Y ADMON CARTERA"
+    },
+    {
+      "sis_clave": "GVAL",
+      "sis_nombre": "GUARDA VALORES"
+    },
+    {
+      "sis_clave": "SIPE",
+      "sis_nombre": "SISTEMA DE INVERSIONES Y PRESTAMOS"
+    },
+    {
+      "sis_clave": "MECA",
+      "sis_nombre": "MERCADO DE CAPITALES"
+    },
+    {
+      "sis_clave": "SIDECA",
+      "sis_nombre": "SISTEMA DERIVADOS Y CAMBIOS"
+    },
+    {
+      "sis_clave": "LOBORH",
+      "sis_nombre": "SISTEMA DE ADMINISTRACION CAPITAL HUMANO"
+    }
+  ]
+  

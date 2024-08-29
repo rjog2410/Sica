@@ -1,0 +1,19 @@
+[
+  {
+    "id": 1,
+    "name": "John Doe",
+    "username": "johndoe",
+    "password": "password123",
+    "jwt": "token123",
+    "roles": ["admin"],
+    "permissions": ["read", "write"]
+  },
+  {
+    "id": 2,
+    "name": "Jane Doe",
+    "path": "/home/janedoe",
+    "jwt": "token456",
+    "roles": ["user"],
+    "permissions": ["read"]
+  }
+]

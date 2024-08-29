@@ -1,0 +1,42 @@
+[
+  {
+    "mod_clave": "MOD001",
+    "mod_nombre": "Modulo de Finanzas",
+    "fecha_carga": "2023-07-01",
+    "no_registros": 1500,
+    "fecha_informacion": "2023-07-01",
+    "tipo_transaccion": "Ingreso",
+    "estatus": "Activo",
+    "agrupacion_reportes": "Finanzas"
+  },
+  {
+    "mod_clave": "MOD002",
+    "mod_nombre": "Modulo de Recursos Humanos",
+    "fecha_carga": "2023-07-02",
+    "no_registros": 200,
+    "fecha_informacion": "2023-07-02",
+    "tipo_transaccion": "Gasto",
+    "estatus": "Inactivo",
+    "agrupacion_reportes": "RRHH"
+  },
+  {
+    "mod_clave": "MOD003",
+    "mod_nombre": "Modulo de Ventas",
+    "fecha_carga": "2023-07-03",
+    "no_registros": 3000,
+    "fecha_informacion": "2023-07-03",
+    "tipo_transaccion": "Ingreso",
+    "estatus": "Activo",
+    "agrupacion_reportes": "Ventas"
+  },
+  {
+    "mod_clave": "MOD004",
+    "mod_nombre": "Modulo de Compras",
+    "fecha_carga": "2023-07-04",
+    "no_registros": 500,
+    "fecha_informacion": "2023-07-04",
+    "tipo_transaccion": "Gasto",
+    "estatus": "Activo",
+    "agrupacion_reportes": "Compras"
+  }
+]

@@ -1,0 +1,219 @@
+{
+    "pantallas": [
+        {
+          "id": 1,
+          "nombre": "Catálogo de Sistemas",
+          "descripcion": "En esta pantalla se dan de alta los sistemas que se toman en cuenta para las conciliaciones contables.",
+          "funciones": [1, 2, 3, 4]
+        },
+        {
+          "id": 2,
+          "nombre": "Catálogo de Módulos",
+          "descripcion": "En esta pantalla se dan de alta los módulos que se toman en cuenta para las conciliaciones contables.",
+          "funciones": []
+        },
+        {
+          "id": 3,
+          "nombre": "Catálogo de Columnas",
+          "descripcion": "En esta pantalla se dan de alta los módulos que se toman en cuenta para las conciliaciones contables.",
+          "funciones": []
+        },
+        {
+          "id": 4,
+          "nombre": "Catálogo de Cuenta Regla",
+          "descripcion": "En esta pantalla se dan de alta los módulos que se toman en cuenta para las conciliaciones contables.",
+          "funciones": [5, 6, 7, 8]
+        }
+      ],
+      "funciones": [
+        {
+          "id": 1,
+          "nombre": "Consulta",
+          "descripcion": "Permitir la consulta de los sistemas registrados de forma tabular.",
+          "columnas": ["Sistema", "Nombre"],
+          "filtros": ["Sistema"]
+        },
+        {
+          "id": 2,
+          "nombre": "Alta y Modificación",
+          "descripcion": "Registro de los siguientes campos para un sistema.",
+          "campos": [
+            {
+              "nombre": "CLAVE SISTEMA",
+              "descripcion": "Clave del sistema",
+              "caracteristicas": {
+                "longitud": 100,
+                "tipo": "Caja Texto",
+                "formato": "Alfanumérico",
+                "editable": true,
+                "obligatorio": true,
+                "origen": "SICA_SISTEMAS"
+              }
+            },
+            {
+              "nombre": "NOMBRE SISTEMA",
+              "descripcion": "Nombre del sistema",
+              "caracteristicas": {
+                "longitud": 100,
+                "tipo": "Caja Texto",
+                "formato": "Alfanumérico",
+                "editable": true,
+                "obligatorio": false,
+                "origen": "SICA_SISTEMAS"
+              }
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "nombre": "Eliminación",
+          "descripcion": "Eliminación de registros múltiple"
+        },
+        {
+          "id": 4,
+          "nombre": "Exportar",
+          "descripcion": "Exportar a Excel la información que es consultada mediante los filtros de búsqueda."
+        },
+        {
+          "id": 5,
+          "nombre": "Consulta",
+          "descripcion": "Permitir la consulta de los módulos registrados de forma tabular.",
+          "columnas": [
+            "Clave del Módulo",
+            "Nombre del módulo",
+            "Fecha Carga",
+            "No. Registros",
+            "Fecha Información",
+            "Tipo transacción",
+            "Estatus",
+            "Agrupación Reportes"
+          ],
+          "filtros": ["Sistema", "Módulo"]
+        },
+        {
+          "id": 6,
+          "nombre": "Alta y Modificación",
+          "descripcion": "Registro de los siguientes campos para un módulo.",
+          "campos": [
+            {
+              "nombre": "CLAVE SISTEMA",
+              "descripcion": "Clave del sistema",
+              "caracteristicas": {
+                "longitud": 100,
+                "tipo": "Lista desplegable",
+                "formato": "Alfanumérico",
+                "editable": true,
+                "obligatorio": true,
+                "origen": "SICA_SISTEMAS"
+              }
+            },
+            {
+              "nombre": "CLAVE MODULO",
+              "descripcion": "Clave del módulo",
+              "caracteristicas": {
+                "longitud": 100,
+                "tipo": "Caja Texto",
+                "formato": "Alfanumérico",
+                "editable": true,
+                "obligatorio": true,
+                "origen": "SICA_MODULOS"
+              }
+            },
+            {
+              "nombre": "NOMBRE MODULO",
+              "descripcion": "Nombre del módulo",
+              "caracteristicas": {
+                "longitud": 100,
+                "tipo": "Caja Texto",
+                "formato": "Alfanumérico",
+                "editable": true,
+                "obligatorio": false,
+                "origen": "SICA_MODULOS"
+              }
+            },
+            {
+              "nombre": "FECHA DE CARGA",
+              "descripcion": "Fecha de carga de la información",
+              "caracteristicas": {
+                "longitud": 10,
+                "tipo": "Fecha",
+                "formato": "DD/MM/AAAA",
+                "editable": true,
+                "obligatorio": false,
+                "origen": "SICA_MODULOS"
+              }
+            },
+            {
+              "nombre": "NUMERO REGISTROS",
+              "descripcion": "Número de registros cargados",
+              "caracteristicas": {
+                "longitud": 10,
+                "tipo": "Caja Texto",
+                "formato": "Numérico",
+                "editable": false,
+                "obligatorio": false,
+                "origen": "SICA_MODULOS"
+              }
+            },
+            {
+              "nombre": "FECHA INFORMACION",
+              "descripcion": "Fecha de operación",
+              "caracteristicas": {
+                "longitud": 10,
+                "tipo": "Fecha",
+                "formato": "DD/MM/AAAA",
+                "editable": false,
+                "obligatorio": false,
+                "origen": "SICA_MODULOS"
+              }
+            },
+            {
+              "nombre": "TIPO TRANSACCION",
+              "descripcion": "Tipo de transacción puede ser A-Archivo o S-Sistema",
+              "caracteristicas": {
+                "longitud": 2,
+                "tipo": "Caja Texto",
+                "formato": "Alfanumérico",
+                "editable": true,
+                "obligatorio": false,
+                "origen": "SICA_MODULOS"
+              }
+            },
+            {
+              "nombre": "ESTATUS TRANSACCION",
+              "descripcion": "Estatus de la transferencia. Las opciones son S- Transferencia correcta, N- Transferencia incorrecta",
+              "caracteristicas": {
+                "longitud": 2,
+                "tipo": "Caja Texto",
+                "formato": "Alfanumérico",
+                "editable": false,
+                "obligatorio": false,
+                "origen": "SICA_MODULOS"
+              }
+            },
+            {
+              "nombre": "AGRUPA REPORTES",
+              "descripcion": "Puede ser S-Si o N-No",
+              "caracteristicas": {
+                "longitud": 2,
+                "tipo": "Caja Texto",
+                "formato": "Alfanumérico",
+                "editable": true,
+                "obligatorio": false,
+                "origen": "SICA_MODULOS"
+              }
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "nombre": "Eliminación",
+          "descripcion": "Eliminación de registros múltiple"
+        },
+        {
+          "id": 8,
+          "nombre": "Exportar",
+          "descripcion": "Exportar a Excel la información que es consultada mediante los filtros de búsqueda."
+        }
+      ]
+}

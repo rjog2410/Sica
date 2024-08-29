@@ -1,0 +1,453 @@
+{
+    "usuarios": [
+      {
+        "id": "user1",
+        "nombre": "Juan Pérez",
+        "roles": [1, 2]
+      },
+      {
+        "id": "user2",
+        "nombre": "María López",
+        "roles": [3]
+      }
+    ],
+    "roles": [
+      {
+        "id": 1,
+        "titulo": "Invitado",
+        "resumen": "Acceso básico a funciones de lectura",
+        "esActivo": true,
+        "accesos": [
+          {"accionId": 2, "entidadId": 2},
+          {"accionId": 2, "entidadId": 3},
+          {"accionId": 2, "entidadId": 5}
+        ]
+      },
+      {
+        "id": 2,
+        "titulo": "Usuario",
+        "resumen": "Permisos básicos para gestionar su propio perfil",
+        "esActivo": true,
+        "accesos": [
+          {"accionId": 2, "entidadId": 1},
+          {"accionId": 3, "entidadId": 1},
+          {"accionId": 2, "entidadId": 5},
+          {"accionId": 3, "entidadId": 5}
+        ],
+        "heredaRoles": [1]
+      },
+      {
+        "id": 3,
+        "titulo": "Gestor de Productos",
+        "resumen": "Gestiona productos dentro del sistema",
+        "esActivo": true,
+        "accesos": [
+          {"accionId": 1, "entidadId": 2},
+          {"accionId": 2, "entidadId": 2},
+          {"accionId": 3, "entidadId": 2},
+          {"accionId": 4, "entidadId": 2},
+          {"accionId": 1, "entidadId": 6},
+          {"accionId": 2, "entidadId": 6},
+          {"accionId": 3, "entidadId": 6},
+          {"accionId": 4, "entidadId": 6}
+        ],
+        "heredaRoles": [2]
+      },
+      {
+        "id": 4,
+        "titulo": "Gestor de Proyectos",
+        "resumen": "Gestiona proyectos y generación de informes",
+        "esActivo": true,
+        "accesos": [
+          {"accionId": 1, "entidadId": 3},
+          {"accionId": 2, "entidadId": 3},
+          {"accionId": 3, "entidadId": 3},
+          {"accionId": 4, "entidadId": 3},
+          {"accionId": 1, "entidadId": 4},
+          {"accionId": 2, "entidadId": 4},
+          {"accionId": 1, "entidadId": 5},
+          {"accionId": 2, "entidadId": 5}
+        ],
+        "heredaRoles": [3]
+      },
+      {
+        "id": 5,
+        "titulo": "Administrador",
+        "resumen": "Acceso total a todas las entidades y acciones del sistema",
+        "esActivo": true,
+        "accesos": [
+          {"accionId": 1, "entidadId": 1},
+          {"accionId": 2, "entidadId": 1},
+          {"accionId": 3, "entidadId": 1},
+          {"accionId": 4, "entidadId": 1},
+          {"accionId": 1, "entidadId": 2},
+          {"accionId": 2, "entidadId": 2},
+          {"accionId": 3, "entidadId": 2},
+          {"accionId": 4, "entidadId": 2},
+          {"accionId": 1, "entidadId": 3},
+          {"accionId": 2, "entidadId": 3},
+          {"accionId": 3, "entidadId": 3},
+          {"accionId": 4, "entidadId": 3},
+          {"accionId": 1, "entidadId": 4},
+          {"accionId": 2, "entidadId": 4},
+          {"accionId": 3, "entidadId": 4},
+          {"accionId": 4, "entidadId": 4},
+          {"accionId": 1, "entidadId": 5},
+          {"accionId": 2, "entidadId": 5},
+          {"accionId": 3, "entidadId": 5},
+          {"accionId": 4, "entidadId": 5},
+          {"accionId": 1, "entidadId": 6},
+          {"accionId": 2, "entidadId": 6},
+          {"accionId": 3, "entidadId": 6},
+          {"accionId": 4, "entidadId": 6}
+        ],
+        "heredaRoles": [4]
+      }
+    ],
+    "pantallas": [
+      {
+        "id": 1,
+        "nombre": "Catálogo de Sistemas",
+        "descripcion": "En esta pantalla se dan de alta los sistemas que se toman en cuenta para las conciliaciones contables.",
+        "rolesPermitidos": [1, 2, 3, 4, 5],
+        "funciones": [1, 2, 3, 4]
+      },
+      {
+        "id": 2,
+        "nombre": "Catálogo de Módulos",
+        "descripcion": "En esta pantalla se dan de alta los módulos que se toman en cuenta para las conciliaciones contables.",
+        "rolesPermitidos": [1, 3, 4, 5],
+        "funciones": [5, 6, 7, 8]
+      }
+    ],
+    "funciones": [
+      {
+        "id": 1,
+        "nombre": "Consulta",
+        "descripcion": "Permitir la consulta de los sistemas registrados de forma tabular.",
+        "columnas": ["Sistema", "Nombre"],
+        "filtros": ["Sistema"]
+      },
+      {
+        "id": 2,
+        "nombre": "Alta y Modificación",
+        "descripcion": "Registro de los siguientes campos para un sistema.",
+        "campos": [
+          {
+            "nombre": "CLAVE SISTEMA",
+            "descripcion": "Clave del sistema",
+            "caracteristicas": {
+              "longitud": 100,
+              "tipo": "Caja Texto",
+              "formato": "Alfanumérico",
+              "editable": true,
+              "obligatorio": true,
+              "origen": "SICA_SISTEMAS"
+            }
+          },
+          {
+            "nombre": "NOMBRE SISTEMA",
+            "descripcion": "Nombre del sistema",
+            "caracteristicas": {
+              "longitud": 100,
+              "tipo": "Caja Texto",
+              "formato": "Alfanumérico",
+              "editable": true,
+              "obligatorio": false,
+              "origen": "SICA_SISTEMAS"
+            }
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "nombre": "Eliminación",
+        "descripcion": "Eliminación de registros múltiple"
+      },
+      {
+        "id": 4,
+        "nombre": "Exportar",
+        "descripcion": "Exportar a Excel la información que es consultada mediante los filtros de búsqueda."
+      },
+      {
+        "id": 5,
+        "nombre": "Consulta",
+        "descripcion": "Permitir la consulta de los módulos registrados de forma tabular.",
+        "columnas": [
+          "Clave del Módulo",
+          "Nombre del módulo",
+          "Fecha Carga",
+          "No. Registros",
+          "Fecha Información",
+          "Tipo transacción",
+          "Estatus",
+          "Agrupación Reportes"
+        ],
+        "filtros": ["Sistema", "Módulo"]
+      },
+      {
+        "id": 6,
+        "nombre": "Alta y Modificación",
+        "descripcion": "Registro de los siguientes campos para un módulo.",
+        "campos": [
+          {
+            "nombre": "CLAVE SISTEMA",
+            "descripcion": "Clave del sistema",
+            "caracteristicas": {
+              "longitud": 100,
+              "tipo": "Lista desplegable",
+              "formato": "Alfanumérico",
+              "editable": true,
+              "obligatorio": true,
+              "origen": "SICA_SISTEMAS"
+            }
+          },
+          {
+            "nombre": "CLAVE MODULO",
+            "descripcion": "Clave del módulo",
+            "caracteristicas": {
+              "longitud": 100,
+              "tipo": "Caja Texto",
+              "formato": "Alfanumérico",
+              "editable": true,
+              "obligatorio": true,
+              "origen": "SICA_MODULOS"
+            }
+          },
+          {
+            "nombre": "NOMBRE MODULO",
+            "descripcion": "Nombre del módulo",
+            "caracteristicas": {
+              "longitud": 100,
+              "tipo": "Caja Texto",
+              "formato": "Alfanumérico",
+              "editable": true,
+              "obligatorio": false,
+              "origen": "SICA_MODULOS"
+            }
+          },
+          {
+            "nombre": "FECHA DE CARGA",
+            "descripcion": "Fecha de carga de la información",
+            "caracteristicas": {
+              "longitud": 10,
+              "tipo": "Fecha",
+              "formato": "DD/MM/AAAA",
+              "editable": true,
+              "obligatorio": false,
+              "origen": "SICA_MODULOS"
+            }
+          },
+          {
+            "nombre": "NUMERO REGISTROS",
+            "descripcion": "Número de registros cargados",
+            "caracteristicas": {
+              "longitud": 10,
+              "tipo": "Caja Texto",
+              "formato": "Numérico",
+              "editable": false,
+              "obligatorio": false,
+              "origen": "SICA_MODULOS"
+            }
+          },
+          {
+            "nombre": "FECHA INFORMACION",
+            "descripcion": "Fecha de operación",
+            "caracteristicas": {
+              "longitud": 10,
+              "tipo": "Fecha",
+              "formato": "DD/MM/AAAA",
+              "editable": false,
+              "obligatorio": false,
+              "origen": "SICA_MODULOS"
+            }
+          },
+          {
+            "nombre": "TIPO TRANSACCION",
+            "descripcion": "Tipo de transacción puede ser A-Archivo o S-Sistema",
+            "caracteristicas": {
+              "longitud": 2,
+              "tipo": "Caja Texto",
+              "formato": "Alfanumérico",
+              "editable": true,
+              "obligatorio": false,
+              "origen": "SICA_MODULOS"
+            }
+          },
+          {
+            "nombre": "ESTATUS TRANSACCION",
+            "descripcion": "Estatus de la transferencia. Las opciones son S- Transferencia correcta, N- Transferencia incorrecta",
+            "caracteristicas": {
+              "longitud": 2,
+              "tipo": "Caja Texto",
+              "formato": "Alfanumérico",
+              "editable": false,
+              "obligatorio": false,
+              "origen": "SICA_MODULOS"
+            }
+          },
+          {
+            "nombre": "AGRUPA REPORTES",
+            "descripcion": "Puede ser S-Si o N-No",
+            "caracteristicas": {
+              "longitud": 2,
+              "tipo": "Caja Texto",
+              "formato": "Alfanumérico",
+              "editable": true,
+              "obligatorio": false,
+              "origen": "SICA_MODULOS"
+            }
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "nombre": "Eliminación",
+        "descripcion": "Eliminación de registros múltiple"
+      },
+      {
+        "id": 8,
+        "nombre": "Exportar",
+        "descripcion": "Exportar a Excel la información que es consultada mediante los filtros de búsqueda."
+      }
+    ],
+    "tiposAcciones": [
+      {"id": 1, "nombre": "crear"},
+      {"id": 2, "nombre": "leer"},
+      {"id": 3, "nombre": "actualizar"},
+      {"id": 4, "nombre": "eliminar"}
+    ],
+    "categoriasEntidades": [
+      {"id": 1, "nombre": "Usuario"},
+      {"id": 2, "nombre": "Producto"},
+      {"id": 3, "nombre": "Proyecto"},
+      {"id": 4, "nombre": "Informe"},
+      {"id": 5, "nombre": "Sistema"},
+      {"id": 6, "nombre": "Módulo"}
+    ],
+    "mapaAccionesEntidades": [
+      {"accionId": 1, "entidadId": 1},
+      {"accionId": 2, "entidadId": 1},
+      {"accionId": 3, "entidadId": 1},
+      {"accionId": 4, "entidadId": 1},
+      {"accionId": 1, "entidadId": 2},
+      {"accionId": 2, "entidadId": 2},
+      {"accionId": 3, "entidadId": 2},
+      {"accionId": 4, "entidadId": 2},
+      {"accionId": 1, "entidadId": 3},
+      {"accionId": 2, "entidadId": 3},
+      {"accionId": 3, "entidadId": 3},
+      {"accionId": 4, "entidadId": 3},
+      {"accionId": 1, "entidadId": 4},
+      {"accionId": 2, "entidadId": 4},
+      {"accionId": 3, "entidadId": 4},
+      {"accionId": 4, "entidadId": 4},
+      {"accionId": 1, "entidadId": 5},
+      {"accionId": 2, "entidadId": 5},
+      {"accionId": 3, "entidadId": 5},
+      {"accionId": 4, "entidadId": 5},
+      {"accionId": 1, "entidadId": 6},
+      {"accionId": 2, "entidadId": 6},
+      {"accionId": 3, "entidadId": 6},
+      {"accionId": 4, "entidadId": 6}
+    ],
+    "mapaRutasPermisos": [
+      {
+        "url": "/usuarios/crear",
+        "permiso": {"accionId": 1, "entidadId": 1}
+      },
+      {
+        "url": "/usuarios/ver",
+        "permiso": {"accionId": 2, "entidadId": 1}
+      },
+      {
+        "url": "/usuarios/editar",
+        "permiso": {"accionId": 3, "entidadId": 1}
+      },
+      {
+        "url": "/usuarios/eliminar",
+        "permiso": {"accionId": 4, "entidadId": 1}
+      },
+      {
+        "url": "/productos/crear",
+        "permiso": {"accionId": 1, "entidadId": 2}
+      },
+      {
+        "url": "/productos/ver",
+        "permiso": {"accionId": 2, "entidadId": 2}
+      },
+      {
+        "url": "/productos/editar",
+        "permiso": {"accionId": 3, "entidadId": 2}
+      },
+      {
+        "url": "/productos/eliminar",
+        "permiso": {"accionId": 4, "entidadId": 2}
+      },
+      {
+        "url": "/proyectos/crear",
+        "permiso": {"accionId": 1, "entidadId": 3}
+      },
+      {
+        "url": "/proyectos/ver",
+        "permiso": {"accionId": 2, "entidadId": 3}
+      },
+      {
+        "url": "/proyectos/editar",
+        "permiso": {"accionId": 3, "entidadId": 3}
+      },
+      {
+        "url": "/proyectos/eliminar",
+        "permiso": {"accionId": 4, "entidadId": 3}
+      },
+      {
+        "url": "/informes/crear",
+        "permiso": {"accionId": 1, "entidadId": 4}
+      },
+      {
+        "url": "/informes/ver",
+        "permiso": {"accionId": 2, "entidadId": 4}
+      },
+      {
+        "url": "/informes/editar",
+        "permiso": {"accionId": 3, "entidadId": 4}
+      },
+      {
+        "url": "/informes/eliminar",
+        "permiso": {"accionId": 4, "entidadId": 4}
+      },
+      {
+        "url": "/sistemas/crear",
+        "permiso": {"accionId": 1, "entidadId": 5}
+      },
+      {
+        "url": "/sistemas/ver",
+        "permiso": {"accionId": 2, "entidadId": 5}
+      },
+      {
+        "url": "/sistemas/editar",
+        "permiso": {"accionId": 3, "entidadId": 5}
+      },
+      {
+        "url": "/sistemas/eliminar",
+        "permiso": {"accionId": 4, "entidadId": 5}
+      },
+      {
+        "url": "/modulos/crear",
+        "permiso": {"accionId": 1, "entidadId": 6}
+      },
+      {
+        "url": "/modulos/ver",
+        "permiso": {"accionId": 2, "entidadId": 6}
+      },
+      {
+        "url": "/modulos/editar",
+        "permiso": {"accionId": 3, "entidadId": 6}
+      },
+      {
+        "url": "/modulos/eliminar",
+        "permiso": {"accionId": 4, "entidadId": 6}
+      }
+    ]
+  }
+  

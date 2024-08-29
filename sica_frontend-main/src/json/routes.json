@@ -1,0 +1,41 @@
+[
+    {
+      "name": "Dashboard",
+      "path": "/",
+      "icon": "HomeOutlinedIcon",
+      "subMenu": []
+    },
+    {
+      "name": "Users",
+      "icon": "PeopleOutlinedIcon",
+      "subMenu": [
+        {
+          "name": "All Users",
+          "path": "/users",
+          "icon": "PeopleOutlinedIcon"
+        },
+        {
+          "name": "Add User",
+          "path": "/users/add",
+          "icon": "PersonAddOutlinedIcon"
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "icon": "SettingsOutlinedIcon",
+      "subMenu": [
+        {
+          "name": "Profile",
+          "path": "/profile",
+          "icon": "PersonOutlineOutlinedIcon"
+        },
+        {
+          "name": "Preferences",
+          "path": "/preferences",
+          "icon": "TuneOutlinedIcon"
+        }
+      ]
+    }
+  ]
+  

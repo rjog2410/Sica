@@ -1,0 +1,17 @@
+/* src/styles/sidebar.css */
+
+/* Estilo para el root del Sidebar */
+.sidebar-root {
+  z-index: 1000;
+  position: relative;
+}
+
+/* Estilo para los items del Menu y SubMenu */
+.sidebar-menu-item {
+  position: relative;
+}
+
+/* Estilo para el SubMenu al pasar el cursor */
+.sidebar-menu-item:hover .pro-inner-item {
+  background-color: var(--mui-palette-action-hover);
+}
