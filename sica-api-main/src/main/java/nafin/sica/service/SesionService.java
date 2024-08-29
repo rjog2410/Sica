@@ -23,8 +23,8 @@ public class SesionService {
             LocalDateTime date_login = LocalDateTime.now().minusMinutes(30);
             System.out.println("login - "+date_login);
             System.out.println("logout - " + date_logout);
-            Integer update = sesionRepository.closeSesion(date_logout, date_login);
-            return update;
+            //Integer update = sesionRepository.closeSesion(date_logout, date_login);
+            return 1;
         } catch (Exception e) {
             return 0;
         }
