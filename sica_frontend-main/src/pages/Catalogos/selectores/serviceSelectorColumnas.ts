@@ -13,7 +13,7 @@ import {
     createOrUpdateColumna as createOrUpdateAPIColumna
   } from '../servicios/columnasService';  // Ajusta la ruta según tu estructura
   
-  const useMock = true; // Cambia a false para usar la API real, true para usar el mock
+  const useMock = false; // Cambia a false para usar la API real, true para usar el mock
   
   export const fetchColumnas = useMock ? mockFetchColumnas : fetchAPIColumnas;
   export const fetchColumnaByNumero = useMock ? mockFetchColumnaByNumero : mockFetchColumnaByNumero;

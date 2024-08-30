@@ -3,18 +3,22 @@ import { Box, Button } from '@mui/material';
 import BodyHeader from '../../components/base/BodyHeader';
 import ColumnasTable from '../../components/base/tabla/ColumnasTable';
 import ComboBox from '../../components/base/tabla/Combobox';
-import { Columna } from '../../types';
+import { Columna, Modulo, Sistema } from '../../types';
 import * as service from './selectores/serviceSelectorColumnas';
 import { useNotification } from '../../providers/NotificationProvider';
 import ConfirmDialog from '../../components/base/ConfirmDialog';
 import AddColumnaModal from './modales/addColumnaModal';
+import * as serviceSistema from './selectores/serviceSelectorSistemas';
+import * as serviceModulo from './selectores/serviceSelectorModulos';
 
 const ColumnasPage: React.FC = () => {
+  const [sistemas, setSistemas] = useState<Sistema[]>([]); 
+  const [modulos, setModulos] = useState<Modulo[]>([]);
   const [columnas, setColumnas] = useState<Columna[]>([]);
   const [selectedSistema, setSelectedSistema] = useState<string | null>('ALL');
   const [selectedModulo, setSelectedModulo] = useState<string | null>('ALL');
   const [filteredColumnas, setFilteredColumnas] = useState<Columna[]>([]);
-  const [modulos, setModulos] = useState<string[]>([]);
+ 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [editingColumna, setEditingColumna] = useState<Columna | null>(null);
   const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
@@ -24,18 +28,28 @@ const ColumnasPage: React.FC = () => {
   const { notify } = useNotification();
   const tableRef = useRef<any>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await service.fetchColumnas();
-        setColumnas(data);
-      } catch (error) {
-        console.error('Error al cargar los datos de columnas:', error);
-        notify('Error al cargar los datos de columnas', 'error');
-      }
-    };
+  const fetchData = async () => {
+    try {
+    const dataSist= await serviceSistema.fetchSistemas();
+    console.log(dataSist);
+    setSistemas(dataSist);
+    const dataMod= await serviceModulo.fetchModulos();
+    console.log(dataMod);
+    setModulos(dataMod);
+   
+    } catch (error) {
+      console.error('Error al cargar los datos de columnas:', error);
+      notify('Error al cargar los datos de columnas', 'error');
+    }
+  };
 
-    fetchData();
+  useEffect(() => {
+     fetchData().then(resp =>{
+      service.fetchColumnas().then(resp =>{
+        setColumnas(resp);
+      })
+      
+     })
   }, [notify]);
 
   useEffect(() => {
@@ -216,7 +230,7 @@ const ColumnasPage: React.FC = () => {
         open={isModalOpen}
         onClose={handleCloseModal}
         onSave={handleSaveColumna}
-        initialData={editingColumna}
+        initialData={editingColumna}       
       />
       <ConfirmDialog
         open={confirmOpen}

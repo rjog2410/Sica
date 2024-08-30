@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem } from '@mui/material';
-import { Columna } from '../../../types';
+import { Columna, Sistema, Modulo } from '../../../types';
+import * as serviceSistema from '../selectores/serviceSelectorSistemas';
+import * as serviceModulo from '../selectores/serviceSelectorModulos';
+import { useNotification } from '../../../providers/NotificationProvider';
 
 interface AddColumnaModalProps {
   open: boolean;
@@ -10,17 +13,38 @@ interface AddColumnaModalProps {
 }
 
 const AddColumnaModal: React.FC<AddColumnaModalProps> = ({ open, onClose, onSave, initialData }) => {
+  const [sistemas, setSistemas] = useState<Sistema[]>([]); 
+  const [modulos, setModulos] = useState<Modulo[]>([]);
+  const [selectedSistema, setSelectedSistema] = useState<string | null>('ALL');
+  const [selectedModulo, setSelectedModulo] = useState<string | null>('ALL');
   const [claveSistema, setClaveSistema] = useState<string>('');
   const [claveModulo, setClaveModulo] = useState<string>('');
   const [numeroColumna, setNumeroColumna] = useState<number | ''>('');
   const [titulo, setTitulo] = useState<string>('');
+  const { notify } = useNotification();
+  const [newColumna, setNewColumna] = useState<Columna>({ clave_sistema: '', clave_modulo: '', numero_columna: 0,titulo:'' });
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  const fetchData = async () => {
+    try {
+    const dataSist= await serviceSistema.fetchSistemas();
+    setSistemas(dataSist);
+    const dataMod= await serviceModulo.fetchModulos();
+    setModulos(dataMod);
+   
+    } catch (error) {
+      console.error('Error al cargar los datos de columnas:', error);
+      notify('Error al cargar los datos de columnas', 'error');
+    }
+  };
 
   useEffect(() => {
+    fetchData();
     if (initialData) {
       setClaveSistema(initialData.clave_sistema);
       setClaveModulo(initialData.clave_modulo);
       setNumeroColumna(initialData.numero_columna);
-      setTitulo(initialData.titulo);
+      setTitulo(initialData.titulo);      
     } else {
       resetForm();
     }
@@ -32,6 +56,20 @@ const AddColumnaModal: React.FC<AddColumnaModalProps> = ({ open, onClose, onSave
     setNumeroColumna('');
     setTitulo('');
   };
+
+
+  useEffect(() => {
+    // reemplazar el filter por llamada al back para retornar los modulos con base al sistema seleciconado
+    if (claveSistema && claveSistema !== 'ALL') {
+      const modulosFiltrados = modulos
+        .filter(modulo => modulo.clave_sistema === claveSistema)
+        .map(modulo => modulo);
+      setModulos([ ...Array.from(new Set(modulosFiltrados))]);
+    } else {
+      setModulos([]);
+    }
+  }, [claveSistema]);
+
 
   const handleSave = () => {
     if (claveSistema && claveModulo && numeroColumna !== '' && titulo) {
@@ -48,6 +86,23 @@ const AddColumnaModal: React.FC<AddColumnaModalProps> = ({ open, onClose, onSave
     }
   };
 
+
+  const validate = () => {
+    let tempErrors: { [key: string]: string } = {};
+    if (!newSistema.sis_clave) {
+      tempErrors.sis_clave = "La clave del sistema es obligatoria";
+    } 
+     if (newSistema.sis_clave.length >= 100) {
+      tempErrors.sis_clave = "La clave del sistema no puede exceder los 100 caracteres";
+    }
+    if (newSistema.sis_nombre.length >= 100) {
+      tempErrors.sis_nombre = "El nombre del sistema no puede exceder los 100 caracteres";
+    }
+
+    setErrors(tempErrors);
+    return Object.keys(tempErrors).length === 0;
+  };
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>{initialData ? 'Editar Columna' : 'Agregar Columna'}</DialogTitle>
@@ -55,31 +110,31 @@ const AddColumnaModal: React.FC<AddColumnaModalProps> = ({ open, onClose, onSave
         <Box mb={2}>
           <TextField
             select
-            label="Clave del Sistema"
+            label="Clave del Sistema - Nombre del Sistema"
             value={claveSistema}
             onChange={(e) => setClaveSistema(e.target.value)}
             fullWidth
             required
           >
-            {/* Opciones simuladas, en tu aplicación real deberías cargarlas desde el estado o props */}
-            <MenuItem value="SISTEMA1">SISTEMA1</MenuItem>
-            <MenuItem value="SISTEMA2">SISTEMA2</MenuItem>
-            {/* Agrega más sistemas aquí */}
+
+            {
+              sistemas?.map(sistema => <MenuItem value={sistema.sis_clave}>{sistema.sis_clave}-{sistema.sis_nombre}</MenuItem>)
+            }
+
           </TextField>
         </Box>
         <Box mb={2}>
           <TextField
             select
-            label="Clave del Módulo"
+            label="Clave del Módulo - Nombre del Módulo"
             value={claveModulo}
             onChange={(e) => setClaveModulo(e.target.value)}
             fullWidth
             required
           >
-            {/* Opciones simuladas, en tu aplicación real deberías cargarlas desde el estado o props */}
-            <MenuItem value="MODULO1">MODULO1</MenuItem>
-            <MenuItem value="MODULO2">MODULO2</MenuItem>
-            {/* Agrega más módulos aquí */}
+            {
+              modulos?.map(modulo => <MenuItem value={modulo.clave_modulo}>{modulo.clave_modulo}-{modulo.nombre_modulo}</MenuItem>)
+            }
           </TextField>
         </Box>
         <Box mb={2}>
