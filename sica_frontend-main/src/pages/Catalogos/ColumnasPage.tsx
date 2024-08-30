@@ -93,16 +93,44 @@ const ColumnasPage: React.FC = () => {
 
   const handleSaveColumna = async (newColumna: Columna) => {
     try {
-      if (editingColumna) {
-        await service.createOrUpdateColumna(newColumna, true);
-        setColumnas(columnas.map((columna) =>
-          columna.numero_columna === editingColumna.numero_columna ? newColumna : columna
-        ));
-        notify('Columna actualizada correctamente', 'success');
+      if (editingColumna!=null) {
+
+        console.log("editando col: ",newColumna);
+        service.createOrUpdateColumna(newColumna, true).then(resp =>{
+          console.log("respuesta de editando: ",resp);
+          if(resp?.data?.status == 200){
+            /// revisar metodo porque solo valida contra el numero columna tons se despedorra todo el array en memoria
+            setColumnas(columnas.map((columna) =>
+              columna.numero_columna === editingColumna.numero_columna ? newColumna : columna
+            ));
+            notify('Columna actualizada correctamente', 'success');
+          }else{
+            notify( resp?.data?.message, 'info');
+          }
+         
+
+        }).catch(resp =>{
+          console.log("respuesta error de editando: ",resp?.data?.message);
+          notify('No fue posible actualizar la columna', 'error');
+        });
+        
       } else {
-        await service.createOrUpdateColumna(newColumna);
-        setColumnas([...columnas, newColumna]);
-        notify('Columna agregada correctamente', 'success');
+        console.log("nueva col: ");
+        service.createOrUpdateColumna(newColumna).then(resp => {
+          console.log("respuesta agregar columna: ",resp);
+          
+          if(resp?.data?.status == 200){
+            setColumnas([...columnas, newColumna]);
+            notify('Columna '+ resp?.data?.message + ' agregada correctamente', 'success');
+          }else{
+            notify( resp?.data?.message, 'info');
+          }
+          
+        }).catch(resp => {
+          console.log("error agregar columna: ",resp?.data?.message);
+          notify('No fue posible agregar la columna', 'error');
+        });
+       
       }
     } catch (error) {
       notify('Error al guardar la columna', 'error');

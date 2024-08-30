@@ -19,11 +19,11 @@ export const mockFetchModulos = async (): Promise<Modulo[]> => {
 };
 
 // Simulación de la función fetchModuloByClave
-export const mockFetchModuloByClave = async (mod_clave: string): Promise<Modulo | null> => {
+export const mockFetchModuloByClave = async (clave_sistema: string): Promise<String[]> => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      const modulo = mockModulos.find(m => m.clave_modulo === mod_clave);
-      resolve(modulo || null);
+      const modulo = mockModulos.map(m => m.clave_sistema === clave_sistema);
+      //resolve(clave_sistema);
     }, 1000); // Simula un retraso de 1 segundo
   });
 };

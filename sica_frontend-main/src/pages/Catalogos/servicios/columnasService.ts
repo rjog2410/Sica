@@ -82,11 +82,11 @@ export const deleteMultipleColumnas = async (columnas: Columna[]): Promise<void>
 };
 
 
-export const createOrUpdateColumna = async (columna: Columna, isUpdate: boolean = false): Promise<string | null> => {
+export const createOrUpdateColumna = async (columna: Columna, isUpdate: boolean = false): Promise<any | null> => {
   try {
     const endpoint = isUpdate ? 'update' : 'create';
     const response = await axios.post<{ status: number; message: string }>(`${API_URL_COLUMNAS}/${endpoint}`, adaptInternalToApiStructure(columna));
-    return response.data.message;
+    return response;
   } catch (error) {
     console.error(`Error ${isUpdate ? 'updating' : 'creating'} columna:`, error);
     throw error;

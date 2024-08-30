@@ -14,27 +14,38 @@ interface AddColumnaModalProps {
 
 const AddColumnaModal: React.FC<AddColumnaModalProps> = ({ open, onClose, onSave, initialData }) => {
   const [sistemas, setSistemas] = useState<Sistema[]>([]); 
-  const [modulos, setModulos] = useState<Modulo[]>([]);
-  const [selectedSistema, setSelectedSistema] = useState<string | null>('ALL');
-  const [selectedModulo, setSelectedModulo] = useState<string | null>('ALL');
+  const [modulos, setModulos] = useState<String[]>([]);
+  const minValue = 0  
+  const maxValue = 99;
   const [claveSistema, setClaveSistema] = useState<string>('');
   const [claveModulo, setClaveModulo] = useState<string>('');
-  const [numeroColumna, setNumeroColumna] = useState<number | ''>('');
+  const [numeroColumna, setNumeroColumna] = useState<number>(minValue);
   const [titulo, setTitulo] = useState<string>('');
-  const { notify } = useNotification();
-  const [newColumna, setNewColumna] = useState<Columna>({ clave_sistema: '', clave_modulo: '', numero_columna: 0,titulo:'' });
+  const { notify } = useNotification();  
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+
 
   const fetchData = async () => {
     try {
     const dataSist= await serviceSistema.fetchSistemas();
     setSistemas(dataSist);
-    const dataMod= await serviceModulo.fetchModulos();
-    setModulos(dataMod);
    
     } catch (error) {
       console.error('Error al cargar los datos de columnas:', error);
       notify('Error al cargar los datos de columnas', 'error');
+    }
+  };
+
+  const fetchDataMOduloByClaveSistema = async () => {
+    try {
+    const dataModXSist= await serviceModulo.fetchModuloByClave(claveSistema);
+    console.log(dataModXSist);
+    setModulos(dataModXSist);
+   
+    } catch (error) {
+      console.error('Error al cargar los datos de modulos para clave sistema: '+claveSistema, error);
+      notify('Error al cargar los datos de modulos para clave sistema: '+claveSistema, 'error');
     }
   };
 
@@ -53,55 +64,66 @@ const AddColumnaModal: React.FC<AddColumnaModalProps> = ({ open, onClose, onSave
   const resetForm = () => {
     setClaveSistema('');
     setClaveModulo('');
-    setNumeroColumna('');
+    setNumeroColumna(0);
     setTitulo('');
   };
 
 
   useEffect(() => {
-    // reemplazar el filter por llamada al back para retornar los modulos con base al sistema seleciconado
     if (claveSistema && claveSistema !== 'ALL') {
-      const modulosFiltrados = modulos
-        .filter(modulo => modulo.clave_sistema === claveSistema)
-        .map(modulo => modulo);
-      setModulos([ ...Array.from(new Set(modulosFiltrados))]);
-    } else {
+      fetchDataMOduloByClaveSistema();     
+    } else {      
       setModulos([]);
     }
   }, [claveSistema]);
 
 
   const handleSave = () => {
-    if (claveSistema && claveModulo && numeroColumna !== '' && titulo) {
+    if (validate()) {
       onSave({
         clave_sistema: claveSistema,
         clave_modulo: claveModulo,
         numero_columna: numeroColumna as number,
-        titulo,
+        titulo: titulo,
       });
       onClose();
       resetForm();
     } else {
-      alert('Por favor, complete todos los campos obligatorios.');
+      notify('Por favor, complete todos los campos obligatorios.','info');
     }
   };
+
+  const handle = (e) => {
+    const newValue = Math.min(Math.max(e.target.value, minValue), maxValue)
+    setNumeroColumna(previousValue => newValue)
+}
+
 
 
   const validate = () => {
     let tempErrors: { [key: string]: string } = {};
-    if (!newSistema.sis_clave) {
-      tempErrors.sis_clave = "La clave del sistema es obligatoria";
+
+    if (!claveSistema) {
+      tempErrors.claveSistema = "La clave del sistema es obligatoria";
     } 
-     if (newSistema.sis_clave.length >= 100) {
-      tempErrors.sis_clave = "La clave del sistema no puede exceder los 100 caracteres";
+     if (!claveModulo ) {
+      tempErrors.claveModulo = "La clave del módulo es obligatoria";
     }
-    if (newSistema.sis_nombre.length >= 100) {
-      tempErrors.sis_nombre = "El nombre del sistema no puede exceder los 100 caracteres";
+    if (numeroColumna < 0 || numeroColumna>99) {
+      tempErrors.noColumna = "El número de columna debe estar en el rango de 0 a 99";
     }
+    if (!titulo) {
+      tempErrors.titulo = "El título es obligatorio";
+    }
+    if (titulo.length >= 50) {
+      tempErrors.sis_nombre = "El título no puede exceder los 50 caracteres";
+    }
+
 
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
+  
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -110,15 +132,18 @@ const AddColumnaModal: React.FC<AddColumnaModalProps> = ({ open, onClose, onSave
         <Box mb={2}>
           <TextField
             select
-            label="Clave del Sistema - Nombre del Sistema"
+            label="Clave del Sistema"
             value={claveSistema}
             onChange={(e) => setClaveSistema(e.target.value)}
-            fullWidth
-            required
+            fullWidth  
+            required 
+            error={!!errors?.claveSistema}
+            helperText={errors?.claveSistema}          
+            
           >
 
             {
-              sistemas?.map(sistema => <MenuItem value={sistema.sis_clave}>{sistema.sis_clave}-{sistema.sis_nombre}</MenuItem>)
+              sistemas?.map(sistema => <MenuItem value={sistema.sis_clave}>{sistema.sis_clave}</MenuItem>)
             }
 
           </TextField>
@@ -126,14 +151,16 @@ const AddColumnaModal: React.FC<AddColumnaModalProps> = ({ open, onClose, onSave
         <Box mb={2}>
           <TextField
             select
-            label="Clave del Módulo - Nombre del Módulo"
+            label="Clave del Módulo"
             value={claveModulo}
             onChange={(e) => setClaveModulo(e.target.value)}
             fullWidth
             required
+            error={!!errors?.claveModulo}
+            helperText={errors?.claveModulo}
           >
             {
-              modulos?.map(modulo => <MenuItem value={modulo.clave_modulo}>{modulo.clave_modulo}-{modulo.nombre_modulo}</MenuItem>)
+              modulos?.map(modulo => <MenuItem value={modulo.mod_clave}>{modulo.mod_clave}</MenuItem>)
             }
           </TextField>
         </Box>
@@ -142,9 +169,12 @@ const AddColumnaModal: React.FC<AddColumnaModalProps> = ({ open, onClose, onSave
             label="Número de Columna"
             type="number"
             value={numeroColumna}
-            onChange={(e) => setNumeroColumna(e.target.value === '' ? '' : parseInt(e.target.value))}
+            onChange={(e) => handle(e)}
             fullWidth
+            inputProps={{ maxLength: 2 , type: 'number', min: "0", max: "99", step: "1"}}
             required
+            error={!!errors?.noColumna}
+            helperText={errors?.noColumna}
           />
         </Box>
         <Box mb={2}>
@@ -154,6 +184,9 @@ const AddColumnaModal: React.FC<AddColumnaModalProps> = ({ open, onClose, onSave
             onChange={(e) => setTitulo(e.target.value)}
             fullWidth
             required
+            error={!!errors?.titulo}
+            helperText={errors?.titulo}
+            inputProps={{ maxLength: 50 }}
           />
         </Box>
       </DialogContent>
