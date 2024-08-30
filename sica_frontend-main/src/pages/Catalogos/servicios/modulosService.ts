@@ -14,12 +14,12 @@ export const fetchModulos = async (): Promise<Modulo[]> => {
   }
 };
 
-export const fetchModuloByClave = async (mod_clave: string): Promise<Modulo | null> => {
+export const fetchModuloByClave = async (mod_sis_clave: string): Promise<String[]> => {
   try {
-    const response = await axios.post<{ data: Modulo[], status: number }>(`${API_URL_MODULOS}/get_module`, { mod_clave });
-    return response.data.data.length ? response.data.data[0] : null; // Suponiendo que se devuelve una lista de módulos
+    const response = await axios.post<{ data: String[], status: number }>(`${API_URL_MODULOS}/get_module`, { mod_sis_clave });
+    return response.data.data; 
   } catch (error) {
-    console.error(`Error fetching modulo with clave ${mod_clave}:`, error);
+    console.error(`Error fetching modulos with clave ${mod_sis_clave}:`, error);
     throw error;
   }
 };

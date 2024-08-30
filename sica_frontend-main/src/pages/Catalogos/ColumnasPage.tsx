@@ -3,18 +3,22 @@ import { Box, Button } from '@mui/material';
 import BodyHeader from '../../components/base/BodyHeader';
 import ColumnasTable from '../../components/base/tabla/ColumnasTable';
 import ComboBox from '../../components/base/tabla/Combobox';
-import { Columna } from '../../types';
+import { Columna, Modulo, Sistema } from '../../types';
 import * as service from './selectores/serviceSelectorColumnas';
 import { useNotification } from '../../providers/NotificationProvider';
 import ConfirmDialog from '../../components/base/ConfirmDialog';
 import AddColumnaModal from './modales/addColumnaModal';
+import * as serviceSistema from './selectores/serviceSelectorSistemas';
+import * as serviceModulo from './selectores/serviceSelectorModulos';
 
 const ColumnasPage: React.FC = () => {
+  const [sistemas, setSistemas] = useState<Sistema[]>([]); 
+  const [modulos, setModulos] = useState<Modulo[]>([]);
   const [columnas, setColumnas] = useState<Columna[]>([]);
   const [selectedSistema, setSelectedSistema] = useState<string | null>('ALL');
   const [selectedModulo, setSelectedModulo] = useState<string | null>('ALL');
   const [filteredColumnas, setFilteredColumnas] = useState<Columna[]>([]);
-  const [modulos, setModulos] = useState<string[]>([]);
+ 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [editingColumna, setEditingColumna] = useState<Columna | null>(null);
   const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
@@ -24,18 +28,28 @@ const ColumnasPage: React.FC = () => {
   const { notify } = useNotification();
   const tableRef = useRef<any>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await service.fetchColumnas();
-        setColumnas(data);
-      } catch (error) {
-        console.error('Error al cargar los datos de columnas:', error);
-        notify('Error al cargar los datos de columnas', 'error');
-      }
-    };
+  const fetchData = async () => {
+    try {
+    const dataSist= await serviceSistema.fetchSistemas();
+    console.log(dataSist);
+    setSistemas(dataSist);
+    const dataMod= await serviceModulo.fetchModulos();
+    console.log(dataMod);
+    setModulos(dataMod);
+   
+    } catch (error) {
+      console.error('Error al cargar los datos de columnas:', error);
+      notify('Error al cargar los datos de columnas', 'error');
+    }
+  };
 
-    fetchData();
+  useEffect(() => {
+     fetchData().then(resp =>{
+      service.fetchColumnas().then(resp =>{
+        setColumnas(resp);
+      })
+      
+     })
   }, [notify]);
 
   useEffect(() => {
@@ -79,16 +93,44 @@ const ColumnasPage: React.FC = () => {
 
   const handleSaveColumna = async (newColumna: Columna) => {
     try {
-      if (editingColumna) {
-        await service.createOrUpdateColumna(newColumna, true);
-        setColumnas(columnas.map((columna) =>
-          columna.numero_columna === editingColumna.numero_columna ? newColumna : columna
-        ));
-        notify('Columna actualizada correctamente', 'success');
+      if (editingColumna!=null) {
+
+        console.log("editando col: ",newColumna);
+        service.createOrUpdateColumna(newColumna, true).then(resp =>{
+          console.log("respuesta de editando: ",resp);
+          if(resp?.data?.status == 200){
+            /// revisar metodo porque solo valida contra el numero columna tons se despedorra todo el array en memoria
+            setColumnas(columnas.map((columna) =>
+              columna.numero_columna === editingColumna.numero_columna ? newColumna : columna
+            ));
+            notify('Columna actualizada correctamente', 'success');
+          }else{
+            notify( resp?.data?.message, 'info');
+          }
+         
+
+        }).catch(resp =>{
+          console.log("respuesta error de editando: ",resp?.data?.message);
+          notify('No fue posible actualizar la columna', 'error');
+        });
+        
       } else {
-        await service.createOrUpdateColumna(newColumna);
-        setColumnas([...columnas, newColumna]);
-        notify('Columna agregada correctamente', 'success');
+        console.log("nueva col: ");
+        service.createOrUpdateColumna(newColumna).then(resp => {
+          console.log("respuesta agregar columna: ",resp);
+          
+          if(resp?.data?.status == 200){
+            setColumnas([...columnas, newColumna]);
+            notify('Columna '+ resp?.data?.message + ' agregada correctamente', 'success');
+          }else{
+            notify( resp?.data?.message, 'info');
+          }
+          
+        }).catch(resp => {
+          console.log("error agregar columna: ",resp?.data?.message);
+          notify('No fue posible agregar la columna', 'error');
+        });
+       
       }
     } catch (error) {
       notify('Error al guardar la columna', 'error');
@@ -216,7 +258,7 @@ const ColumnasPage: React.FC = () => {
         open={isModalOpen}
         onClose={handleCloseModal}
         onSave={handleSaveColumna}
-        initialData={editingColumna}
+        initialData={editingColumna}       
       />
       <ConfirmDialog
         open={confirmOpen}
