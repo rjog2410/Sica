@@ -8,7 +8,7 @@ export const fetchSistemas = async () => {
 
   try {
     const response = await axios.post<{ data: Sistema[], status: number }>(`${API_URL}/get_all`);
-    return response.data.data;
+    return response?.data?.data;
   } catch (error) {
     console.error('Error fetching sistemas from API:', error);
     throw error;
