@@ -5,7 +5,7 @@ import ConsultaBatchPage from './pages/Administracion/ConsultaBatchPage';
 import ConsultaCargaAOPage from './pages/Administracion/ConsultaCargaAOPage';
 import ConsultaCargaSIFPage from './pages/Administracion/ConsultaCargaSIFPage';
 import ColumnasPage from './pages/Catalogos/ColumnasPage';
-import CuentaReglaPage from './pages/Catalogos/CuentaReglaPage';
+import CuentaPage from './pages/Catalogos/CuentaPage.tsx';
 import ModulosPage from './pages/Catalogos/ModulosPage';
 import SistemasPage from './pages/Catalogos/SistemasPage';
 import ConciliacionSaldosPage from './pages/Consultas/ConciliacionSaldosPage';
@@ -14,6 +14,7 @@ import Home from './pages/Home';
 import ExtraccionSIFPage from './pages/Procesos/ExtraccionSIFPage';
 import TraductorPage from './pages/Procesos/TraductorPage';
 import ReporteConciliacionSaldosPage from './pages/Reportes/ReporteConciliacionSaldosPage';
+import ReglasPage from "@/pages/Catalogos/ReglasPage.tsx";
 
 const routes = [
   { 
@@ -43,9 +44,14 @@ const routes = [
         component: ColumnasPage // Otro ejemplo de subruta
       },
       {
-        path: '/catalogos/cuenta-regla',
-        name: 'Cuenta Reglas',
-        component: CuentaReglaPage // Otro ejemplo de subruta
+        path: '/catalogos/cuentas',
+        name: 'Cuentas',
+        component: CuentaPage // Otro ejemplo de subruta
+      },
+      {
+        path: '/catalogos/reglas',
+        name: 'Reglas',
+        component: ReglasPage // Otro ejemplo de subruta
       },
     ]
   },

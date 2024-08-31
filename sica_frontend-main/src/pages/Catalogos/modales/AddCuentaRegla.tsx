@@ -10,37 +10,13 @@ interface AddCuentaReglaProps {
 }
 
 const AddCuentaRegla: React.FC<AddCuentaReglaProps> = ({ open, onClose, onSave, initialData }) => {
-  const [newRegla, setNewRegla] = useState<Regla>({
-    id: 0,
-    clave_regla: '',
-    descripcion: '',
-    reg_cuc_clave: 0,
-    reg_tit_mod_sis_clave: '',
-    reg_tit_mod_clave: '',
-    reg_tit_columna: 0,
-    reg_secuencia: 0,
-    reg_operador: '',
-    reg_valor: '',  // Asume que es un string, ajústalo si es necesario
-  });
+  const [newRegla, setNewRegla] = useState<Regla>(initialData);
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     if (initialData) {
       setNewRegla(initialData);
-    } else {
-      setNewRegla({
-        id: 0,
-        clave_regla: '',
-        descripcion: '',
-        reg_cuc_clave: 0,
-        reg_tit_mod_sis_clave: '',
-        reg_tit_mod_clave: '',
-        reg_tit_columna: 0,
-        reg_secuencia: 0,
-        reg_operador: '',
-        reg_valor: '',
-      });
     }
   }, [initialData]);
 
@@ -54,18 +30,51 @@ const AddCuentaRegla: React.FC<AddCuentaReglaProps> = ({ open, onClose, onSave, 
 
   const validate = () => {
     let tempErrors: { [key: string]: string } = {};
-    if (!newRegla.clave_regla) {
+    if (!newRegla.reg_cuc_clave) {
       tempErrors.clave_regla = "La clave de la regla es obligatoria";
-    } else if (newRegla.clave_regla.length > 100) {
+    }
+    if (newRegla.reg_cuc_clave.toString().length > 100) {
       tempErrors.clave_regla = "La clave de la regla no puede exceder los 100 caracteres";
     }
-
-    if (newRegla.descripcion.length > 100) {
-      tempErrors.descripcion = "La descripción no puede exceder los 100 caracteres";
+    if (!newRegla.reg_secuencia) {
+      tempErrors.reg_secuencia = "La secuencia es requerida";
+    }
+    if (newRegla.reg_secuencia?.toString()?.length > 6) {
+      tempErrors.reg_secuencia = "Longitud de campo invalida max 6 caracteres [0-9]";
+    }
+    if (!/^[0-9]*$/gm.test(newRegla.reg_secuencia?.toString())) {
+      tempErrors.reg_secuencia = "Solo numeros";
     }
 
-    // Agregar más validaciones si es necesario...
+    if (!newRegla.reg_valor) {
+      tempErrors.reg_valor = "El valor es requerioa";
+    }
+    if (newRegla.reg_valor?.toString()?.length > 2) {
+      tempErrors.reg_valor = "Longitud de campo invalida max 2 caracteres [0-9a-zA-Z]";
+    }
+    if (!/^[0-9a-zA-Z]*$/gm.test(newRegla.reg_valor?.toString())) {
+      tempErrors.reg_valor = "El campo debe ser alfanumerico";
+    }
 
+    if (!newRegla.reg_tit_columna) {
+      tempErrors.reg_tit_columna = "El valor es requerido";
+    }
+    if (newRegla.reg_tit_columna?.toString()?.length > 2) {
+      tempErrors.reg_tit_columna = "Longitud de campo invalida max 2 caracteres [0-9a-zA-Z]";
+    }
+    if (!/^[0-9]*$/gm.test(newRegla.reg_tit_columna?.toString())) {
+      tempErrors.reg_tit_columna = "El campo debe ser numerico";
+    }
+
+    if (!newRegla.reg_operador) {
+      tempErrors.reg_operador = "El valor es requerido";
+    }
+    if (newRegla.reg_operador?.toString()?.length > 10) {
+      tempErrors.reg_operador = "Longitud de campo invalida max 10 caracteres [0-9a-zA-Z]";
+    }
+    if (!/^[0-9a-zA-Z]*$/gm.test(newRegla.reg_operador?.toString())) {
+      tempErrors.reg_operador = "El campo debe ser alfanumerico";
+    }
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
@@ -81,28 +90,28 @@ const AddCuentaRegla: React.FC<AddCuentaReglaProps> = ({ open, onClose, onSave, 
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>{initialData ? 'Editar Regla' : 'Agregar Nueva Regla'}</DialogTitle>
       <DialogContent>
-        <TextField
-          autoFocus
-          margin="dense"
-          label="Clave de la Regla"
-          name="clave_regla"
-          fullWidth
-          value={newRegla.clave_regla}
-          onChange={handleChange}
-          error={!!errors.clave_regla}
-          helperText={errors.clave_regla}
-          disabled={!!initialData}
-        />
-        <TextField
-          margin="dense"
-          label="Descripción"
-          name="descripcion"
-          fullWidth
-          value={newRegla.descripcion}
-          onChange={handleChange}
-          error={!!errors.descripcion}
-          helperText={errors.descripcion}
-        />
+        {/*<TextField*/}
+        {/*  autoFocus*/}
+        {/*  margin="dense"*/}
+        {/*  label="Clave de la Regla"*/}
+        {/*  name="reg_cuc_clave"*/}
+        {/*  fullWidth*/}
+        {/*  value={newRegla.reg_cuc_clave}*/}
+        {/*  onChange={handleChange}*/}
+        {/*  error={!!errors.reg_cuc_clave}*/}
+        {/*  helperText={errors.reg_cuc_clave}*/}
+        {/*  disabled={!!initialData}*/}
+        {/*/>*/}
+        {/*<TextField*/}
+        {/*  margin="dense"*/}
+        {/*  label="Descripción"*/}
+        {/*  name="descripcion"*/}
+        {/*  fullWidth*/}
+        {/*  value={newRegla.descripcion}*/}
+        {/*  onChange={handleChange}*/}
+        {/*  error={!!errors.descripcion}*/}
+        {/*  helperText={errors.descripcion}*/}
+        {/*/>*/}
         <TextField
           margin="dense"
           label="Clave CUC"
@@ -121,6 +130,8 @@ const AddCuentaRegla: React.FC<AddCuentaReglaProps> = ({ open, onClose, onSave, 
           fullWidth
           value={newRegla.reg_tit_mod_sis_clave}
           onChange={handleChange}
+          error={!!errors.reg_tit_mod_sis_clave}
+          helperText={errors.reg_tit_mod_sis_clave}
         />
         <TextField
           margin="dense"
@@ -129,6 +140,8 @@ const AddCuentaRegla: React.FC<AddCuentaReglaProps> = ({ open, onClose, onSave, 
           fullWidth
           value={newRegla.reg_tit_mod_clave}
           onChange={handleChange}
+          error={!!errors.reg_tit_mod_clave}
+          helperText={errors.reg_tit_mod_clave}
         />
         <TextField
           margin="dense"
@@ -138,6 +151,8 @@ const AddCuentaRegla: React.FC<AddCuentaReglaProps> = ({ open, onClose, onSave, 
           value={newRegla.reg_tit_columna}
           onChange={handleChange}
           type="number"
+          error={!!errors.reg_tit_columna}
+          helperText={errors.reg_tit_columna}
         />
         <TextField
           margin="dense"
@@ -147,6 +162,8 @@ const AddCuentaRegla: React.FC<AddCuentaReglaProps> = ({ open, onClose, onSave, 
           value={newRegla.reg_secuencia}
           onChange={handleChange}
           type="number"
+          error={!!errors.reg_secuencia}
+          helperText={errors.reg_secuencia}
         />
         <TextField
           margin="dense"
@@ -155,6 +172,8 @@ const AddCuentaRegla: React.FC<AddCuentaReglaProps> = ({ open, onClose, onSave, 
           fullWidth
           value={newRegla.reg_operador}
           onChange={handleChange}
+          error={!!errors.reg_operador}
+          helperText={errors.reg_operador}
         />
         <TextField
           margin="dense"
@@ -163,6 +182,8 @@ const AddCuentaRegla: React.FC<AddCuentaReglaProps> = ({ open, onClose, onSave, 
           fullWidth
           value={newRegla.reg_valor}
           onChange={handleChange}
+          error={!!errors.reg_valor}
+          helperText={errors.reg_valor}
         />
       </DialogContent>
       <DialogActions>

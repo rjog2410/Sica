@@ -24,25 +24,7 @@ interface AddCuentaModalProps {
 const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, initialData}) => {
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
-    const [cuentaData, setCuentaData] = useState<Cuenta>({
-        cuc_clave: 0,
-        cuc_mod_sis_clave: '',
-        cuc_mod_clave: '',
-        cuc_cuenta: 0,
-        cuc_scta1: '',
-        cuc_scta2: '',
-        cuc_scta3: '',
-        cuc_scta4: '',
-        cuc_scta5: '',
-        cuc_scta6: '',
-        cuc_scta7: '',
-        cuc_tipo_ente: 0,
-        cuc_ente: 0,
-        cuc_consolida_ente: 'N',
-        cuc_inc_saldo: 'N',
-        cuc_inc_movs: 'N',
-        cuc_inc: ''
-    });
+    const [cuentaData, setCuentaData] = useState<Cuenta>(initialData);
 
     const [sistemas, setSistemas] = useState<Sistema[]>([]);
     const [modulos, setModulos] = useState<ModuloO[]>([]);
@@ -56,10 +38,10 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
     }, []);
 
     useEffect(() => {
-        fetchModuloByClave(cuentaData.cuc_mod_sis_clave).then( resp =>{
+        fetchModuloByClave(cuentaData?.cuc_mod_sis_clave).then( resp =>{
             setModulos(resp)
         })
-    }, [cuentaData.cuc_mod_sis_clave]);
+    }, [cuentaData?.cuc_mod_sis_clave]);
 
     useEffect(() => {
         if (initialData) {
@@ -70,34 +52,34 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
     const validate = () => {
         let tempErrors: { [key: string]: string } = {};
 
-        if (!cuentaData.cuc_mod_sis_clave) {
-            tempErrors.clave_sistema = "La clave del sistema es obligatoria";
+        if (!cuentaData?.cuc_mod_sis_clave) {
+            tempErrors.cuc_mod_sis_clave = "La clave del sistema es obligatoria";
         }
-        if (!cuentaData.cuc_mod_clave) {
-            tempErrors.clave_modulo = "La clave del modulo es obligatoria";
+        if (!cuentaData?.cuc_mod_clave) {
+            tempErrors.cuc_mod_clave = "La clave del modulo es obligatoria";
         }
-        if (!cuentaData.cuc_cuenta) {
-            tempErrors.cuenta = "La cuenta es obligatoria";
+        if (!cuentaData?.cuc_cuenta) {
+            tempErrors.cuc_cuenta = "La cuenta es obligatoria";
         }
-        if (cuentaData.cuc_cuenta.toString().length > 25) {
-            tempErrors.cuenta = "Longitud de campo invalida max 25 caracteres [0-9]";
+        if (cuentaData?.cuc_cuenta?.toString()?.length > 25) {
+            tempErrors.cuc_cuenta = "Longitud de campo invalida max 25 caracteres [0-9]";
         }
-        if (!/([0-9])\w+/g.test(cuentaData.cuc_cuenta.toString())) {
-            tempErrors.cuenta = "Solo numeros";
+        if (!/^[0-9]*$/gm.test(cuentaData?.cuc_cuenta?.toString())) {
+            tempErrors.cuc_cuenta = "Solo numeros";
         }
-        if (cuentaData.cuc_tipo_ente?.toString().length > 2) {
+        if (cuentaData?.cuc_tipo_ente?.toString()?.length > 2) {
             tempErrors.cuc_tipo_ente = "Longitud invalida para tipo ente";
         }
-        if (!/([0-9])\w+/g.test(cuentaData.cuc_tipo_ente?.toString())) {
+        if (!/^[0-9]*$/gm.test(cuentaData?.cuc_tipo_ente?.toString())) {
             tempErrors.cuc_tipo_ente = "Solo numeros";
         }
-        if (cuentaData.cuc_ente?.toString().length > 6) {
+        if (cuentaData?.cuc_ente?.toString()?.length > 6) {
             tempErrors.cuc_ente = "Longitud invalida para tipo ente";
         }
-        if (!/([0-9])\w+/g.test(cuentaData.cuc_ente?.toString())) {
+        if (!/^[0-9]*$/gm.test(cuentaData?.cuc_ente?.toString())) {
             tempErrors.cuc_ente = "Solo numeros";
         }
-        if(!cuentaData.cuc_inc){
+        if(!cuentaData?.cuc_inc){
             tempErrors.cuc_inc = "Requerido";
         }
 
@@ -126,7 +108,6 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
 
     const handleSave = () => {
         if (validate()) {
-
             onSave(cuentaData);
             onClose();
         }
@@ -179,8 +160,8 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
                             value={cuentaData.cuc_cuenta}
                             onChange={handleChange}
                             required
-                            error={!!errors.cuenta}
-                            helperText={errors.cuenta}
+                            error={!!errors.cuc_cuenta}
+                            helperText={errors.cuc_cuenta}
                         />
                     </Grid>
                     <Grid item xs={1}>
