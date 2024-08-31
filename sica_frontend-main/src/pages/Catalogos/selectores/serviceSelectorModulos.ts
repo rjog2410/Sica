@@ -1,6 +1,5 @@
 import { 
     mockFetchModulos,
-    mockFetchModuloByClave,
     mockDeleteModulo,
     mockDeleteMultipleModulos,
     mockCreateOrUpdateModulo
@@ -17,7 +16,7 @@ import {
   const useMock = false; // Cambia a false para usar la API real, true para usar el mock
   
   const _fetchModulos = useMock ? mockFetchModulos : fetchAPIModulos;
-  const _fetchModuloByClave = useMock ? mockFetchModuloByClave : fetchAPIModuloByClave;
+  const _fetchModuloByClave = fetchAPIModuloByClave;
   const _deleteModulo = useMock ? mockDeleteModulo : deleteAPIModulo;
   const _deleteMultipleModulos = useMock ? mockDeleteMultipleModulos : deleteAPIMultipleModulos;
   const _createOrUpdateModulo = useMock ? mockCreateOrUpdateModulo : createOrUpdateAPIModulo;

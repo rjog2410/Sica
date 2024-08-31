@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Modulo } from '../../../types';
+import {Modulo, ModuloO} from '../../../types';
 
 // URL base de la API para módulos
 const API_URL_MODULOS = 'http://localhost:8080/catalogos/modulos';
@@ -14,9 +14,9 @@ export const fetchModulos = async (): Promise<Modulo[]> => {
   }
 };
 
-export const fetchModuloByClave = async (mod_sis_clave: string): Promise<String[]> => {
+export const fetchModuloByClave = async (mod_sis_clave: string): Promise<ModuloO[]> => {
   try {
-    const response = await axios.post<{ data: String[], status: number }>(`${API_URL_MODULOS}/get_module`, { mod_sis_clave });
+    const response = await axios.post<{ data: ModuloO[], status: number }>(`${API_URL_MODULOS}/get_module`, { mod_sis_clave });
     return response.data.data; 
   } catch (error) {
     console.error(`Error fetching modulos with clave ${mod_sis_clave}:`, error);
