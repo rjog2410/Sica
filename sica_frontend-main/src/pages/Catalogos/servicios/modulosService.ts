@@ -14,7 +14,7 @@ export const fetchModulos = async (): Promise<Modulo[]> => {
   }
 };
 
-export const fetchModuloByClave = async (mod_sis_clave: string): Promise<ModuloO[]> => {
+export const fetchModuloByClave = async (mod_sis_clave: string | undefined): Promise<ModuloO[]> => {
   try {
     const response = await axios.post<{ data: ModuloO[], status: number }>(`${API_URL_MODULOS}/get_module`, { mod_sis_clave });
     return response.data.data; 

@@ -2,29 +2,41 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Box, Button } from '@mui/material';
 import BodyHeader from '../../components/base/BodyHeader';
 import CuentasTable from '../../components/base/tabla/CuentasTable';
-import ReglasTable from '../../components/base/tabla/ReglasTable';
 import ComboBox from '../../components/base/tabla/Combobox';
 import { Cuenta, Regla } from '../../types';
 import * as service from './selectores/serviceSelectorCuentaRegla';
 import { useNotification } from '../../providers/NotificationProvider';
 import ConfirmDialog from '../../components/base/ConfirmDialog';
-import AddReglaModal from './modales/AddCuentaRegla';
 import AddCuentaModal from './modales/AddCuentaModal';
-import ReglasSubpantallaModal from './modales/ReglasSubpantallaModal'; // Asumiendo que tienes este modal para manejar las reglas
 
-const CuentaReglaPage: React.FC = () => {
+const CuentaPage: React.FC = () => {
+  const originalObject: Cuenta = {
+    cuc_clave: 0,
+    cuc_mod_sis_clave: '',
+    cuc_mod_clave: '',
+    cuc_cuenta: 0,
+    cuc_scta1: '',
+    cuc_scta2: '',
+    cuc_scta3: '',
+    cuc_scta4: '',
+    cuc_scta5: '',
+    cuc_scta6: '',
+    cuc_scta7: '',
+    cuc_tipo_ente: 0,
+    cuc_ente: 0,
+    cuc_consolida_ente: 'N',
+    cuc_inc_saldo: 'N',
+    cuc_inc_movs: 'N',
+    cuc_inc: ''
+  }
   const [cuentas, setCuentas] = useState<Cuenta[]>([]);
   const [reglas, setReglas] = useState<Regla[]>([]);
   const [selectedSistema, setSelectedSistema] = useState<string | null>('ALL');
   const [selectedModulo, setSelectedModulo] = useState<string | null>('ALL');
   const [filteredCuentas, setFilteredCuentas] = useState<Cuenta[]>([]);
   const [modulos, setModulos] = useState<string[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isCuentaModalOpen, setIsCuentaModalOpen] = useState<boolean>(false); // Estado para el modal de cuentas
-  const [isSubpantallaOpen, setIsSubpantallaOpen] = useState<boolean>(false); // Estado para la subpantalla de reglas
-  const [editingRegla, setEditingRegla] = useState<Regla | null>(null);
-  const [editingCuenta, setEditingCuenta] = useState<Cuenta | null>(null); // Estado para la cuenta que se está editando
-  const [currentReglas, setCurrentReglas] = useState<Regla[]>([]); // Estado para las reglas asociadas a una cuenta
+  const [editingCuenta, setEditingCuenta] = useState<Cuenta>(originalObject); // Estado para la cuenta que se está editando o agregando
   const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
   const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -48,23 +60,23 @@ const CuentaReglaPage: React.FC = () => {
 
   useEffect(() => {
     if (selectedSistema && selectedSistema !== 'ALL') {
-      const modulosFiltrados = cuentas
-        .filter(cuenta => cuenta.clave_sistema === selectedSistema)
-        .map(cuenta => cuenta.clave_modulo);
-      setModulos(['ALL', ...Array.from(new Set(modulosFiltrados))]);
+      // const modulosFiltrados = cuentas
+      //   .filter(cuenta => cuenta.clave_sistema === selectedSistema)
+      //   .map(cuenta => cuenta.clave_modulo);
+      // setModulos(['ALL', ...Array.from(new Set(modulosFiltrados))]);
     } else {
       setModulos(['ALL']);
     }
   }, [selectedSistema, cuentas]);
 
   useEffect(() => {
-    setFilteredCuentas(
-      cuentas.filter(cuenta => {
-        const matchSistema = selectedSistema === 'ALL' || cuenta.clave_sistema === selectedSistema;
-        const matchModulo = selectedModulo === 'ALL' || cuenta.clave_modulo === selectedModulo;
-        return matchSistema && matchModulo;
-      })
-    );
+    // setFilteredCuentas(
+    //   cuentas.filter(cuenta => {
+    //     const matchSistema = selectedSistema === 'ALL' || cuenta.clave_sistema === selectedSistema;
+    //     const matchModulo = selectedModulo === 'ALL' || cuenta.clave_modulo === selectedModulo;
+    //     return matchSistema && matchModulo;
+    //   })
+    // );
   }, [selectedSistema, selectedModulo, cuentas]);
 
   const handleSistemaSelect = (sistema: string | null) => {
@@ -76,48 +88,21 @@ const CuentaReglaPage: React.FC = () => {
     setSelectedModulo(modulo);
   };
 
-  const handleOpenModal = () => {
-    setEditingRegla(null);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleSaveRegla = async (newRegla: Regla) => {
-    try {
-      if (editingRegla) {
-        await service.createOrUpdateRegla(newRegla, true);
-        setReglas(reglas.map((regla) =>
-          regla.id === editingRegla.id ? newRegla : regla
-        ));
-        notify('Regla actualizada correctamente', 'success');
-      } else {
-        await service.createOrUpdateRegla(newRegla, false);
-        setReglas([...reglas, newRegla]);
-        notify('Regla agregada correctamente', 'success');
-      }
-    } catch (error) {
-      notify('Error al guardar la regla', 'error');
-    }
-    handleCloseModal();
-  };
-
   const handleOpenCuentaModal = () => {
-    setEditingCuenta(null);
+    setEditingCuenta(originalObject);
     setIsCuentaModalOpen(true);
   };
 
   const handleCloseCuentaModal = () => {
     setIsCuentaModalOpen(false);
+    setEditingCuenta(originalObject);
   };
 
   const handleSaveCuenta = async (cuenta: Cuenta) => {
     try {
       await service.createOrUpdateCuentaRegla(cuenta);
-      if (cuenta.id) {
-        setCuentas(cuentas.map(c => (c.id === cuenta.id ? cuenta : c)));
+      if (cuenta.cuc_clave) {
+        setCuentas(cuentas.map(c => (c.cuc_clave === cuenta.cuc_clave ? cuenta : c)));
       } else {
         setCuentas([...cuentas, cuenta]);
       }
@@ -134,20 +119,20 @@ const CuentaReglaPage: React.FC = () => {
   };
 
   const handleViewRules = (id: number) => {
-    const cuentaSeleccionada = cuentas.find(cuenta => cuenta.id === id);
-
-    if (!cuentaSeleccionada) {
-      notify('Cuenta no encontrada', 'error');
-      return;
-    }
-
-    const reglasAsociadas = reglas.filter(regla => regla.clave_regla === cuentaSeleccionada.clave_regla);
-    setCurrentReglas(reglasAsociadas);
-    setIsSubpantallaOpen(true);
+    // const cuentaSeleccionada = cuentas.find(cuenta => cuenta.id === id);
+    //
+    // if (!cuentaSeleccionada) {
+    //   notify('Cuenta no encontrada', 'error');
+    //   return;
+    // }
+    //
+    // const reglasAsociadas = reglas.filter(regla => regla.clave_regla === cuentaSeleccionada.clave_regla);
+    // setCurrentReglas(reglasAsociadas);
+    // setIsSubpantallaOpen(true);
   };
 
   const handleDeleteRegla = (id: number) => {
-    const reglaToDelete = reglas.find(regla => regla.id === id);
+    const reglaToDelete = reglas.find(regla => regla.reg_cuc_clave === id);
 
     if (!reglaToDelete) {
       notify('Regla no encontrada', 'error');
@@ -156,8 +141,8 @@ const CuentaReglaPage: React.FC = () => {
 
     setConfirmAction(() => async () => {
       try {
-        await service.removeRegla(reglaToDelete.id);
-        setReglas(reglas.filter((regla) => regla.id !== id));
+        // await service.removeRegla(reglaToDelete.id);
+        setReglas(reglas.filter((regla) => regla.reg_cuc_clave !== id));
         notify('Regla eliminada correctamente', 'success');
       } catch (error) {
         notify('Error al eliminar la regla', 'error');
@@ -167,7 +152,7 @@ const CuentaReglaPage: React.FC = () => {
   };
 
   const handleDeleteMultiple = (ids: number[]) => {
-    const reglasToDelete = reglas.filter(regla => ids.includes(regla.id));
+    const reglasToDelete = reglas.filter(regla => ids.includes(regla.reg_cuc_clave));
 
     if (reglasToDelete.length === 0) {
       notify('No se encontraron reglas para eliminar', 'error');
@@ -176,8 +161,8 @@ const CuentaReglaPage: React.FC = () => {
 
     setConfirmAction(() => async () => {
       try {
-        await service.removeMultipleReglas(ids);
-        setReglas(reglas.filter(regla => !ids.includes(regla.id)));
+        // await service.removeMultipleReglas(ids);
+        setReglas(reglas.filter(regla => !ids.includes(regla.reg_cuc_clave)));
         notify('Reglas eliminadas correctamente', 'success');
       } catch (error) {
         notify('Error al eliminar las reglas', 'error');
@@ -204,15 +189,16 @@ const CuentaReglaPage: React.FC = () => {
   return (
     <Box>
       <BodyHeader
-        headerRoute="Catálogos / Cuentas y Reglas"
-        TitlePage="Cuentas y Reglas"
-        tooltipProps={{ title: "Información sobre la Gestión de Cuentas y Reglas" }}
+        headerRoute="Catálogos / Cuentas"
+        TitlePage="Cuentas"
+        tooltipProps={{ title: "Información sobre la Gestión de Cuentas" }}
         typographyPropsRoute={{ variant: "h6" }}
         typographyPropsTitle={{ variant: "h3" }}
       />
       <Box mb={2}>
         <ComboBox
-          options={['ALL', ...Array.from(new Set(cuentas.map(cuenta => cuenta.clave_sistema)))]}
+          // options={['ALL', ...Array.from(new Set(cuentas.map(cuenta => cuenta.clave_sistema)))]}
+          options={['ALL']}
           onSelect={handleSistemaSelect}
           label="Seleccione un Sistema"
           getOptionLabel={(option: string) => option}
@@ -242,9 +228,6 @@ const CuentaReglaPage: React.FC = () => {
           <Button variant="contained" color="primary" onClick={handleOpenCuentaModal} sx={{ mr: 1 }}>
             Agregar Cuenta
           </Button>
-          <Button variant="contained" color="primary" onClick={handleOpenModal} sx={{ mr: 1 }}>
-            Agregar Regla
-          </Button>
           <Button
             variant="contained"
             sx={{ backgroundColor: '#28a745', '&:hover': { backgroundColor: '#218838' } }}
@@ -262,35 +245,16 @@ const CuentaReglaPage: React.FC = () => {
         onDeleteCuenta={handleDeleteRegla}
         onViewRules={handleViewRules}
       />
-      <ReglasTable
-        data={currentReglas}
-        onUpdateRegla={handleSaveRegla}
-        onDeleteRegla={handleDeleteRegla}
-        onSelectionChange={setSelectedIds}
-      />
-      <AddReglaModal
-        open={isModalOpen}
-        onClose={handleCloseModal}
-        onSave={handleSaveRegla}
-        initialData={editingRegla}
-      />
       <AddCuentaModal
         open={isCuentaModalOpen}
         onClose={handleCloseCuentaModal}
         onSave={handleSaveCuenta}
         initialData={editingCuenta}
       />
-      <ReglasSubpantallaModal
-        open={isSubpantallaOpen}
-        onClose={() => setIsSubpantallaOpen(false)}
-        reglas={currentReglas}
-        onSaveRegla={handleSaveRegla}    
-        onDeleteRegla={handleDeleteRegla} 
-      />
       <ConfirmDialog
         open={confirmOpen}
         title="Confirmar eliminación"
-        content="¿Estás seguro de que deseas eliminar esta regla? Esta acción no se puede deshacer."
+        content="¿Estás seguro de que deseas eliminar esta cuenta? Esta acción no se puede deshacer."
         onClose={(confirmed) => {
           setConfirmOpen(false);
           if (confirmed) confirmAction();
@@ -300,4 +264,4 @@ const CuentaReglaPage: React.FC = () => {
   );
 };
 
-export default CuentaReglaPage;
+export default CuentaPage;
