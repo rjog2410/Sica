@@ -68,29 +68,35 @@ export interface Columna {
 
 
 export interface Cuenta {
-  id?: number; 
-  clave_sistema: string;
-  clave_modulo: string;
-  cuenta: string;
-  clave_regla: string;
-  descripcion: string;
-  reg_cuc_clave: number; // Este campo es de tipo número
-  reg_tit_mod_sis_clave: string;
-  reg_tit_mod_clave: string;
-  reg_tit_columna: number;  
-  subcta1: string | null;
-  subcta2: string | null;
-  subcta3: string | null;
-  subcta4: string | null;
-  subcta5: string | null;
-  subcta6: string | null;
-  subcta7: string | null;
-  tipo_ente: number | null;
-  ente: number | string | null;
-  tipo_conciliacion: 'E' | 'S' | 'M' | 'N';
-  consolida_ente: string;
-  inc_saldo: string;
-  inc_movs: string;
+  cuc_clave?: number;
+  cuc_mod_sis_clave: string;
+  cuc_mod_clave: string;
+  cuc_cuenta: number;
+  cuc_scta1: string;
+  cuc_scta2: string;
+  cuc_scta3: string;
+  cuc_scta4: string;
+  cuc_scta5: string;
+  cuc_scta6: string;
+  cuc_scta7: string;
+  cuc_tipo_ente : number;
+  cuc_ente : number;
+  cuc_consolida_ente : 'S' |  'N';
+  cuc_inc_saldo :  'S' |  'N';
+  cuc_inc_movs :  'S' |  'N';
+  cuc_inc : string;
+}
+
+export interface ModuloO {
+    mod_sis_clave?: number;
+    mod_clave?: string;
+    mod_nombre?: string;
+    mod_registros?: number;
+    mod_fecha_carga?: string;
+    mod_fecha_info?: string;
+    status_trans?: string;
+    tipo_trans?: string;
+    mod_agrup_rep?: string;
 }
 export interface Regla {
   id: number;
