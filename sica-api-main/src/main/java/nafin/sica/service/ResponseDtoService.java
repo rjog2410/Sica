@@ -20,13 +20,13 @@ public class ResponseDtoService {
         return response;
     }
 
-    // // 200 con array de datos
-    // public ResponseDto buildJsonResponseObject(Object object) {
-    // ResponseDto response = new ResponseDto();
-    // response.setStatus(200);
-    // response.setData(object);
-    // return response;
-    // }
+    // 200 con array de datos
+    public ResponseDto buildJsonResponseObject(Object object) {
+    ResponseDto response = new ResponseDto();
+    response.setStatus(200);
+    response.setData(object);
+    return response;
+    }
 
     // public ResponseDto buildJsonResponseObjectDelete(Object object) {
     // ResponseDto response = new ResponseDto();

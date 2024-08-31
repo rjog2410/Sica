@@ -21,6 +21,9 @@ public class ConsultasService {
     @Autowired
     ConciliacionesRepository conciliacionesRepository;
 
+    @Autowired
+    Utils utils;
+
     String sistema = null;
     String modulo = null;
     String fecha = null;
@@ -35,9 +38,9 @@ public class ConsultasService {
         Map<String, Object> data_validate = new HashMap<>();
         try {
             get_data(data);
-            if (status == "OK") {
+            if (status.equals("OK")) {
                 data_validate = get_data_validated();
-                if (status == "OK") {
+                if (status.equals("OK")) {
                     response.put("data", data_validate.get("data"));
                 }
             }
@@ -88,31 +91,36 @@ public class ConsultasService {
         try {
             status = "OK";
             sistema = (String) data.get("sistema");
-            if (sistema == null || sistema.equals("")) {
+            if (utils.isNullOrEmpty(sistema)) {
                 status = "Error";
                 msg = "El sistema no puede ser nulo.";
+                return;
             }
             modulo = (String) data.get("modulo");
-            if (modulo == null || modulo.equals("")) {
+            if (utils.isNullOrEmpty(modulo)) {
                 status = "Error";
                 msg = "El modulo no puede ser nulo.";
+                return;
             }
             fecha = (String) data.get("fecha_informacion");
             if (fecha != null && !fecha.equals("")) {
                 if (!is_validate_date(fecha)) {
                     status = "Error";
                     msg = "Formato de fecha incorrecto";
+                    return;
                 }
             }
             moneda = (Integer) data.get("moneda");
             if (moneda != null && moneda == 0) {
                 status = "Error";
                 msg = "La moneda no puede ser cero.";
+                return;
             }
             oficina = (Integer) data.get("oficina");
             if (oficina != null && oficina == 0) {
                 status = "Error";
                 msg = "La oficina no puede ser cero.";
+                return;
             }
         } catch (Exception e) {
             status = "Error";

@@ -126,6 +126,7 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
 
     const handleSave = () => {
         if (validate()) {
+
             onSave(cuentaData);
             onClose();
         }

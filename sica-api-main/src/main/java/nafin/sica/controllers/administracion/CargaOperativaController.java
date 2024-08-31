@@ -35,7 +35,7 @@ public class CargaOperativaController {
         Map<String, Object> response = new HashMap<>();
         try {
             response = administracionService.get_carga_operativa(data,"Operativa");
-            if (response.get("status") == "OK") {
+            if (response.get("status").equals("OK")) {
                 response = responseService.buildJsonResponseObject(response.get("data"));
             } else {
                 response = responseService.buildJsonErrorValidateResponse((String) response.get("message"));

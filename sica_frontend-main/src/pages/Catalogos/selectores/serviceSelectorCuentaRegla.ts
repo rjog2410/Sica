@@ -29,7 +29,7 @@ import {
   deleteMultipleReglas,
 } from '@/pages/Catalogos/servicios/cuentasReglaService';
 
-const useMock = true; // Cambia a false para usar la API real, true para usar el mock
+const useMock = false; // Cambia a false para usar la API real, true para usar el mock
 
 export const getSistemas = useMock ? mockFetchSistemas : fetchSistemas;
 export const getModulosBySistema = useMock

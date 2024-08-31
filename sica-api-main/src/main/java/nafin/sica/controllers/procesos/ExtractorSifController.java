@@ -45,7 +45,7 @@ public class ExtractorSifController {
         Map<String, Object> response = new HashMap<>();
         try {
             response = extractorService.validate_data(data, "extractor");
-            if (response.get("status") != "OK") {
+            if (!response.get("status").equals("OK")) {
                 return response = responseService.buildJsonErrorValidateResponse((String) response.get("message"));
             }
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");

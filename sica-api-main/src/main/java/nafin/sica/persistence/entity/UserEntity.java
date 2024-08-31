@@ -1,6 +1,6 @@
 package nafin.sica.persistence.entity;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -61,7 +61,7 @@ public class UserEntity {
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_usuario")
-    private Set<RolesUsuariosEntity> rolesUsuarios;
+    private List<RolesUsuariosEntity> rolesUsuarios;
 
 
 }

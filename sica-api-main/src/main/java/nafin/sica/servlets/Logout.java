@@ -30,7 +30,7 @@ public class Logout extends HttpServlet{
             //response.sendRedirect("https://"+ request.getServerName()+":"+request.getServerPort()+"/sicader-api/init");
             response.sendRedirect(logoutURL+"?p_done_url="+urlinit+"/init");
         } catch(Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             System.out.println("**error:"+e);
         }
     }

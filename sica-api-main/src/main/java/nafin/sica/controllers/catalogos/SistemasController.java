@@ -24,6 +24,7 @@ import nafin.sica.persistence.repositories.ColumnasRepository;
 import nafin.sica.persistence.repositories.ModuloRepository;
 import nafin.sica.persistence.repositories.SistemasRepository;
 import nafin.sica.service.ResponseService;
+import nafin.sica.service.Utils;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,6 +39,9 @@ public class SistemasController {
     ModuloRepository moduloRepository;
     @Autowired
     ColumnasRepository columnasRepository;
+
+    @Autowired
+    Utils utils;
 
     String sis_clave = null;
 
@@ -58,7 +62,7 @@ public class SistemasController {
         Map<String, Object> response = new HashMap<>();
         try {
             sis_clave = (String) data.get("sis_clave");
-            if (sis_clave == null) {
+            if (utils.isNullOrEmpty(sis_clave)) {
                 return response = responseService.buildJsonErrorValidateString();
             }
             Optional<SistemDto> sistemOptional = sistemasRepository.getBySis_Clave(sis_clave);
@@ -122,7 +126,7 @@ public class SistemasController {
         Map<String, Object> response = new HashMap<>();
         try {
             sis_clave = (String) data.get("sis_clave");
-            if (sis_clave == null || sis_clave.equals("")) {
+            if (utils.isNullOrEmpty(sis_clave)) {
                 return response = responseService.buildJsonErrorValidateString();
             }
             Optional<SistemasEntity> sistemOptional = sistemasRepository.findById(sis_clave);

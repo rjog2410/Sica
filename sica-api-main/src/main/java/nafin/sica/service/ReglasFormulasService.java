@@ -9,6 +9,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import nafin.sica.persistence.dto.FormulasDto;
@@ -126,7 +127,7 @@ public class ReglasFormulasService {
                 }
                 Optional<ReglasDto> reglasEntity = reglasRepository.get_regla_by_Id(clave_cuenta, sis_clave, mod_clave,
                         columna, secuencia);
-                if (reglasEntity.isPresent() && status == "OK") {
+                if (reglasEntity.isPresent() && status.equals("OK")) {
                     if (action.equals("update")) {
                         data2 = save_data();
                     } else {
@@ -238,7 +239,7 @@ public class ReglasFormulasService {
 
             status = "OK";
             msg = "OK";
-            if (origin == "reglas") {
+            if (origin.equals("reglas")) {
                 list_data.stream().forEach(data -> {
                     get_data_reglas(data);
                     total_delete = total_delete
@@ -266,7 +267,7 @@ public class ReglasFormulasService {
         try {
             status = "OK";
             msg = "OK";
-            if (origin == "reglas") {
+            if (origin.equals("reglas")) {
                 get_data_reglas(data);
                 total_delete = total_delete
                         + reglasRepository.deleteReglas(clave_cuenta, sis_clave, mod_clave, columna, secuencia);
@@ -299,7 +300,7 @@ public class ReglasFormulasService {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            if (origin == "reglas") {
+            if (origin.equals("reglas")) {
                 data_all.stream().forEach(data -> {
                     get_data_reglas(data);
                     reglasRepository.deleteReglas(clave_cuenta, sis_clave, mod_clave, columna, secuencia);
