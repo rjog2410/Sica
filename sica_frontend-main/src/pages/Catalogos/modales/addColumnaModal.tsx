@@ -41,6 +41,9 @@ const AddColumnaModal: React.FC<AddColumnaModalProps> = ({ open, onClose, onSave
     try {
     const dataModXSist= await serviceModulo.fetchModuloByClave(claveSistema);
     console.log(dataModXSist);
+    if(!dataModXSist || dataModXSist.length == 0 ){
+      notify('No existen módulos para clave sistema: '+claveSistema, 'info');
+    }
     setModulos(dataModXSist);
    
     } catch (error) {

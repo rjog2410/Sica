@@ -30,6 +30,8 @@ export const fetchColumnas = async (): Promise<Columna[]> => {
   }
 };
 
+
+
 export const fetchColumnaBySistema = async (sis_clave: string): Promise<Columna[]> => {
   try {
     const response = await axios.post<{ data: any[], status: number }>(`${API_URL_COLUMNAS}/get_titulo_by_sis_clave`, { sis_clave });
