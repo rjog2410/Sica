@@ -44,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         final String token = getTokenFromRequest(request);
 
-        if (token == null || !jwtService.isTokenValid(token)) {
+        /*if (token == null || !jwtService.isTokenValid(token)) {
             filterChain.doFilter(request, response);
             Integer udpate = sesionService.closeSesion();
             log.info("Se han cerrado - " + Integer.toString(udpate) + " sesiones.");
@@ -75,7 +75,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-        }
+        }*/
 
         filterChain.doFilter(request, response);
 
