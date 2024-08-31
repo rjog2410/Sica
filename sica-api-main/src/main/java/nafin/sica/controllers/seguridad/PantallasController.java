@@ -20,19 +20,22 @@ import nafin.sica.persistence.dto.ResponseDto;
 import nafin.sica.persistence.entity.PantallasEntity;
 import nafin.sica.persistence.repositories.PantallaRepository;
 import nafin.sica.service.ResponseDtoService;
+import nafin.sica.service.Utils;
 
 @RestController
 @AllArgsConstructor
 @CrossOrigin(origins = "*", methods = { RequestMethod.POST })
 public class PantallasController {
-     @Autowired
+    @Autowired
     ResponseDtoService responseDtoService;
 
     @Autowired
     PantallaRepository pantallaRepository;
 
+    @Autowired
+    Utils utils;
 
-     @PostMapping("/seguridad/pantallas/create")
+    @PostMapping("/seguridad/pantallas/create")
     public ResponseEntity<ResponseDto> create(@RequestBody @Valid PantallasEntity pantalla) {
         ResponseDto response = new ResponseDto();
         try {
@@ -49,7 +52,7 @@ public class PantallasController {
         ResponseDto response = new ResponseDto();
         response.setStatus(200);
         try {
-            if (pantalla.getId().equals(null)) {
+            if (utils.isNullOrZero(pantalla.getId())) {
                 response = responseDtoService.buildJsonErrorValidateResponse("El Id no debe ser nulo.");
             } else {
                 Optional<PantallasEntity> pantallaUpdate = pantallaRepository.findById(pantalla.getId());
@@ -72,7 +75,7 @@ public class PantallasController {
         ResponseDto response = new ResponseDto();
         response.setStatus(200);
         try {
-            if (data.get("id").equals(null)) {
+            if (utils.isNullOrZero(data.get("id"))) {
                 response = responseDtoService.buildJsonErrorValidateResponse("El Id no debe ser nulo.");
             } else {
                 Optional<PantallasEntity> pantOptional = pantallaRepository.findById(data.get("id"));
@@ -80,7 +83,8 @@ public class PantallasController {
                     pantallaRepository.deleteById(data.get("id"));
                     response = responseDtoService.buildJsonResponse();
                 } else {
-                    response = responseDtoService.buildJsonErrorValidateResponse("No existe Pantalla con el Id enviado.");
+                    response = responseDtoService
+                            .buildJsonErrorValidateResponse("No existe Pantalla con el Id enviado.");
                 }
             }
         } catch (Exception e) {
@@ -95,10 +99,11 @@ public class PantallasController {
         ResponseDto response = new ResponseDto();
         response.setStatus(200);
         try {
-            if (data.get("ids").equals(null)) {
+            if (data.get("ids") == null) {
                 response = responseDtoService.buildJsonErrorValidateResponse("El Id no debe ser nulo.");
             } else {
-                List<PantallasEntity> pantallas = (List<PantallasEntity>) pantallaRepository.findAllById(data.get("ids"));
+                List<PantallasEntity> pantallas = (List<PantallasEntity>) pantallaRepository
+                        .findAllById(data.get("ids"));
                 if (pantallas.size() != data.get("ids").size()) {
                     response = responseDtoService.buildJsonErrorValidateResponse("Uno o más Ids no son válidos");
                 } else {

@@ -60,14 +60,14 @@ public class ExtractorService {
                     switch (origin) {
                     case "extractor":
                         validate_date = utils.is_validate_date_ini_and_end(fecha_inicial, fecha_inicial, true);
-                        if (validate_date != "OK") {
+                        if (!validate_date.equals("OK")) {
                             status = "Error";
                             msg = validate_date;
                         }
                         break;
                     default:
                         validate_date = utils.is_validate_date_ini_and_end(fecha_inicial, fecha_final, false);
-                        if (validate_date != "OK") {
+                        if (!validate_date.equals("OK")) {
                             status = "Error";
                             msg = validate_date;
                         }

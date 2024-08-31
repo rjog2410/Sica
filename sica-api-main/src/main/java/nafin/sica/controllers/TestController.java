@@ -1,7 +1,8 @@
 package nafin.sica.controllers;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
-
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -16,6 +17,8 @@ import nafin.sica.persistence.entity.UserEntity;
 import nafin.sica.persistence.repositories.SesionRepository;
 import nafin.sica.persistence.repositories.UserRepository;
 import nafin.sica.service.JwtService;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.util.JRLoader;
 
 @RestController
 @RequiredArgsConstructor
@@ -92,12 +95,10 @@ public class TestController {
             // .id_rol(1)
             // .build();
             // userRepository.save(sicaUser);
-            SesionEntity sesionEntity = SesionEntity.builder()
-                    .username(username)
-                    .build();
+            SesionEntity sesionEntity = SesionEntity.builder().username(username).build();
             sesionRepository.save(sesionEntity);
             System.out.println(sesionEntity.getId());
-             token = jwtService.getToken(sesionEntity.getId());
+            token = jwtService.getToken(sesionEntity.getId());
         } catch (Exception e) {
             return "Ocurrio un error:";
         }
@@ -117,6 +118,7 @@ public class TestController {
             // .build();
             // userRepository.save(sicaUser);
             // String token = jwtUtils.GetToken(username);
+            
 
             return username;
         } catch (Exception e) {
@@ -128,12 +130,16 @@ public class TestController {
 
     @GetMapping("index/secure")
     public String index_secure() {
-        Authentication auth = SecurityContextHolder
-                .getContext()
-                .getAuthentication();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         System.out.println(auth.getName());
         return auth.getName();
+    }
+
+    public Map<String, Object> get_pdf() {
+        Map<String, Object> response = new HashMap<>();
+        
+        return response;
     }
 
 }

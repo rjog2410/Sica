@@ -41,13 +41,13 @@ public class AdministracionCargasService {
         Map<String, Object> response = new HashMap<>();
         try {
             getData(data);
-            if (status != "OK") {
+            if (!status.equals("OK")) {
                 response.put("status", status);
                 response.put("message", msg);
                 return response;
             }
             validate_data(origin);
-            if (status != "OK") {
+            if (!status.equals("OK")) {
                 response.put("status", status);
                 response.put("message", msg);
                 return response;
@@ -65,7 +65,7 @@ public class AdministracionCargasService {
             if (origin.equals("Operativa")) {
                 List<Object[]> resultados = obtenerDatosCanasta(sistema, modulo, fecha_carga_format,
                         fecha_operativa_format, tipoSalMov);
-                if (status != "OK") {
+                if (!status.equals("OK")) {
                     response.put("status", status);
                     response.put("message", msg);
                     return response;
@@ -94,7 +94,7 @@ public class AdministracionCargasService {
                             fecha_operativa_format);
                 }
 
-                if (status != "OK") {
+                if (!status.equals("OK")) {
                     response.put("status", status);
                     response.put("message", msg);
                     return response;
@@ -283,7 +283,7 @@ public class AdministracionCargasService {
                 jpql.append("AND c.con_fecha = :canFecha ");
             }
             jpql.append("GROUP BY c.con_mod_sis_clave, c.con_mod_clave, c.con_fecha_carga, c.con_fecha");
-            System.out.println(jpql);
+            // System.out.println(jpql);
             TypedQuery<Object[]> query = em.createQuery(jpql.toString(), Object[].class);
             if (canModSisClave != null) {
                 query.setParameter("canModSisClave", canModSisClave);

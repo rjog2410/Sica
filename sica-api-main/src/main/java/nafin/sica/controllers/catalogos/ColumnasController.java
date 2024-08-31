@@ -19,10 +19,13 @@ import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import nafin.sica.persistence.dto.ColumnasDto;
 import nafin.sica.persistence.entity.ColumnasEntity;
+import nafin.sica.persistence.entity.ColumnasId;
+import nafin.sica.persistence.entity.ColumnasValidateEntity;
 import nafin.sica.persistence.repositories.ColumnasRepository;
 import nafin.sica.persistence.repositories.ModuloRepository;
 import nafin.sica.persistence.repositories.SistemasRepository;
 import nafin.sica.service.ResponseService;
+import nafin.sica.service.Utils;
 
 @RestController
 @AllArgsConstructor
@@ -37,6 +40,9 @@ public class ColumnasController {
     ModuloRepository moduloRepository;
     @Autowired
     ColumnasRepository columnasRepository;
+
+    @Autowired
+    Utils utils;
 
     String tit_mod_clave = null;
     String tit_mod_sis_clave = null;
@@ -59,7 +65,7 @@ public class ColumnasController {
         try {
             tit_mod_clave = (String) data.get("mod_clave");
             tit_mod_sis_clave = (String) data.get("sis_clave");
-            if (tit_mod_clave == null || tit_mod_sis_clave == null) {
+            if (utils.isNullOrEmpty(tit_mod_clave) || utils.isNullOrEmpty(tit_mod_sis_clave)) {
                 return response = responseService.buildJsonErrorValidateString();
             }
             List<ColumnasDto> columnasDtos = columnasRepository.get_titulo_by_mod_clave(tit_mod_clave,
@@ -76,7 +82,7 @@ public class ColumnasController {
         Map<String, Object> response = new HashMap<>();
         try {
             tit_mod_sis_clave = (String) data.get("sis_clave");
-            if (tit_mod_sis_clave == null || tit_mod_sis_clave.equals("")) {
+            if (utils.isNullOrEmpty(tit_mod_sis_clave)) {
                 return response = responseService.buildJsonErrorValidateString();
             }
             List<ColumnasDto> columnasDtos = columnasRepository.get_titulo_by_sis_clave(tit_mod_sis_clave);
@@ -87,23 +93,25 @@ public class ColumnasController {
         return response;
     }
 
+    @SuppressWarnings("unused")
     @Transactional
     @PostMapping("/catalogos/columnas/create")
-    public Map<String, Object> create_titulos(@RequestBody @Valid ColumnasEntity columnasEntity) {
+    public Map<String, Object> create_titulos(@RequestBody @Valid ColumnasValidateEntity columnasEntity) {
         Map<String, Object> response = new HashMap<>();
-        System.out.println(columnasEntity.getTit_mod_sis_clave());
-        System.out.println(columnasEntity.getTit_mod_clave());
-        System.out.println(columnasEntity.getTit_columna());
         try {
             Optional<ColumnasEntity> valid_titulo = columnasRepository.get_titulo(columnasEntity.getTit_mod_sis_clave(),
                     columnasEntity.getTit_mod_clave(), columnasEntity.getTit_columna());
-                    System.out.println(valid_titulo);
+            System.out.println(valid_titulo);
             if (valid_titulo.isPresent()) {
                 response = responseService
                         .buildJsonErrorValidateResponse("Ya existe un registros con los datos enviados.");
             } else {
-                ColumnasEntity newcColumnasEntity = columnasRepository.save(columnasEntity);
-                response = responseService.buildJsonResponseString(newcColumnasEntity.getTit_descripcion());
+                ColumnasId id = ColumnasId.builder().tit_mod_sis_clave(columnasEntity.getTit_mod_sis_clave())
+                        .tit_mod_clave(columnasEntity.getTit_mod_clave()).tit_columna(columnasEntity.getTit_columna())
+                        .build();
+                ColumnasEntity newcColumnasEntity = ColumnasEntity.builder()
+                        .tit_descripcion(columnasEntity.getTit_descripcion()).id(id).build();
+                response = responseService.buildJsonResponseString("Columna creada correctamente.");
             }
         } catch (Exception e) {
             response = responseService.buildJsonErrorResponse(e.getMessage());
@@ -111,16 +119,21 @@ public class ColumnasController {
         return response;
     }
 
+    @SuppressWarnings("unused")
     @Transactional
     @PostMapping("/catalogos/columnas/update")
-    public Map<String, Object> update_titulos(@RequestBody @Valid ColumnasEntity columnasEntity) {
+    public Map<String, Object> update_titulos(@RequestBody @Valid ColumnasValidateEntity columnasEntity) {
         Map<String, Object> response = new HashMap<>();
         try {
             Optional<ColumnasEntity> valid_titulo = columnasRepository.get_titulo(columnasEntity.getTit_mod_sis_clave(),
                     columnasEntity.getTit_mod_clave(), columnasEntity.getTit_columna());
             if (valid_titulo.isPresent()) {
-                ColumnasEntity newcColumnasEntity = columnasRepository.save(columnasEntity);
-                response = responseService.buildJsonResponseString(newcColumnasEntity.getTit_descripcion());
+                ColumnasId id = ColumnasId.builder().tit_columna(columnasEntity.getTit_columna())
+                        .tit_mod_clave(columnasEntity.getTit_mod_clave())
+                        .tit_mod_sis_clave(columnasEntity.getTit_mod_sis_clave()).build();
+                ColumnasEntity updateColumna = ColumnasEntity.builder().id(id)
+                        .tit_descripcion(columnasEntity.getTit_descripcion()).build();
+                response = responseService.buildJsonResponseString("Columna actualizada correctamente.");
             } else {
                 response = responseService
                         .buildJsonErrorValidateResponse("No existe un registro con los datos enviados.");
@@ -133,18 +146,20 @@ public class ColumnasController {
 
     @Transactional
     @PostMapping("/catalogos/columnas/delete_titulo")
-    public Map<String, Object> delete_titulo(@RequestBody @Valid ColumnasEntity columnasEntity) {
+    public Map<String, Object> delete_titulo(@RequestBody @Valid ColumnasValidateEntity columnasEntity) {
         Map<String, Object> response = new HashMap<>();
         try {
             Optional<ColumnasEntity> columna = columnasRepository.get_titulo(columnasEntity.getTit_mod_sis_clave(),
                     columnasEntity.getTit_mod_clave(), columnasEntity.getTit_columna());
             if (columna.isPresent()) {
-                columnasRepository.delete(columnasEntity);
-                response = responseService.buildJsonResponseString("OK");
+                ColumnasId id = ColumnasId.builder().tit_columna(columnasEntity.getTit_columna())
+                        .tit_mod_clave(columnasEntity.getTit_mod_clave())
+                        .tit_mod_sis_clave(columnasEntity.getTit_mod_sis_clave()).build();
+                columnasRepository.deleteById(id);
+                response = responseService.buildJsonResponseString("Columna Eliminada Correctamente.");
             } else {
                 response = responseService.buildJsonErrorValidateString();
             }
-
         } catch (Exception e) {
             response = responseService.buildJsonErrorResponse(e.getMessage());
         }
@@ -153,13 +168,16 @@ public class ColumnasController {
 
     @Transactional
     @PostMapping("/catalogos/columnas/delete_all")
-    public Map<String, Object> delete_all_titulos(@RequestBody @Valid List<ColumnasEntity> entities) {
+    public Map<String, Object> delete_all_titulos(@RequestBody @Valid List<ColumnasValidateEntity> entities) {
         Map<String, Object> response = new HashMap<>();
         try {
             entities.forEach(entity -> {
-                columnasRepository.delete(entity);
+                ColumnasId id = ColumnasId.builder().tit_columna(entity.getTit_columna())
+                        .tit_mod_clave(entity.getTit_mod_clave()).tit_mod_sis_clave(entity.getTit_mod_sis_clave())
+                        .build();
+                columnasRepository.deleteById(id);
             });
-            response = responseService.buildJsonResponseString("OK");
+            response = responseService.buildJsonResponseString("Columnas eliminadas correctamente");
         } catch (Exception e) {
             response = responseService.buildJsonErrorResponse(e.getMessage());
         }

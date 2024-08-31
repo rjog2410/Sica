@@ -179,7 +179,7 @@ public class AdministracionBatchService {
                     case "SICAP002":
                         if (tipo_info.equals("S")) {
                             validate_date = utils.is_validate_date_ini_and_end(fecha_ini, fecha_fin, true);
-                            if (validate_date != "OK") {
+                            if (!validate_date.equals("OK")) {
                                 status = "Error";
                                 msg = validate_date;
                                 return;
@@ -188,7 +188,7 @@ public class AdministracionBatchService {
                         break;
                     default:
                         validate_date = utils.is_validate_date_ini_and_end(fecha_ini, fecha_fin, false);
-                        if (validate_date != "OK") {
+                        if (!validate_date.equals("OK")) {
                             status = "Error";
                             msg = validate_date;
                             return;

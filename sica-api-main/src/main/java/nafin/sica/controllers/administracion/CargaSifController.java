@@ -35,7 +35,7 @@ public class CargaSifController {
         Map<String, Object> response = new HashMap<>();
         try {
             response = administracionService.get_carga_operativa(data, "sif");
-            if (response.get("status") == "OK") {
+            if (response.get("status").equals("OK")) {
                 response = responseService.buildJsonResponseObject(response.get("data"));
             } else {
                 response = responseService.buildJsonErrorValidateResponse((String) response.get("message"));

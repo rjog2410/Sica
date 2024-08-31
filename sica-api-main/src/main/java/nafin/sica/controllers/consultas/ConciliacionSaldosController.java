@@ -40,10 +40,10 @@ public class ConciliacionSaldosController {
         Map<String, Object> result = new HashMap<>();
         try {
             result = consultasService.get_conciliacion_saldos(data);
-            if ((String) result.get("status") == "OK") {
+            if (((String) result.get("status")).equals("OK")) {
                 response = responseService.buildJsonResponseObject(result.get("data"));
             } else {
-                response = responseService.buildJsonErrorValidateResponse((String)result.get("message"));
+                response = responseService.buildJsonErrorValidateResponse((String) result.get("message"));
             }
         } catch (Exception e) {
             return response = responseService.buildJsonErrorResponse(e.getMessage());

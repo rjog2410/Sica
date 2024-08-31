@@ -1,12 +1,12 @@
 package nafin.sica.service;
 
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
-
 
 @Service
 @AllArgsConstructor
@@ -53,11 +53,11 @@ public class Utils {
 
     }
 
-    public boolean isNullOrEmpty(String value){
+    public boolean isNullOrEmpty(String value) {
         try {
-            if(value == null || value.equals("")){
+            if (value == null || value.equals("")) {
                 return true;
-            }else{
+            } else {
                 return false;
             }
         } catch (Exception e) {
@@ -65,16 +65,21 @@ public class Utils {
         }
     }
 
-    public boolean isNullOrZero(Integer value){
+    public boolean isNullOrZero(Integer value) {
         try {
-            if(value == null || value == 0){
+            if (value == null || value == 0) {
                 return true;
-            }else{
+            } else {
                 return false;
             }
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public String format_moneda(Double value) {
+        DecimalFormat formato = new DecimalFormat("#,###,###,###,###.00");
+        return formato.format(value);
     }
 
 }

@@ -24,11 +24,12 @@ import nafin.sica.persistence.dto.SistemFilterDto;
 import nafin.sica.persistence.entity.CuentasConciliaEntity;
 import nafin.sica.persistence.repositories.CuentasConciliaRepository;
 import nafin.sica.service.ResponseService;
+import nafin.sica.service.Utils;
 
 @RestController
 @RequiredArgsConstructor
 @AllArgsConstructor
-@CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST})
+@CrossOrigin(origins = "*", methods = { RequestMethod.GET, RequestMethod.POST })
 public class CuentasReglaController {
 
     @Autowired
@@ -36,6 +37,9 @@ public class CuentasReglaController {
 
     @Autowired
     ResponseService responseService;
+
+    @Autowired
+    Utils utils;
 
     String cuc_mod_clave = null;
     String cuc_mod_sis_clave = null;
@@ -57,7 +61,7 @@ public class CuentasReglaController {
         Map<String, Object> response = new HashMap<>();
         try {
             cuc_mod_sis_clave = (String) data.get("cuc_mod_sis_clave");
-            if (cuc_mod_sis_clave == null || cuc_mod_sis_clave.equals("")) {
+            if (utils.isNullOrEmpty(cuc_mod_sis_clave)) {
                 return response = responseService.buildJsonErrorValidateString();
             }
             List<ModulesFilterDto> modulosFilter = cuentasConciliaRepository.getModulesFilter(cuc_mod_sis_clave);
@@ -85,7 +89,7 @@ public class CuentasReglaController {
         Map<String, Object> response = new HashMap<>();
         try {
             cuc_mod_sis_clave = (String) data.get("cuc_mod_sis_clave");
-            if (cuc_mod_sis_clave == null || cuc_mod_sis_clave.equals("")) {
+            if (utils.isNullOrEmpty(cuc_mod_sis_clave)) {
                 return response = responseService.buildJsonErrorValidateString();
             }
             List<CuentasReglaDto> cuentasRegla = cuentasConciliaRepository.get_by_cuc_sis_clave(cuc_mod_sis_clave);
@@ -102,8 +106,7 @@ public class CuentasReglaController {
         try {
             cuc_mod_clave = (String) data.get("cuc_mod_clave");
             cuc_mod_sis_clave = (String) data.get("cuc_mod_sis_clave");
-            if (cuc_mod_clave == null || cuc_mod_clave.equals("") || cuc_mod_sis_clave == null
-                    || cuc_mod_sis_clave.equals("")) {
+            if (utils.isNullOrEmpty(cuc_mod_clave) || utils.isNullOrEmpty(cuc_mod_sis_clave)) {
                 return response = responseService.buildJsonErrorValidateString();
             }
             List<CuentasReglaDto> cuentasRegla = cuentasConciliaRepository.get_by_cuc_mod_clave(cuc_mod_sis_clave,

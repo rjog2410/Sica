@@ -20,6 +20,7 @@ import nafin.sica.persistence.dto.ResponseDto;
 import nafin.sica.persistence.entity.MenusEntity;
 import nafin.sica.persistence.repositories.MenusRepository;
 import nafin.sica.service.ResponseDtoService;
+import nafin.sica.service.Utils;
 
 @RestController
 @AllArgsConstructor
@@ -30,6 +31,9 @@ public class MenusController {
 
     @Autowired
     ResponseDtoService responseDtoService;
+
+    @Autowired
+    Utils utils;
 
     @PostMapping("/seguridad/menus/create")
     public ResponseEntity<ResponseDto> create(@RequestBody @Valid MenusEntity menu) {
@@ -48,7 +52,7 @@ public class MenusController {
         ResponseDto response = new ResponseDto();
         response.setStatus(200);
         try {
-            if (menu.getId().equals(null)) {
+            if (utils.isNullOrZero(menu.getId())) {
                 response = responseDtoService.buildJsonErrorValidateResponse("El Id no debe ser nulo.");
             } else {
                 Optional<MenusEntity> menuUpdate = menusRepository.findById(menu.getId());
@@ -71,7 +75,7 @@ public class MenusController {
         ResponseDto response = new ResponseDto();
         response.setStatus(200);
         try {
-            if (data.get("id").equals(null)) {
+            if (utils.isNullOrZero(data.get("id"))) {
                 response = responseDtoService.buildJsonErrorValidateResponse("El Id no debe ser nulo.");
             } else {
                 Optional<MenusEntity> menuOptional = menusRepository.findById(data.get("id"));
@@ -94,7 +98,7 @@ public class MenusController {
         ResponseDto response = new ResponseDto();
         response.setStatus(200);
         try {
-            if (data.get("ids").equals(null)) {
+            if (data.get("ids") == null) {
                 response = responseDtoService.buildJsonErrorValidateResponse("El Id no debe ser nulo.");
             } else {
                 List<MenusEntity> menus = (List<MenusEntity>) menusRepository.findAllById(data.get("ids"));

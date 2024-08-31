@@ -21,6 +21,7 @@ import nafin.sica.persistence.dto.ResponseDto;
 import nafin.sica.persistence.entity.RolesEntity;
 import nafin.sica.persistence.repositories.RoleRepository;
 import nafin.sica.service.ResponseDtoService;
+import nafin.sica.service.Utils;
 
 @RestController
 @AllArgsConstructor
@@ -33,6 +34,8 @@ public class RolesController {
     @Autowired
     RoleRepository roleRepository;
 
+    @Autowired
+    Utils utils;
 
     @PostMapping("/seguridad/roles/create")
     public ResponseEntity<ResponseDto> create(@RequestBody @Valid RolesEntity role) {
@@ -52,7 +55,7 @@ public class RolesController {
         ResponseDto response = new ResponseDto();
         response.setStatus(200);
         try {
-            if (role.getId().equals(null)) {
+            if (utils.isNullOrZero(role.getId())) {
                 response = responseDtoService.buildJsonErrorValidateResponse("El Id no debe ser nulo.");
             } else {
                 Optional<RolesEntity> roleUpdate = roleRepository.findById(role.getId());
@@ -76,7 +79,7 @@ public class RolesController {
         ResponseDto response = new ResponseDto();
         response.setStatus(200);
         try {
-            if (data.get("id").equals(null)) {
+            if (utils.isNullOrZero(data.get("id"))) {
                 response = responseDtoService.buildJsonErrorValidateResponse("El Id no debe ser nulo.");
             } else {
                 Optional<RolesEntity> userUpdate = roleRepository.findById(data.get("id"));
@@ -100,7 +103,7 @@ public class RolesController {
         ResponseDto response = new ResponseDto();
         response.setStatus(200);
         try {
-            if (data.get("ids").equals(null)) {
+            if (data.get("ids") == null) {
                 response = responseDtoService.buildJsonErrorValidateResponse("El Id no debe ser nulo.");
             } else {
                 List<RolesEntity> users = (List<RolesEntity>) roleRepository.findAllById(data.get("ids"));

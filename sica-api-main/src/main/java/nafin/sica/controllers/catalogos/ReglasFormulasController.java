@@ -19,6 +19,7 @@ import nafin.sica.persistence.repositories.CuentasConciliaRepository;
 import nafin.sica.persistence.repositories.FormulasRepository;
 import nafin.sica.persistence.repositories.ReglasRepository;
 import nafin.sica.service.ResponseService;
+import nafin.sica.service.Utils;
 import nafin.sica.service.ReglasFormulasService;
 
 @RestController
@@ -41,6 +42,9 @@ public class ReglasFormulasController {
     @Autowired
     ReglasFormulasService reglasFormulasService;
 
+    @Autowired
+    Utils utils;
+
     Integer id = null;
     Map<String, Object> response = new HashMap<>();
 
@@ -49,7 +53,7 @@ public class ReglasFormulasController {
 
         try {
             id = (Integer) data.get("id");
-            if (id == null || id == 0) {
+            if (utils.isNullOrZero(id)) {
                 return response = responseService.buildJsonErrorValidateString();
             }
             List<ReglasDto> reglas = reglasRepository.get_by_reg_cuc_clave(id);
@@ -65,7 +69,7 @@ public class ReglasFormulasController {
     public Map<String, Object> create_regla(@RequestBody Map<String, Object> data) {
         Map<String, Object> regla_creacion = new HashMap<>();
         regla_creacion = reglasFormulasService.validate_reglas_entity(data, "create", "reglas");
-        if (regla_creacion.get("status") != "OK") {
+        if (!regla_creacion.get("status").equals("OK")) {
             return response = responseService.buildJsonErrorValidateObject(regla_creacion);
         }
         response = responseService.buildJsonResponseObject(regla_creacion.get("data"));
@@ -76,7 +80,7 @@ public class ReglasFormulasController {
     public Map<String, Object> update_regla(@RequestBody Map<String, Object> data) {
         Map<String, Object> regla_creacion = new HashMap<>();
         regla_creacion = reglasFormulasService.validate_reglas_entity(data, "update", "reglas");
-        if (regla_creacion.get("status") != "OK") {
+        if (!regla_creacion.get("status").equals("OK")) {
             return response = responseService.buildJsonErrorValidateObject(regla_creacion);
         }
         response = responseService.buildJsonResponseObject(regla_creacion.get("data"));
@@ -89,7 +93,7 @@ public class ReglasFormulasController {
 
         try {
             delete_regla = reglasFormulasService.delete(data, "reglas");
-            if (delete_regla.get("status") != "OK") {
+            if (!delete_regla.get("status").equals("OK")) {
                 return response = responseService.buildJsonResponseObject(delete_regla.get("message"));
             }
             Integer result = (Integer) delete_regla.get("message");
@@ -113,7 +117,7 @@ public class ReglasFormulasController {
 
         try {
             delete_regla = reglasFormulasService.delete_one(data, "reglas");
-            if (delete_regla.get("status") != "OK") {
+            if (!delete_regla.get("status").equals("OK")) {
                 return response = responseService.buildJsonResponseObject(delete_regla.get("message"));
             }
             response = responseService.buildJsonResponseString("Exitoso");
@@ -129,7 +133,7 @@ public class ReglasFormulasController {
     public Map<String, Object> get_formula(@RequestBody Map<String, Object> data) {
         try {
             id = (Integer) data.get("id");
-            if (id == null || id == 0) {
+            if (utils.isNullOrZero(id)) {
                 return response = responseService.buildJsonErrorValidateString();
             }
             List<FormulasDto> formulas = formulasRepository.get_by_for_cuc_clave(id);
@@ -144,7 +148,7 @@ public class ReglasFormulasController {
     public Map<String, Object> create_formula(@RequestBody Map<String, Object> data) {
         Map<String, Object> formula_creacion = new HashMap<>();
         formula_creacion = reglasFormulasService.validate_reglas_entity(data, "create", "formulas");
-        if (formula_creacion.get("status") != "OK") {
+        if (!formula_creacion.get("status").equals("OK")) {
             return response = responseService.buildJsonErrorValidateObject(formula_creacion);
         }
         response = responseService.buildJsonResponseObject(formula_creacion.get("data"));
@@ -155,7 +159,7 @@ public class ReglasFormulasController {
     public Map<String, Object> update_formula(@RequestBody Map<String, Object> data) {
         Map<String, Object> formula_creacion = new HashMap<>();
         formula_creacion = reglasFormulasService.validate_reglas_entity(data, "update", "formulas");
-        if (formula_creacion.get("status") != "OK") {
+        if (!formula_creacion.get("status").equals("OK")) {
             return response = responseService.buildJsonErrorValidateObject(formula_creacion);
         }
         response = responseService.buildJsonResponseObject(formula_creacion.get("data"));
@@ -167,7 +171,7 @@ public class ReglasFormulasController {
         Map<String, Object> delete_regla = new HashMap<>();
         try {
             delete_regla = reglasFormulasService.delete(data, "formulas");
-            if (delete_regla.get("status") != "OK") {
+            if (!delete_regla.get("status").equals("OK")) {
                 return response = responseService.buildJsonResponseObject(delete_regla.get("message"));
             }
             Integer result = (Integer) delete_regla.get("message");
@@ -189,7 +193,7 @@ public class ReglasFormulasController {
         Map<String, Object> delete_regla = new HashMap<>();
         try {
             delete_regla = reglasFormulasService.delete_one(data, "formulas");
-            if (delete_regla.get("status") != "OK") {
+            if (!delete_regla.get("status").equals("OK")) {
                 return response = responseService.buildJsonResponseObject(delete_regla.get("message"));
             }
             response = responseService.buildJsonResponseString("Exitoso");

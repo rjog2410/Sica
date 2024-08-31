@@ -15,8 +15,8 @@ const ColumnasPage: React.FC = () => {
   const [sistemas, setSistemas] = useState<Sistema[]>([]); 
   const [modulos, setModulos] = useState<Modulo[]>([]);
   const [columnas, setColumnas] = useState<Columna[]>([]);
-  const [selectedSistema, setSelectedSistema] = useState<string | null>('ALL');
-  const [selectedModulo, setSelectedModulo] = useState<string | null>('ALL');
+  const [selectedSistema, setSelectedSistema] = useState<string>('ALL');
+  const [selectedModulo, setSelectedModulo] = useState<string>('ALL');
   const [filteredColumnas, setFilteredColumnas] = useState<Columna[]>([]);
  
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -33,9 +33,6 @@ const ColumnasPage: React.FC = () => {
     const dataSist= await serviceSistema.fetchSistemas();
     console.log(dataSist);
     setSistemas(dataSist);
-    const dataMod= await serviceModulo.fetchModulos();
-    console.log(dataMod);
-    setModulos(dataMod);
    
     } catch (error) {
       console.error('Error al cargar los datos de columnas:', error);
@@ -50,14 +47,22 @@ const ColumnasPage: React.FC = () => {
       })
       
      })
-  }, [notify]);
+  }, []);
+
+  const fetchDataMOduloByClaveSis = async () => {
+    try {
+    const dataMod= await serviceModulo.fetchModuloByClave(selectedSistema);
+      console.log(dataMod);
+      //setModulos(['ALL', ...Array.from(new Set(dataMod))]);
+    } catch (error) {
+      console.error('Error al cargar los datos de modulos para el sistema: '+selectedSistema, error);
+      notify('Error al cargar los datos de modulos para el sistema: '+selectedSistema, 'error');
+    }
+  };
 
   useEffect(() => {
     if (selectedSistema && selectedSistema !== 'ALL') {
-      const modulosFiltrados = columnas
-        .filter(columna => columna.clave_sistema === selectedSistema)
-        .map(columna => columna.clave_modulo);
-      setModulos(['ALL', ...Array.from(new Set(modulosFiltrados))]);
+      fetchDataMOduloByClaveSis();
     } else {
       setModulos(['ALL']);
     }
