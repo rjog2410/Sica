@@ -111,6 +111,7 @@ public class ColumnasController {
                         .build();
                 ColumnasEntity newcColumnasEntity = ColumnasEntity.builder()
                         .tit_descripcion(columnasEntity.getTit_descripcion()).id(id).build();
+                columnasRepository.save(newcColumnasEntity);
                 response = responseService.buildJsonResponseString("Columna creada correctamente.");
             }
         } catch (Exception e) {
@@ -133,6 +134,7 @@ public class ColumnasController {
                         .tit_mod_sis_clave(columnasEntity.getTit_mod_sis_clave()).build();
                 ColumnasEntity updateColumna = ColumnasEntity.builder().id(id)
                         .tit_descripcion(columnasEntity.getTit_descripcion()).build();
+                columnasRepository.save(updateColumna);
                 response = responseService.buildJsonResponseString("Columna actualizada correctamente.");
             } else {
                 response = responseService
