@@ -33,6 +33,7 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
 
     useEffect(() => {
         fetchSistemas().then( resp =>{
+            console.log("Sistemas: ", resp)
             setSistemas(resp);
         })
     }, []);
