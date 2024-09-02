@@ -76,7 +76,8 @@ public class CuentasReglaController {
     public Map<String, Object> get_all() {
         Map<String, Object> response = new HashMap<>();
         try {
-            List<CuentasReglaDto> CuentasRegla = cuentasConciliaRepository.findAllDto();
+            //List<CuentasReglaDto> CuentasRegla = cuentasConciliaRepository.findAllDto();
+            List<CuentasConciliaEntity> CuentasRegla = cuentasConciliaRepository.findAllCuentas();
             response = responseService.buildJsonResponseObject(CuentasRegla);
         } catch (Exception e) {
             response = responseService.buildJsonErrorResponse(e.getMessage());

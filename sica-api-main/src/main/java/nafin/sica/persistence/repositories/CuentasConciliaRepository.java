@@ -29,4 +29,7 @@ public interface CuentasConciliaRepository extends CrudRepository<CuentasConcili
     @Query("select new nafin.sica.persistence.dto.ModulesFilterDto(c.cuc_mod_clave) from CuentasConciliaEntity c where c.cuc_mod_sis_clave = ?1 group by c.cuc_mod_clave order by c.cuc_mod_clave")
     List<ModulesFilterDto> getModulesFilter(String cuc_mod_sis_clave);
 
+    @Query("select c from CuentasConciliaEntity c")
+    List<CuentasConciliaEntity> findAllCuentas();
+
 }

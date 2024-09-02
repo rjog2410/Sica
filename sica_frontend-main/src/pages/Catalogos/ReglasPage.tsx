@@ -12,13 +12,16 @@ import ReglasSubpantallaModal from './modales/ReglasSubpantallaModal';
 
 const CuentaReglaPage: React.FC = () => {
     const originalObject: Regla = {
+        id: 0,
+        clave_regla: '',
+        descripcion: '',
         reg_cuc_clave: 0,
         reg_tit_mod_sis_clave: '',
         reg_tit_mod_clave: '',
         reg_tit_columna: 0,
         reg_secuencia: 0,
         reg_operador: '',
-        reg_valor: '',
+        reg_valor: ''
     }
 
     const [reglas, setReglas] = useState<Regla[]>([]);

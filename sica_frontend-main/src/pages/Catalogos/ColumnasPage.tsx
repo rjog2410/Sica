@@ -36,7 +36,6 @@ const ColumnasPage: React.FC = () => {
         console.log(resp);
         setSistemas(resp);
         
-
         serviceColumna.fetchColumnas().then(resp => {
           console.log(resp);
           setColumnas(resp); 

@@ -23,9 +23,27 @@ interface AddCuentaModalProps {
 
 const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, initialData}) => {
 
+    const originalObject: Cuenta = {
+        cuc_clave: 0,
+        cuc_mod_sis_clave: '',
+        cuc_mod_clave: '',
+        cuc_cuenta: 0,
+        cuc_scta1: '',
+        cuc_scta2: '',
+        cuc_scta3: '',
+        cuc_scta4: '',
+        cuc_scta5: '',
+        cuc_scta6: '',
+        cuc_scta7: '',
+        cuc_tipo_ente : 0,
+        cuc_ente : 0,
+        cuc_consolida_ente : 'N',
+        cuc_inc_saldo : 'N',
+        cuc_inc_movs : 'N',
+        cuc_inc : ''
+    }
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [cuentaData, setCuentaData] = useState<Cuenta>(initialData);
-
     const [sistemas, setSistemas] = useState<Sistema[]>([]);
     const [modulos, setModulos] = useState<ModuloO[]>([]);
 
@@ -33,7 +51,6 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
 
     useEffect(() => {
         fetchSistemas().then( resp =>{
-            console.log("Sistemas: ", resp)
             setSistemas(resp);
         })
     }, []);
@@ -116,7 +133,7 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
 
     return (
         <Dialog open={open} onClose={onClose}>
-            <DialogTitle>{initialData ? 'Editar Cuenta' : 'Agregar Cuenta'}</DialogTitle>
+            <DialogTitle>{initialData !== originalObject ? 'Editar Cuenta' : 'Agregar Cuenta'}</DialogTitle>
             <DialogContent>
                 <Grid container spacing={1} display="flex" justifyContent="center" alignItems="center">
                     <Grid item xs={12}>
@@ -165,7 +182,7 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
                             helperText={errors.cuc_cuenta}
                         />
                     </Grid>
-                    <Grid item xs={1}>
+                    <Grid item xs={2}>
                         <TextField
                             fullWidth
                             label="S1"
@@ -176,7 +193,7 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
                             helperText={errors.cuc_scta1}
                         />
                     </Grid>
-                    <Grid item xs={1}>
+                    <Grid item xs={2}>
                         <TextField
                             fullWidth
                             label="S2"
@@ -187,7 +204,7 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
                             helperText={errors.cuc_scta2}
                         />
                     </Grid>
-                    <Grid item xs={1}>
+                    <Grid item xs={2}>
                         <TextField
                             fullWidth
                             label="S3"
@@ -198,7 +215,7 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
                             helperText={errors.cuc_scta3}
                         />
                     </Grid>
-                    <Grid item xs={1}>
+                    <Grid item xs={2}>
                         <TextField
                             fullWidth
                             label="S4"
@@ -209,7 +226,7 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
                             helperText={errors.cuc_scta4}
                         />
                     </Grid>
-                    <Grid item xs={1}>
+                    <Grid item xs={2}>
                         <TextField
                             fullWidth
                             label="S5"
@@ -220,7 +237,7 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
                             helperText={errors.cuc_scta5}
                         />
                     </Grid>
-                    <Grid item xs={1}>
+                    <Grid item xs={2}>
                         <TextField
                             fullWidth
                             label="S6"
@@ -231,7 +248,7 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
                             helperText={errors.cuc_scta6}
                         />
                     </Grid>
-                    <Grid item xs={1}>
+                    <Grid item xs={2}>
                         <TextField
                             fullWidth
                             label="S7"
@@ -242,7 +259,7 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
                             helperText={errors.cuc_scta7}
                         />
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={12}>
                         <TextField
                             fullWidth
                             label="Tipo ente"
@@ -253,7 +270,7 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
                             helperText={errors.cuc_tipo_ente}
                         />
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={12}>
                         <TextField
                             fullWidth
                             label="Ente"

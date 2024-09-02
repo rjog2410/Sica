@@ -99,6 +99,9 @@ export interface ModuloO {
     mod_agrup_rep?: string;
 }
 export interface Regla {
+  id: number;
+  clave_regla: string;
+  descripcion: string;
   reg_cuc_clave: number;
   reg_tit_mod_sis_clave: string;
   reg_tit_mod_clave: string;
