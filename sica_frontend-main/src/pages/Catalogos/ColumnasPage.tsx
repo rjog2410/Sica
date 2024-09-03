@@ -42,14 +42,14 @@ const ColumnasPage: React.FC = () => {
           setColumnas(resp); 
           notify("consultando todas las columnas", 'success');              
         }).catch(resp =>{
-          console.error('Error al cargar los datos de columnas todos los sistemas', error);
-        notify('Error al cargar los datos de columnas todos los sistemas', 'error');
+          console.error('Error al cargar los datos de columnas para todos los sistemas', error);
+        notify('Error al cargar los datos de columnas para todos los sistemas', 'error');
         });
         
       }
     }).catch (error =>{
       console.error('Error al cargar los datos de sistemas:', error);
-      notify('Error al cargar los datos de sistema', 'error');
+      notify('Error al cargar los datos de sistemas', 'error');
     }) 
   }, []);
 
@@ -107,7 +107,7 @@ const ColumnasPage: React.FC = () => {
     }
   }, [selectedSistema]);
 
-  useEffect(() => {
+  const consultaCols = () => {
     setColumnas([]);
       if(!!selectedModulo && selectedModulo === 'ALL'){
         console.log("consultando columnas por sistema: "+selectedSistema);
@@ -145,7 +145,12 @@ const ColumnasPage: React.FC = () => {
           });
         }
       }
+  };
+
+  useEffect(() => {
+    consultaCols();
   }, [selectedModulo]);
+
 
   const handleSistemaSelect = (sistema: string | null) => {
     setSelectedSistema(sistema);
@@ -223,6 +228,7 @@ const ColumnasPage: React.FC = () => {
       notify('Columna no encontrada', 'error');
       return;
     }
+    console.log("columnas a eliminar: "+columnaToDelete);
   
     setConfirmAction(() => async () => {
       try {
@@ -243,13 +249,14 @@ const ColumnasPage: React.FC = () => {
   
     setConfirmAction(() => async () => {
       try {
+        console.log("columnas a eliminar: ",columnasToDelete);
         await serviceColumna.deleteMultipleColumnas(columnasToDelete); 
-        setColumnas(columnas.filter(columna => 
-          !numero_columnas.includes(columna.numero_columna)
-        ));
+        consultaCols();
         notify('Columnas eliminadas correctamente', 'success');
+        console.log("columnas eliminadoas correctamente");
       } catch (error) {
         notify('Error al eliminar las columnas', 'error');
+        console.log("columnas eliminadoas correctamente");
       }
     });
     setConfirmOpen(true);
