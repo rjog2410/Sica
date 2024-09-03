@@ -28,7 +28,7 @@ export const fetchSistemaByClave = async (sis_clave: string): Promise<Sistema | 
 export const deleteSistema = async (sis_clave: string): Promise<string | null> => {
   try {
     const response = await axios.post<{ message: string, status: number }>(`${API_URL}/delete`, { sis_clave });
-    return response.data.message;
+    return response.data;
   } catch (error) {
     console.error(`Error deleting sistema with clave ${sis_clave}:`, error);
     throw error;
@@ -38,7 +38,7 @@ export const deleteSistema = async (sis_clave: string): Promise<string | null> =
 export const deleteMultipleSistemas = async (sis_claves: string[]): Promise<string[] | null> => {
   try {
     const response = await axios.post<{ data: string[], status: number }>(`${API_URL}/delete_all`, { sis_claves });
-    return response.data.data;
+    return response.data;
   } catch (error) {
     console.error('Error deleting multiple sistemas:', error);
     throw error;
