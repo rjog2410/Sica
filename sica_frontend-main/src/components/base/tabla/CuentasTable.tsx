@@ -47,7 +47,7 @@ const CuentasTable = forwardRef(({
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelecteds = data.map((n) => n.id!);
+      const newSelecteds = data.map((n) => n.cuc_clave!);
       setSelected(newSelecteds);
       onSelectionChange(newSelecteds);
       return;
@@ -59,7 +59,7 @@ const CuentasTable = forwardRef(({
   const handleClick = (_event: React.MouseEvent<unknown>, id: number) => {
     const selectedIndex = selected.indexOf(id);
     let newSelected: number[] = [];
-
+    console.log("ID selected: ", id)
     if (selectedIndex === -1) {
       newSelected = newSelected.concat(selected, id);
     } else if (selectedIndex === 0) {
@@ -83,7 +83,7 @@ const CuentasTable = forwardRef(({
   const isSelected = (id: number) => selected.indexOf(id) !== -1;
 
   const sortedData = useMemo(() => {
-    return data.slice().sort((a, b) => {
+    return data?.slice().sort((a, b) => {
       const aValue = a[orderBy] ?? ''
       const bValue = b[orderBy] ?? ''; 
   
@@ -92,7 +92,7 @@ const CuentasTable = forwardRef(({
   }, [data, order, orderBy]);
 
   const paginatedData = useMemo(() => {
-    return sortedData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+    return sortedData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
   }, [sortedData, page, rowsPerPage]);
 
   const handleExportToExcel = useCallback(async () => {
@@ -108,10 +108,10 @@ const CuentasTable = forwardRef(({
 
     sortedData.forEach((cuenta) => {
       worksheet.addRow({
-        cuenta: cuenta.cuenta,
-        tipo_ente: cuenta.tipo_ente || 'N/A',
-        ente: cuenta.ente || 'N/A',
-        tipo_conciliacion: cuenta.tipo_conciliacion,  
+        cuenta: cuenta.cuc_cuenta,
+        tipo_ente: cuenta.cuc_tipo_ente || 'N/A',
+        ente: cuenta.cuc_ente || 'N/A',
+        tipo_conciliacion: cuenta.cuc_consolida_ente === 'S' ? 'E': (cuenta.cuc_inc_saldo === 'S' ? 'S' : (cuenta.cuc_inc_movs === 'S' && 'M')) ,
       });
     });
 
@@ -140,8 +140,8 @@ const CuentasTable = forwardRef(({
           <TableRow>
             <TableCell padding="checkbox">
               <Checkbox
-                indeterminate={selected.length > 0 && selected.length < data.length}
-                checked={data.length > 0 && selected.length === data.length}
+                indeterminate={selected?.length > 0 && selected?.length < data?.length}
+                checked={data?.length > 0 && selected?.length === data?.length}
                 onChange={handleSelectAllClick}
               />
             </TableCell>
@@ -161,41 +161,40 @@ const CuentasTable = forwardRef(({
           </TableRow>
         </TableHead>
         <TableBody>
-          {paginatedData.map((row) => {
-            const isItemSelected = row.id ? isSelected(row.id) : false;  
-
+          {paginatedData?.map((row) => {
+            const isItemSelected = row.cuc_clave ? isSelected(row.cuc_clave) : false;
             return (
               <TableRow
                 hover
-                onClick={(event) => handleClick(event, row.id!)}
+                onClick={(event) => handleClick(event, row.cuc_clave!)}
                 role="checkbox"
                 aria-checked={isItemSelected}
                 tabIndex={-1}
-                key={row.id}
+                key={row.cuc_clave}
                 selected={isItemSelected}
               >
                 <TableCell padding="checkbox">
                   <Checkbox checked={isItemSelected} />
                 </TableCell>
-                <TableCell>{row.cuenta}</TableCell>
-                <TableCell>{row.tipo_ente || 'N/A'}</TableCell>
-                <TableCell>{row.ente || 'N/A'}</TableCell>
-                <TableCell>{row.tipo_conciliacion}</TableCell>
+                <TableCell>{row.cuc_cuenta}</TableCell>
+                <TableCell>{row.cuc_tipo_ente || 'N/A'}</TableCell>
+                <TableCell>{row.cuc_ente || 'N/A'}</TableCell>
+                <TableCell>{row.cuc_consolida_ente === 'S' ? 'E': (row.cuc_inc_saldo === 'S' ? 'S' : (row.cuc_inc_movs === 'S' && 'M'))}</TableCell>
                 <TableCell>
                   <IconButton onClick={() => {
                     // Desactivar selección múltiple y seleccionar solo la cuenta en edición
-                    setSelected([row.id!]);
-                    onSelectionChange([row.id!]);
+                    setSelected([row.cuc_clave!]);
+                    onSelectionChange([row.cuc_clave!]);
                     onUpdateCuenta(row);
                   }} aria-label="edit">
                     <EditIcon />
                   </IconButton>
-                  <IconButton onClick={() => onDeleteCuenta(row.id!)} aria-label="delete">
+                  <IconButton onClick={() => onDeleteCuenta(row.cuc_clave!)} aria-label="delete">
                     <DeleteIcon />
                   </IconButton>
                   <IconButton onClick={(e) => {
                     e.stopPropagation(); // Evitar que el clic en la lupa seleccione la fila
-                    onViewRules(row.id!);
+                    onViewRules(row.cuc_clave!);
                   }} aria-label="view">
                     🔎
                   </IconButton>
@@ -208,7 +207,7 @@ const CuentasTable = forwardRef(({
       <TablePagination
         rowsPerPageOptions={[5, 10, 20]}
         component="div"
-        count={sortedData.length}
+        count={sortedData?.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
