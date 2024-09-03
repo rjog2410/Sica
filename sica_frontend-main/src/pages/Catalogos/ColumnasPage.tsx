@@ -249,10 +249,21 @@ const ColumnasPage: React.FC = () => {
     setConfirmAction(() => async () => {
       try {
         console.log("columnas a eliminar: ",columnasToDelete);
-        await serviceColumna.deleteMultipleColumnas(columnasToDelete); 
-        consultaCols();
-        notify('Columnas eliminadas correctamente', 'success');
-        console.log("columnas eliminadoas correctamente");
+        await serviceColumna.deleteMultipleColumnas(columnasToDelete).then(resp =>{
+          if(resp.status === 200){
+            consultaCols();
+            notify(resp.message, 'success');
+            console.log("columnas eliminadoas correctamente");
+          }else{
+            notify(resp.message, 'info');
+            console.log("ocurrio un error al eliminar columnas: ",resp.message);
+          }
+         
+        }).catch(error =>{
+          notify(error.response.data.message, 'error');
+          console.log("ocurrio un error al eliminar columnas: ",error.response.data.message);
+        }) 
+       
       } catch (error) {
         notify('Error al eliminar las columnas', 'error');
         console.log("columnas eliminadoas correctamente");
