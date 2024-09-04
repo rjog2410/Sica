@@ -76,6 +76,7 @@ const SistemasPage: React.FC = () => {
     } catch (error) {
       notify('Error al guardar el sistema', 'error');
     }
+    setEditingSistema(null);
 
     handleCloseModal();
   };
@@ -88,17 +89,42 @@ const SistemasPage: React.FC = () => {
   };
 
   const handleDeleteSistema = (sis_clave: string) => {
-    setConfirmAction(() => () => {
-      setSistemas(sistemas.filter((sistema) => sistema.sis_clave !== sis_clave));
-      notify('Sistema eliminado correctamente', 'success');
+
+    setConfirmAction(() => async () => {
+      try {
+      const responseMessage = await service.deleteSistema(sis_clave);
+      console.log (responseMessage);
+      if(responseMessage?.status=='200'){
+        setSistemas(sistemas.filter((sistema) => sistema.sis_clave !== sis_clave));
+
+        notify('Sistema '+responseMessage.message+' eliminado correctamente', 'success');
+      }else{
+        notify(responseMessage.message, 'warning');
+      }
+    } catch (error) {
+      notify('Error al Eliminar el sistema: '+error.response.data.message, 'error');
+    }
     });
     setConfirmOpen(true);
   };
 
   const handleDeleteMultiple = (sis_claves: string[]) => {
-    setConfirmAction(() => () => {
-      setSistemas(sistemas.filter((sistema) => !sis_claves.includes(sistema.sis_clave)));
-      notify('Sistemas eliminados correctamente', 'success');
+console.log(sis_claves)
+    setConfirmAction(() => async () => {
+      try {
+      const responseMessage = await service.deleteMultipleSistemas(sis_claves);
+      console.log(responseMessage?.status);
+      if(responseMessage?.status=='200'){
+        setSistemas(sistemas.filter((sistema) => !sis_claves.includes(sistema.sis_clave)));
+        sis_claves==[];
+        setSelectedIds([]);        
+        notify('Sistemas eliminados correctamente', 'success');
+        }else{
+        notify(responseMessage.message, 'warning');
+      }
+    } catch (error) {
+      notify('Error al Eliminar el sistema: '+error.response.data.message, 'error');
+    }
     });
     setConfirmOpen(true);
   };

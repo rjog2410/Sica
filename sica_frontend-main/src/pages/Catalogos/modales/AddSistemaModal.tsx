@@ -10,7 +10,7 @@ interface AddSistemaModalProps {
 }
 
 const AddSistemaModal: React.FC<AddSistemaModalProps> = ({ open, onClose, onSave, initialData }) => {
-  const [newSistema, setNewSistema] = useState<Sistema>(initialData);
+  const [newSistema, setNewSistema] = useState<Sistema>({ sis_clave: '', sis_nombre: '' });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {

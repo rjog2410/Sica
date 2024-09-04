@@ -63,7 +63,7 @@ export const deleteColumna = async (columna: Columna): Promise<string | null> =>
 };
 
 // services/columnasService.ts
-export const deleteMultipleColumnas = async (columnas: Columna[]): Promise<void> => {
+export const deleteMultipleColumnas = async (columnas: Columna[]): Promise<any | null> => {
   try {
     const response = await axios.post<{ status: number; info: string }>(
       `${API_URL_COLUMNAS}/delete_all`,
@@ -74,9 +74,16 @@ export const deleteMultipleColumnas = async (columnas: Columna[]): Promise<void>
         tit_descripcion: columna.titulo,
       }))
     );
-    if (response.data.info !== 'OK') {
-      throw new Error('Error al eliminar las columnas');
+    console.log("resp elimiacion varias: ",response.data);
+
+    return response.data;
+   /*
+    if (response.data.status !== 200) {
+      throw new Error(response.data.message);
+    }else{
+      return response.data.message;
     }
+      */
   } catch (error) {
     console.error('Error deleting multiple columnas:', error);
     throw error;

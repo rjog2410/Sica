@@ -10,6 +10,17 @@ import AddModuloModal from './modales/AddModuloModal';
 import ConfirmDialog from '../../components/base/ConfirmDialog';
 
 const ModulosPage: React.FC = () => {
+  const originalObject = {
+    clave_sistema: '',
+    clave_modulo: '',
+    nombre_modulo: '',
+    fecha_carga: null,
+    num_registros: null,
+    fecha_informacion: null,
+    tipo_transaccion: null, // Se inicia como null
+    status: null,           // Se inicia como null
+    agrupacion_reportes: null
+  }
   const [modulos, setModulos] = useState<Modulo[]>([]);
   const [selectedSistema, setSelectedSistema] = useState<string | null>('ALL');
   const [secondFilterOptions, setSecondFilterOptions] = useState<string[]>([]);
@@ -17,10 +28,12 @@ const ModulosPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const tableRef = useRef<any>(null);
-  const [editingModulo, setEditingModulo] = useState<Modulo | null>(null);
+  const [editingModulo, setEditingModulo] = useState<Modulo | null>(originalObject);
   const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
   const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [editando, setEditando] = useState<boolean>(false);
+
 
   const { notify } = useNotification();
 
@@ -64,34 +77,42 @@ const ModulosPage: React.FC = () => {
   });
 
   const handleOpenModal = () => {
+    setEditando(false);
     setEditingModulo(null);
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setEditingModulo(originalObject);
+
   };
 
   const handleSaveModulo = async (newModulo: Modulo) => {
     try {
-      if (editingModulo) {
-        await service.createOrUpdateModulo(newModulo, true);
+      const responseMessage = await service.createOrUpdateModulo(newModulo, editando);
+
+      if (editando) {
+        // Actualizar el sistema en el estado local
         setModulos(modulos.map((modulo) =>
           modulo.clave_modulo === editingModulo.clave_modulo ? newModulo : modulo
         ));
-        notify('Módulo actualizado correctamente', 'success');
+        notify('Módulo '+responseMessage.message+' actualizado correctamente', 'success');
+      }else if(responseMessage.status=='400'){
+        notify(responseMessage.message,'warning');
       } else {
-        await service.createOrUpdateModulo(newModulo);
         setModulos([...modulos, newModulo]);
         notify('Módulo agregado correctamente', 'success');
       }
     } catch (error) {
-      notify('Error al guardar el módulo', 'error');
+      console.log(error)
+      notify('Error al Eliminar el sistema: '+error.response.data.message, 'error');
     }
     handleCloseModal();
   };
 
   const handleEditModulo = (modulo: Modulo) => {
+    setEditando(true);
     setEditingModulo(modulo);
     setIsModalOpen(true);
   };
@@ -109,6 +130,7 @@ const ModulosPage: React.FC = () => {
     setConfirmOpen(true);
   };
 
+  console.log(selectedIds);
   const handleDeleteMultiple = (clave_modulos: string[]) => {
     setConfirmAction(() => async () => {
       try {
