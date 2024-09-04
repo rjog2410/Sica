@@ -85,7 +85,6 @@ const ModulosPage: React.FC = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingModulo(originalObject);
-
   };
 
   const handleSaveModulo = async (newModulo: Modulo) => {
@@ -118,6 +117,7 @@ const ModulosPage: React.FC = () => {
   };
 
   const handleDeleteModulo = (clave_modulo: string) => {
+    console.log("handleDeleteModulo")
     setConfirmAction(() => async () => {
       try {
         await service.deleteModulo(clave_modulo);
@@ -130,8 +130,10 @@ const ModulosPage: React.FC = () => {
     setConfirmOpen(true);
   };
 
-  console.log(selectedIds);
+  console.log("setSelectedIds: ", selectedIds)
+
   const handleDeleteMultiple = (clave_modulos: string[]) => {
+    console.log("handleDeleteMultiple")
     setConfirmAction(() => async () => {
       try {
         await service.deleteMultipleModulos(clave_modulos);
@@ -141,6 +143,7 @@ const ModulosPage: React.FC = () => {
         notify('Error al eliminar los módulos', 'error');
       }
     });
+    setSelectedIds([]);
     setConfirmOpen(true);
   };
 

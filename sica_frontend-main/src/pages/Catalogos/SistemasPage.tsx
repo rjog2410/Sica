@@ -89,7 +89,7 @@ const SistemasPage: React.FC = () => {
   };
 
   const handleDeleteSistema = (sis_clave: string) => {
-
+    console.log("handleDeleteSistema")
     setConfirmAction(() => async () => {
       try {
       const responseMessage = await service.deleteSistema(sis_clave);
@@ -109,14 +109,14 @@ const SistemasPage: React.FC = () => {
   };
 
   const handleDeleteMultiple = (sis_claves: string[]) => {
-console.log(sis_claves)
+    console.log("DeleteMultiple")
+    console.log(sis_claves)
     setConfirmAction(() => async () => {
       try {
       const responseMessage = await service.deleteMultipleSistemas(sis_claves);
-      console.log(responseMessage?.status);
+      console.log("-----"+responseMessage?.status);
       if(responseMessage?.status=='200'){
         setSistemas(sistemas.filter((sistema) => !sis_claves.includes(sistema.sis_clave)));
-        sis_claves==[];
         setSelectedIds([]);        
         notify('Sistemas eliminados correctamente', 'success');
         }else{

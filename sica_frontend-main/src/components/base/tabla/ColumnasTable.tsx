@@ -75,9 +75,11 @@ const ColumnasTable = forwardRef(({
   const isSelected = (numero_columna: number) => selected.includes(numero_columna);
 
   const sortedData = useMemo(() => {
-    return [...data].sort((a, b) => {
-      const comparison = a[orderBy] < b[orderBy] ? -1 : 1;
-      return order === 'asc' ? comparison : -comparison;
+    console.log("order: ",order)
+    console.log("orderBy: ",orderBy)
+    console.log("data: ",data)
+    return data.slice().sort((a, b) => {
+      return (a[orderBy] < b[orderBy] ? -1 : 1) * (order === 'asc' ? 1 : -1);
     });
   }, [data, order, orderBy]);
 

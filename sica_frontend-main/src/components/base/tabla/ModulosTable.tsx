@@ -68,7 +68,6 @@ const ModulosTable = forwardRef(({
     } else if (selectedIndex > 0) {
       newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
     }
-
     setSelected(newSelected);
     onSelectionChange(newSelected);
   };
@@ -82,6 +81,7 @@ const ModulosTable = forwardRef(({
   const isSelected = (clave_modulo: string) => selected.indexOf(clave_modulo) !== -1;
 
   const sortedData = useMemo(() => {
+    setSelected([])
     return data.slice().sort((a, b) => {
       if (orderBy === 'clave_modulo' || orderBy === 'nombre_modulo') {
         return (a[orderBy] < b[orderBy] ? -1 : 1) * (order === 'asc' ? 1 : -1);

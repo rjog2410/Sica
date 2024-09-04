@@ -40,7 +40,6 @@ const AddSistemaModal: React.FC<AddSistemaModalProps> = ({ open, onClose, onSave
     if (newSistema.sis_nombre.length >= 100) {
       tempErrors.sis_nombre = "El nombre del sistema no puede exceder los 100 caracteres";
     }
-
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
