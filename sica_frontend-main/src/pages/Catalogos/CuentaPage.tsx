@@ -164,6 +164,8 @@ const CuentaPage: React.FC = () => {
         }
     }, [selectedModulo]);
 
+    console.log("filteredCuentas: ", filteredCuentas)
+
     const handleSistemaSelect = (sistema: string | null) => {
         setSelectedSistema(sistema);
         setSelectedModulo('ALL');

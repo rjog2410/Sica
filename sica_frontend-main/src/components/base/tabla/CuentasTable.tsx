@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useState, useMemo, useCallback } from 'react';
+import React, {forwardRef, useImperativeHandle, useState, useMemo, useCallback, useEffect} from 'react';
 import {
   Table,
   TableBody,
@@ -83,6 +83,7 @@ const CuentasTable = forwardRef(({
   const isSelected = (id: number) => selected.indexOf(id) !== -1;
 
   const sortedData = useMemo(() => {
+    console.log("memo: ", data)
     return data?.slice().sort((a, b) => {
       const aValue = a[orderBy] ?? ''
       const bValue = b[orderBy] ?? ''; 
@@ -94,6 +95,10 @@ const CuentasTable = forwardRef(({
   const paginatedData = useMemo(() => {
     return sortedData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
   }, [sortedData, page, rowsPerPage]);
+
+  useEffect(() => {
+
+  }, [paginatedData]);
 
   const handleExportToExcel = useCallback(async () => {
     const workbook = new ExcelJS.Workbook();
@@ -132,6 +137,8 @@ const CuentasTable = forwardRef(({
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+  console.log("paginatedData: ", paginatedData)
 
   return (
     <TableContainer component={Paper}>
