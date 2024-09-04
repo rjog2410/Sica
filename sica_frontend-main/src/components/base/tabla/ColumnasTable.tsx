@@ -78,12 +78,15 @@ const ColumnasTable = forwardRef(({
     console.log("order: ",order)
     console.log("orderBy: ",orderBy)
     console.log("data: ",data)
-    return data.slice().sort((a, b) => {
+
+    return data.sort((a, b) => {
+      console.log("a[orderBy] < b[orderBy]: ", a[orderBy] < b[orderBy])
       return (a[orderBy] < b[orderBy] ? -1 : 1) * (order === 'asc' ? 1 : -1);
     });
   }, [data, order, orderBy]);
 
   const paginatedData = useMemo(() => {
+
     return sortedData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
   }, [sortedData, page, rowsPerPage]);
 
