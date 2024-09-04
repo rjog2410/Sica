@@ -84,6 +84,8 @@ const SistemasTable = forwardRef(({
   const isSelected = (sis_clave: string) => selected.indexOf(sis_clave) !== -1;
 
   const filteredData = useMemo(() => {
+    setSelected([]);
+    onSelectionChange([]);
     return filterValue === 'ALL'
       ? data
       : data.filter((sistema) => sistema.sis_clave.includes(filterValue));

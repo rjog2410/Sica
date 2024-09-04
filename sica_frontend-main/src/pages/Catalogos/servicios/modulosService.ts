@@ -28,9 +28,9 @@ export const fetchModulos = async (): Promise<Modulo[]> => {
   }
 };
 
-export const fetchModuloByClave = async (mod_sis_clave: string | undefined): Promise<ModuloO[]> => {
+export const fetchModuloByClave = async (mod_sis_clave: string | undefined): Promise<Modulo[]> => {
   try {
-    const response = await axios.post<{ data: ModuloO[], status: number }>(`${API_URL_MODULOS}/get_module`, { mod_sis_clave });
+    const response = await axios.post<{ data: Modulo[], status: number }>(`${API_URL_MODULOS}/get_module`, { mod_sis_clave });
     return response.data.data; 
   } catch (error) {
     console.error(`Error fetching modulos with clave ${mod_sis_clave}:`, error);
@@ -78,9 +78,12 @@ export const createOrUpdateModulo = async (modulo: Modulo, isUpdate: boolean = f
     var fecha =modulo.fecha_informacion?.split("-");
     newModulo.mod_fecha_info=fecha[2]+"/"+fecha[1]+"/"+fecha[0];
 
+    var fecha =modulo.fecha_carga?.split("-");
+    newModulo.mod_fecha_carga=fecha[2]+"/"+fecha[1]+"/"+fecha[0];
+
     console.log(newModulo.mod_sis_clave)
     const response = await axios.post<{ status: number; message: string }>(`${API_URL_MODULOS}/${endpoint}`, newModulo);
-    return response.data.message;
+    return response.data;
   } catch (error) {
     console.error(`Error ${isUpdate ? 'updating' : 'creating'} modulo:`, error);
     throw error;

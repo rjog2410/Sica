@@ -127,9 +127,10 @@ const [sistemas, setSistemas] = useState<Sistema[]>([]);
         </Box>
         <Box mb={2}>
           <TextField
+            label="Fecha Carga"
             type="date"
-            value={newModulo.fecha_informacion || ''}
-            onChange={(e) => handleInputChange('fecha_informacion', e.target.value)}
+            value={newModulo.fecha_carga || ''}
+            onChange={(e) => handleInputChange('fecha_carga', e.target.value)}
             fullWidth
           />
         </Box>
@@ -146,6 +147,16 @@ const [sistemas, setSistemas] = useState<Sistema[]>([]);
             disabled={!!initialData}
             error={!!errors.num_registros}
             helperText={errors.num_registros}
+          />
+        </Box>
+        <Box mb={2}>
+          <TextField
+            label="Fecha Información"
+            type="date"
+            value={newModulo.fecha_informacion || ''}
+            onChange={(e) => handleInputChange('fecha_informacion', e.target.value)}
+            fullWidth
+            disabled={!!initialData}
           />
         </Box>
         <Box mb={2}>

@@ -99,10 +99,10 @@ const SistemasPage: React.FC = () => {
 
         notify('Sistema '+responseMessage.message+' eliminado correctamente', 'success');
       }else{
-        notify('Error al Eliminar el sistema', 'error');
+        notify(responseMessage.message, 'warning');
       }
     } catch (error) {
-      notify('Error al Eliminar el sistema', 'error');
+      notify('Error al Eliminar el sistema: '+error.response.data.message, 'error');
     }
     });
     setConfirmOpen(true);
@@ -113,18 +113,17 @@ console.log(sis_claves)
     setConfirmAction(() => async () => {
       try {
       const responseMessage = await service.deleteMultipleSistemas(sis_claves);
-      console.log("response"+responseMessage);
-
+      console.log(responseMessage?.status);
       if(responseMessage?.status=='200'){
         setSistemas(sistemas.filter((sistema) => !sis_claves.includes(sistema.sis_clave)));
         sis_claves==[];
         setSelectedIds([]);        
         notify('Sistemas eliminados correctamente', 'success');
-            }else{
-        notify('Error al Eliminar el sistema', 'error');
+        }else{
+        notify(responseMessage.message, 'warning');
       }
     } catch (error) {
-      notify('Error al Eliminar el sistema', 'error');
+      notify('Error al Eliminar el sistema: '+error.response.data.message, 'error');
     }
     });
     setConfirmOpen(true);
