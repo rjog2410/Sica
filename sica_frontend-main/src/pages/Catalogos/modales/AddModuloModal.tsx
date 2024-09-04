@@ -16,6 +16,10 @@ interface AddModuloModalProps {
 const AddModuloModal: React.FC<AddModuloModalProps> = ({ open, onClose, onSave, initialData }) => {
 const [claveSistema, setClaveSistema] = useState<string>('');
 const [sistemas, setSistemas] = useState<Sistema[]>([]); 
+const minValue = 0  
+const maxValue = 99;
+const [numRegistros, setNumRegistros] = useState<number>(minValue);
+
 
   const [newModulo, setNewModulo] = useState<Modulo>({
     clave_sistema: '',
@@ -65,6 +69,13 @@ const [sistemas, setSistemas] = useState<Sistema[]>([]);
   const handleInputChange = (field: keyof Modulo, value: any) => {
     setNewModulo({ ...newModulo, [field]: value });
   };
+
+  const handle = (e) => {
+    const newValue = Math.min(Math.max(e.target.value, minValue), maxValue)
+
+
+    setNewModulo({ ...newModulo, ['num_registros']: newValue });
+}
 
   const handleSave = () => {
     const newErrors: { [key: string]: string } = {};
@@ -139,10 +150,9 @@ const [sistemas, setSistemas] = useState<Sistema[]>([]);
             label="Número Registros"
             type="number"
             value={newModulo.num_registros}
-            onChange={(e) => handleInputChange('num_registros', e.target.value)}
-            onInput={(e)=>{ 
-              e.target.value = Math.max(0, parseInt(e.target.value) ).toString().slice(0,10)
-          }}
+            onChange={(e) => handle(e)}
+            inputProps={{ maxLength: 2 , type: 'number', min: "0", max: "99", step: "1"}}
+
             fullWidth
             disabled={!!initialData}
             error={!!errors.num_registros}

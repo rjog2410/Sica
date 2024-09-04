@@ -40,12 +40,10 @@ const AddColumnaModal: React.FC<AddColumnaModalProps> = ({ open, onClose, onSave
   const fetchDataMOduloByClaveSistema = async () => {
     try {
     const dataModXSist= await serviceModulo.fetchModuloByClave(claveSistema);
-    console.log(dataModXSist);
     if(!dataModXSist || dataModXSist.length == 0 ){
       notify('No existen módulos para clave sistema: '+claveSistema, 'info');
     }
     setModulos(dataModXSist);
-   
     } catch (error) {
       console.error('Error al cargar los datos de modulos para clave sistema: '+claveSistema, error);
       notify('Error al cargar los datos de modulos para clave sistema: '+claveSistema, 'error');
@@ -176,6 +174,7 @@ const AddColumnaModal: React.FC<AddColumnaModalProps> = ({ open, onClose, onSave
             fullWidth
             inputProps={{ maxLength: 2 , type: 'number', min: "0", max: "99", step: "1"}}
             required
+            disabled={!!initialData}
             error={!!errors?.noColumna}
             helperText={errors?.noColumna}
           />

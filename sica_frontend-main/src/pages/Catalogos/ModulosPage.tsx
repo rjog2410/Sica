@@ -77,6 +77,7 @@ const ModulosPage: React.FC = () => {
   });
 
   const handleOpenModal = () => {
+    setEditando(false);
     setEditingModulo(null);
     setIsModalOpen(true);
   };
@@ -129,6 +130,7 @@ const ModulosPage: React.FC = () => {
     setConfirmOpen(true);
   };
 
+  console.log(selectedIds);
   const handleDeleteMultiple = (clave_modulos: string[]) => {
     setConfirmAction(() => async () => {
       try {
