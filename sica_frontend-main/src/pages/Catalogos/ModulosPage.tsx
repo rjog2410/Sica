@@ -33,6 +33,8 @@ const ModulosPage: React.FC = () => {
   const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [editando, setEditando] = useState<boolean>(false);
+  var [eliminados,setEliminados]= useState<number>(0);
+  const [filterValue, setFilterValue] = useState<string>('ALL');
 
 
   const { notify } = useNotification();
@@ -68,6 +70,8 @@ const ModulosPage: React.FC = () => {
 
   const handleModuloSelect = (modulo: string | null) => {
     setSelectedModulo(modulo || 'ALL');
+    setFilterValue(modulo ? modulo : 'ALL');
+
   };
 
   const filteredModulos = modulos.filter(modulo => {
@@ -89,23 +93,34 @@ const ModulosPage: React.FC = () => {
 
   const handleSaveModulo = async (newModulo: Modulo) => {
     try {
-      const responseMessage = await service.createOrUpdateModulo(newModulo, editando);
+      await service.createOrUpdateModulo(newModulo, editando).then(resp =>{
+        if(resp.status === 200){
 
-      if (editando) {
-        // Actualizar el sistema en el estado local
-        setModulos(modulos.map((modulo) =>
-          modulo.clave_modulo === editingModulo.clave_modulo ? newModulo : modulo
-        ));
-        notify('Módulo '+responseMessage.message+' actualizado correctamente', 'success');
-      }else if(responseMessage.status=='400'){
-        notify(responseMessage.message,'warning');
-      } else {
-        setModulos([...modulos, newModulo]);
-        notify('Módulo agregado correctamente', 'success');
-      }
+          if (editando) {
+            setModulos(modulos.map((modulo) =>
+              modulo.clave_modulo === editingModulo.clave_modulo ? newModulo : modulo
+            ));
+            notify('Módulo '+resp.message+' actualizado correctamente', 'success');
+          } else {
+            setModulos([...modulos, newModulo]);
+            notify('Módulo agregado correctamente', 'success');
+          }
+
+        }else{
+          notify(resp.message, 'info');
+          console.log("ocurrio un error: ",resp.message);
+          setEliminados(0);    
+        }
+         }).catch(error =>{
+        notify(error.response.data.message, 'error');
+        setEliminados(0);    
+        console.log("ocurrio un error",error.response.data.message);
+      }) 
+
+
+      
     } catch (error) {
-      console.log(error)
-      notify('Error al Eliminar el sistema: '+error.response.data.message, 'error');
+      notify('Error al Eliminar el sistema: '+error, 'error');
     }
     handleCloseModal();
   };
@@ -120,9 +135,25 @@ const ModulosPage: React.FC = () => {
     console.log("handleDeleteModulo")
     setConfirmAction(() => async () => {
       try {
-        await service.deleteModulo(clave_modulo);
-        setModulos(modulos.filter((modulo) => modulo.clave_modulo !== clave_modulo));
-        notify('Módulo eliminado correctamente', 'success');
+        await service.deleteModulo(clave_modulo).then(resp =>{
+          if(resp.status === 200){
+            setModulos(modulos.filter((modulo) => modulo.clave_modulo !== clave_modulo));
+            notify('Módulo eliminado correctamente', 'success');
+            setSelectedIds([]);        
+          }else{
+            notify(resp.message, 'info');
+            console.log("ocurrio un error al eliminar modulo: ",resp.message);
+            setEliminados(0);    
+            setSelectedIds([]);        
+
+          }
+           }).catch(error =>{
+          notify(error.response.data.message, 'error');
+          setEliminados(0);    
+          console.log("ocurrio un error al eliminar Modulo: ",error.response.data.message);
+        }) 
+
+    
       } catch (error) {
         notify('Error al eliminar el módulo', 'error');
       }
@@ -130,20 +161,40 @@ const ModulosPage: React.FC = () => {
     setConfirmOpen(true);
   };
 
-  console.log("setSelectedIds: ", selectedIds)
-
+console.log(selectedIds);
   const handleDeleteMultiple = (clave_modulos: string[]) => {
-    console.log("handleDeleteMultiple")
+    for (var i=0; i < eliminados; i++) {
+      console.log("---")
+      clave_modulos.shift();
+    }
     setConfirmAction(() => async () => {
       try {
-        await service.deleteMultipleModulos(clave_modulos);
-        setModulos(modulos.filter((modulo) => !clave_modulos.includes(modulo.clave_modulo)));
-        notify('Módulos eliminados correctamente', 'success');
+       await service.deleteMultipleModulos(clave_modulos).then(resp =>{
+        if(resp.status === 200){
+          setModulos(modulos.filter((modulo) => !clave_modulos.includes(modulo.clave_modulo)));
+          notify('Módulo eliminado correctamente', 'success');
+          setEliminados(clave_modulos.length+eliminados);    
+          setSelectedIds([]);        
+
+          console.log("modulos eliminadoas correctamente");
+        }else{
+          notify(resp.message, 'info');
+          console.log("ocurrio un error al eliminar modulos: ",resp.message);
+          setEliminados(0);    
+          setSelectedIds([]);
+
+        }
+         }).catch(error =>{
+        notify(error.response.data.message, 'error');
+        setEliminados(0);    
+        console.log("ocurrio un error al eliminar columnas: ",error.response.data.message);
+      }) 
+      
       } catch (error) {
+        setEliminados(0);    
         notify('Error al eliminar los módulos', 'error');
       }
     });
-    setSelectedIds([]);
     setConfirmOpen(true);
   };
 
@@ -222,6 +273,7 @@ const ModulosPage: React.FC = () => {
             onSelectionChange={setSelectedIds}
             onUpdateModulo={handleEditModulo}
             onDeleteModulo={handleDeleteModulo}
+            filterValue={filterValue}
           />
           <AddModuloModal
             open={isModalOpen}

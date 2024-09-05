@@ -23,6 +23,7 @@ interface ModulosTableProps {
   onSelectionChange: (selectedIds: string[]) => void;
   onUpdateModulo: (modulo: Modulo) => void;
   onDeleteModulo: (clave_modulo: string) => void;
+  filterValue: string;
 }
 
 type Order = 'asc' | 'desc';
@@ -32,7 +33,8 @@ const ModulosTable = forwardRef(({
   onSelectionChange,
   onUpdateModulo,
   onDeleteModulo,
-}: ModulosTableProps, ref: Ref<{ exportToExcel: () => void }>) => {
+  filterValue,
+}: ModulosTableProps, ref) => {
 
   const [selected, setSelected] = useState<string[]>([]);
   const [order, setOrder] = useState<Order>('asc');
@@ -45,31 +47,25 @@ const ModulosTable = forwardRef(({
   }));
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      const newSelecteds = data.map((n) => n.clave_modulo);
-      setSelected(newSelecteds);
-      onSelectionChange(newSelecteds);
-      return;
-    }
-    setSelected([]);
-    onSelectionChange([]);
+    const newSelecteds = event.target.checked ? data.map((n) => n.clave_modulo) : [];
+    setSelected(newSelecteds);
+    onSelectionChange(newSelecteds);
   };
 
   const handleClick = (event: React.MouseEvent<unknown>, clave_modulo: string) => {
-    const selectedIndex = selected.indexOf(clave_modulo);
-    let newSelected: string[] = [];
+    setSelected((prevSelected) => {
+      const selectedIndex = prevSelected.indexOf(clave_modulo);
+      let newSelected: number[] = [];
 
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, clave_modulo);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
-    }
-    setSelected(newSelected);
-    onSelectionChange(newSelected);
+      if (selectedIndex === -1) {
+        newSelected = [...prevSelected, clave_modulo];
+      } else {
+        newSelected = prevSelected.filter(id => id !== clave_modulo);
+      }
+
+      onSelectionChange(newSelected);
+      return newSelected;
+    });
   };
 
   const handleRequestSort = (property: keyof Modulo) => {
@@ -78,17 +74,26 @@ const ModulosTable = forwardRef(({
     setOrderBy(property);
   };
 
-  const isSelected = (clave_modulo: string) => selected.indexOf(clave_modulo) !== -1;
+  const isSelected = (clave_modulo: number) => selected.includes(clave_modulo);
+
+
+  
+  const filteredData = useMemo(() => {
+    
+    console.log(filterValue)
+    return filterValue === 'ALL'
+      ? data
+      : data.filter((modulo) => modulo.clave_modulo.includes(filterValue));
+  }, [data, filterValue]);
 
   const sortedData = useMemo(() => {
-    setSelected([])
-    return data.slice().sort((a, b) => {
+    return filteredData.slice().sort((a, b) => {
       if (orderBy === 'clave_modulo' || orderBy === 'nombre_modulo') {
         return (a[orderBy] < b[orderBy] ? -1 : 1) * (order === 'asc' ? 1 : -1);
       }
       return 0;
     });
-  }, [data, order, orderBy]);
+  }, [filteredData, order, orderBy]);
 
   const paginatedData = useMemo(() => {
     return sortedData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);

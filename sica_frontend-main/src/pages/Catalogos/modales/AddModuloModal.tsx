@@ -105,10 +105,11 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             onChange={(e) => handleInputChange('clave_sistema', e.target.value)}
             fullWidth
             required
+            disabled={!!initialData}
             error={!!errors.clave_sistema}
             helperText={errors.clave_sistema}
           > {
-              sistemas?.map(sistema => <MenuItem value={sistema.sis_clave}>{sistema.sis_clave}-{sistema.sis_nombre}</MenuItem>)
+              sistemas?.map(sistema => <MenuItem value={sistema.sis_clave}>{sistema.sis_clave}</MenuItem>)
             }
           </TextField>
         </Box>
@@ -120,7 +121,8 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             onChange={(e) => handleInputChange('clave_modulo', e.target.value)}
             fullWidth
             required
-            inputProps={{ maxLength: 100 }}
+            disabled={!!initialData}
+            inputProps={{ maxLength: 10 }}
             error={!!errors.clave_modulo}
             helperText={errors.clave_modulo}
           />
@@ -131,7 +133,7 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             value={newModulo.nombre_modulo}
             onChange={(e) => handleInputChange('nombre_modulo', e.target.value)}
             fullWidth
-            inputProps={{ maxLength: 100 }}
+            inputProps={{ maxLength: 50 }}
             error={!!errors.nombre_modulo}
             helperText={errors.nombre_modulo}
           />
@@ -143,6 +145,8 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             value={newModulo.fecha_carga || ''}
             onChange={(e) => handleInputChange('fecha_carga', e.target.value)}
             fullWidth
+            InputLabelProps={{ shrink: true }}
+
           />
         </Box>
         <Box mb={2}>
@@ -152,9 +156,7 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             value={newModulo.num_registros}
             onChange={(e) => handle(e)}
             inputProps={{ maxLength: 2 , type: 'number', min: "0", max: "99", step: "1"}}
-
             fullWidth
-            disabled={!!initialData}
             error={!!errors.num_registros}
             helperText={errors.num_registros}
           />
@@ -167,6 +169,8 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             onChange={(e) => handleInputChange('fecha_informacion', e.target.value)}
             fullWidth
             disabled={!!initialData}
+            InputLabelProps={{ shrink: true }}
+
           />
         </Box>
         <Box mb={2}>
@@ -175,6 +179,7 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             label="Tipo de Transacción"
             value={newModulo.tipo_transaccion || ''}
             onChange={(e) => handleInputChange('tipo_transaccion', e.target.value as 'A' | 'S' | null)}
+            disabled={!!initialData}
             fullWidth
           >
             <MenuItem value="A">Archivo</MenuItem>
@@ -201,6 +206,7 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             value={newModulo.agrupacion_reportes || ''}
             onChange={(e) => handleInputChange('agrupacion_reportes', e.target.value)}
             fullWidth
+            disabled={!!initialData}
             >
                <MenuItem value="S">Sí</MenuItem>
                <MenuItem value="N">No</MenuItem>

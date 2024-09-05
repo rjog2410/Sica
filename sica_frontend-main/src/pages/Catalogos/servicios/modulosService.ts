@@ -7,7 +7,6 @@ const API_URL_MODULOS = 'http://localhost:8080/catalogos/modulos';
 
 
 export const fetchSistemas = async () => {
-console.log("Trae los sistemas")
   try {
     const response = await axios.post<{ data: Sistema[], status: number }>(`${API_URL_MODULOS}/get_all`);
     console.log(response.data)
@@ -41,7 +40,7 @@ export const fetchModuloByClave = async (mod_sis_clave: string | undefined): Pro
 export const deleteModulo = async (mod_clave: string): Promise<string | null> => {
   try {
     const response = await axios.post<{ status: number; message: string }>(`${API_URL_MODULOS}/delete_module`, { mod_clave });
-    return response.data.message;
+    return response.data;
   } catch (error) {
     console.error(`Error deleting modulo with clave ${mod_clave}:`, error);
     throw error;
@@ -51,7 +50,7 @@ export const deleteModulo = async (mod_clave: string): Promise<string | null> =>
 export const deleteMultipleModulos = async (mod_claves: string[]): Promise<string[] | null> => {
   try {
     const response = await axios.post<{ data: string[], status: number }>(`${API_URL_MODULOS}/delete_all`, { mod_claves });
-    return response.data.data;
+    return response.data;
   } catch (error) {
     console.error('Error deleting multiple modulos:', error);
     throw error;

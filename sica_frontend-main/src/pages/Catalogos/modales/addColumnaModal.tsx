@@ -138,6 +138,7 @@ const AddColumnaModal: React.FC<AddColumnaModalProps> = ({ open, onClose, onSave
             onChange={(e) => setClaveSistema(e.target.value)}
             fullWidth  
             required 
+            disabled={!!initialData}
             error={!!errors?.claveSistema}
             helperText={errors?.claveSistema}          
             
@@ -157,6 +158,7 @@ const AddColumnaModal: React.FC<AddColumnaModalProps> = ({ open, onClose, onSave
             onChange={(e) => setClaveModulo(e.target.value)}
             fullWidth
             required
+            disabled={!!initialData}
             error={!!errors?.claveModulo}
             helperText={errors?.claveModulo}
           >
@@ -188,7 +190,7 @@ const AddColumnaModal: React.FC<AddColumnaModalProps> = ({ open, onClose, onSave
             required
             error={!!errors?.titulo}
             helperText={errors?.titulo}
-            inputProps={{ maxLength: 50 }}
+            inputProps={{ maxLength: 40 }}
           />
         </Box>
       </DialogContent>

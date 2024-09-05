@@ -67,7 +67,7 @@ const AddSistemaModal: React.FC<AddSistemaModalProps> = ({ open, onClose, onSave
           error={!!errors.sis_clave}
           helperText={errors.sis_clave}
           disabled={!!initialData}
-          inputProps={{ maxLength: 100 }}
+          inputProps={{ maxLength: 10 }}
         />
         <TextField
           margin="dense"
@@ -78,7 +78,7 @@ const AddSistemaModal: React.FC<AddSistemaModalProps> = ({ open, onClose, onSave
           onChange={handleChange}
           error={!!errors.sis_nombre}
           helperText={errors.sis_nombre}
-          inputProps={{ maxLength: 100 }}
+          inputProps={{ maxLength: 60 }}
         />
       </DialogContent>
       <DialogActions>

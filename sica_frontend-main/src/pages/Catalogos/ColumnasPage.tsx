@@ -33,7 +33,6 @@ const ColumnasPage: React.FC = () => {
     setModulos([]);
     serviceSistema.fetchSistemas().then(resp=>{
       if(!!resp && resp.length>0){
-        console.log(resp);
         setSistemas(resp);
         
         serviceColumna.fetchColumnas().then(resp => {
@@ -95,7 +94,6 @@ const ColumnasPage: React.FC = () => {
       console.log("consultando all columnas");
   
           serviceColumna.fetchColumnas().then(resp => {
-            console.log(resp);
             setColumnas(resp);    
             notify("consultando todas las columnas", 'success');             
           }).catch(resp =>{
@@ -178,7 +176,7 @@ const ColumnasPage: React.FC = () => {
           console.log("respuesta de editando: ",resp);
           if(resp?.data?.status == 200){
             setColumnas(columnas.map((columna) =>
-              columna.numero_columna === editingColumna.numero_columna ? newColumna : columna
+              (columna.numero_columna === editingColumna.numero_columna && columna.clave_sistema === editingColumna.clave_sistema && columna.clave_modulo === editingColumna.clave_modulo) ? newColumna : columna
             ));
             notify('Columna actualizada correctamente', 'success');
           }else{
