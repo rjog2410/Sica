@@ -108,7 +108,7 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             error={!!errors.clave_sistema}
             helperText={errors.clave_sistema}
           > {
-              sistemas?.map(sistema => <MenuItem value={sistema.sis_clave}>{sistema.sis_clave}-{sistema.sis_nombre}</MenuItem>)
+              sistemas?.map(sistema => <MenuItem value={sistema.sis_clave}>{sistema.sis_clave}</MenuItem>)
             }
           </TextField>
         </Box>

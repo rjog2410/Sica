@@ -33,7 +33,6 @@ const ColumnasPage: React.FC = () => {
     setModulos([]);
     serviceSistema.fetchSistemas().then(resp=>{
       if(!!resp && resp.length>0){
-        console.log(resp);
         setSistemas(resp);
         
         serviceColumna.fetchColumnas().then(resp => {
@@ -95,7 +94,6 @@ const ColumnasPage: React.FC = () => {
       console.log("consultando all columnas");
   
           serviceColumna.fetchColumnas().then(resp => {
-            console.log(resp);
             setColumnas(resp);    
             notify("consultando todas las columnas", 'success');             
           }).catch(resp =>{

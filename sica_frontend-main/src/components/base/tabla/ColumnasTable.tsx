@@ -79,8 +79,7 @@ const ColumnasTable = forwardRef(({
     console.log("orderBy: ",orderBy)
     console.log("data: ",data)
 
-    return data.sort((a, b) => {
-      console.log("a[orderBy] < b[orderBy]: ", a[orderBy] < b[orderBy])
+    return data.slice().sort((a, b) => {
       return (a[orderBy] < b[orderBy] ? -1 : 1) * (order === 'asc' ? 1 : -1);
     });
   }, [data, order, orderBy]);
@@ -216,7 +215,7 @@ const ColumnasTable = forwardRef(({
         </TableBody>
       </Table>
       <TablePagination
-        rowsPerPageOptions={[5, 10, 20]}
+        rowsPerPageOptions={[5, 10, 50]}
         component="div"
         count={sortedData.length}
         rowsPerPage={rowsPerPage}

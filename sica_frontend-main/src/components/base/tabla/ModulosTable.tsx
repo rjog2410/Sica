@@ -23,6 +23,7 @@ interface ModulosTableProps {
   onSelectionChange: (selectedIds: string[]) => void;
   onUpdateModulo: (modulo: Modulo) => void;
   onDeleteModulo: (clave_modulo: string) => void;
+  filterValue: string;
 }
 
 type Order = 'asc' | 'desc';
@@ -32,7 +33,8 @@ const ModulosTable = forwardRef(({
   onSelectionChange,
   onUpdateModulo,
   onDeleteModulo,
-}: ModulosTableProps, ref: Ref<{ exportToExcel: () => void }>) => {
+  filterValue,
+}: ModulosTableProps, ref) => {
 
   const [selected, setSelected] = useState<string[]>([]);
   const [order, setOrder] = useState<Order>('asc');
@@ -80,15 +82,24 @@ const ModulosTable = forwardRef(({
 
   const isSelected = (clave_modulo: string) => selected.indexOf(clave_modulo) !== -1;
 
+
+  
+  const filteredData = useMemo(() => {
+    
+    console.log(filterValue)
+    return filterValue === 'ALL'
+      ? data
+      : data.filter((modulo) => modulo.clave_modulo.includes(filterValue));
+  }, [data, filterValue]);
+
   const sortedData = useMemo(() => {
-    setSelected([])
-    return data.slice().sort((a, b) => {
+    return filteredData.slice().sort((a, b) => {
       if (orderBy === 'clave_modulo' || orderBy === 'nombre_modulo') {
         return (a[orderBy] < b[orderBy] ? -1 : 1) * (order === 'asc' ? 1 : -1);
       }
       return 0;
     });
-  }, [data, order, orderBy]);
+  }, [filteredData, order, orderBy]);
 
   const paginatedData = useMemo(() => {
     return sortedData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
