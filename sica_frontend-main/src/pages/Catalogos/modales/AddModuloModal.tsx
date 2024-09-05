@@ -120,7 +120,7 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             onChange={(e) => handleInputChange('clave_modulo', e.target.value)}
             fullWidth
             required
-            inputProps={{ maxLength: 100 }}
+            inputProps={{ maxLength: 10 }}
             error={!!errors.clave_modulo}
             helperText={errors.clave_modulo}
           />
@@ -131,7 +131,7 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             value={newModulo.nombre_modulo}
             onChange={(e) => handleInputChange('nombre_modulo', e.target.value)}
             fullWidth
-            inputProps={{ maxLength: 100 }}
+            inputProps={{ maxLength: 50 }}
             error={!!errors.nombre_modulo}
             helperText={errors.nombre_modulo}
           />
@@ -154,7 +154,6 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             value={newModulo.num_registros}
             onChange={(e) => handle(e)}
             inputProps={{ maxLength: 2 , type: 'number', min: "0", max: "99", step: "1"}}
-
             fullWidth
             disabled={!!initialData}
             error={!!errors.num_registros}

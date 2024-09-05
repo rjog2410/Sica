@@ -188,7 +188,7 @@ const AddColumnaModal: React.FC<AddColumnaModalProps> = ({ open, onClose, onSave
             required
             error={!!errors?.titulo}
             helperText={errors?.titulo}
-            inputProps={{ maxLength: 50 }}
+            inputProps={{ maxLength: 40 }}
           />
         </Box>
       </DialogContent>
