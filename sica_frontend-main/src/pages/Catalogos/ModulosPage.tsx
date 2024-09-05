@@ -139,10 +139,13 @@ const ModulosPage: React.FC = () => {
           if(resp.status === 200){
             setModulos(modulos.filter((modulo) => modulo.clave_modulo !== clave_modulo));
             notify('Módulo eliminado correctamente', 'success');
+            setSelectedIds([]);        
           }else{
             notify(resp.message, 'info');
             console.log("ocurrio un error al eliminar modulo: ",resp.message);
             setEliminados(0);    
+            setSelectedIds([]);        
+
           }
            }).catch(error =>{
           notify(error.response.data.message, 'error');
@@ -161,6 +164,7 @@ const ModulosPage: React.FC = () => {
 console.log(selectedIds);
   const handleDeleteMultiple = (clave_modulos: string[]) => {
     for (var i=0; i < eliminados; i++) {
+      console.log("---")
       clave_modulos.shift();
     }
     setConfirmAction(() => async () => {
@@ -170,8 +174,8 @@ console.log(selectedIds);
           setModulos(modulos.filter((modulo) => !clave_modulos.includes(modulo.clave_modulo)));
           notify('Módulo eliminado correctamente', 'success');
           setEliminados(clave_modulos.length+eliminados);    
-          setfilter([]);
-          
+          setSelectedIds([]);        
+
           console.log("modulos eliminadoas correctamente");
         }else{
           notify(resp.message, 'info');

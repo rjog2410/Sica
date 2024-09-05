@@ -143,6 +143,8 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             value={newModulo.fecha_carga || ''}
             onChange={(e) => handleInputChange('fecha_carga', e.target.value)}
             fullWidth
+            InputLabelProps={{ shrink: true }}
+
           />
         </Box>
         <Box mb={2}>
@@ -167,6 +169,8 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             onChange={(e) => handleInputChange('fecha_informacion', e.target.value)}
             fullWidth
             disabled={!!initialData}
+            InputLabelProps={{ shrink: true }}
+
           />
         </Box>
         <Box mb={2}>
