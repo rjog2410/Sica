@@ -105,6 +105,7 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             onChange={(e) => handleInputChange('clave_sistema', e.target.value)}
             fullWidth
             required
+            disabled={!!initialData}
             error={!!errors.clave_sistema}
             helperText={errors.clave_sistema}
           > {
@@ -120,6 +121,7 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             onChange={(e) => handleInputChange('clave_modulo', e.target.value)}
             fullWidth
             required
+            disabled={!!initialData}
             inputProps={{ maxLength: 10 }}
             error={!!errors.clave_modulo}
             helperText={errors.clave_modulo}
@@ -155,7 +157,6 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             onChange={(e) => handle(e)}
             inputProps={{ maxLength: 2 , type: 'number', min: "0", max: "99", step: "1"}}
             fullWidth
-            disabled={!!initialData}
             error={!!errors.num_registros}
             helperText={errors.num_registros}
           />
@@ -178,6 +179,7 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             label="Tipo de Transacción"
             value={newModulo.tipo_transaccion || ''}
             onChange={(e) => handleInputChange('tipo_transaccion', e.target.value as 'A' | 'S' | null)}
+            disabled={!!initialData}
             fullWidth
           >
             <MenuItem value="A">Archivo</MenuItem>
@@ -204,6 +206,7 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             value={newModulo.agrupacion_reportes || ''}
             onChange={(e) => handleInputChange('agrupacion_reportes', e.target.value)}
             fullWidth
+            disabled={!!initialData}
             >
                <MenuItem value="S">Sí</MenuItem>
                <MenuItem value="N">No</MenuItem>

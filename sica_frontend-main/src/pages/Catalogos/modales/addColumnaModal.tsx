@@ -138,6 +138,7 @@ const AddColumnaModal: React.FC<AddColumnaModalProps> = ({ open, onClose, onSave
             onChange={(e) => setClaveSistema(e.target.value)}
             fullWidth  
             required 
+            disabled={!!initialData}
             error={!!errors?.claveSistema}
             helperText={errors?.claveSistema}          
             
@@ -157,6 +158,7 @@ const AddColumnaModal: React.FC<AddColumnaModalProps> = ({ open, onClose, onSave
             onChange={(e) => setClaveModulo(e.target.value)}
             fullWidth
             required
+            disabled={!!initialData}
             error={!!errors?.claveModulo}
             helperText={errors?.claveModulo}
           >
