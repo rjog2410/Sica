@@ -162,7 +162,7 @@ const ColumnasTable = forwardRef(({
           </TableRow>
         </TableHead>
         <TableBody>
-          {paginatedData.map((row) => {
+          {paginatedData.map((row, index) => {
             const isItemSelected = isSelected(row.numero_columna);
             const labelId = `enhanced-table-checkbox-${row.numero_columna}`;
 
@@ -173,7 +173,7 @@ const ColumnasTable = forwardRef(({
                 role="checkbox"
                 aria-checked={isItemSelected}
                 tabIndex={-1}
-                key={row.numero_columna}
+                key={index}
                 selected={isItemSelected}
                 sx={getTableRowStyle(isItemSelected)}
               >
