@@ -16,7 +16,7 @@ import {fetchModuloByClave, fetchModulos} from "@/pages/Catalogos/selectores/ser
 import {
     getAllCuentas,
     getCuentasBySistema,
-    getCuentasBySistemaAndModulo
+    getCuentasBySistemaAndModulo, getFormulas, getReglas
 } from "./selectores/serviceSelectorCuentaRegla"; // Asumiendo que tienes este modal para manejar las reglas
 
 interface TabPanelProps {
@@ -95,6 +95,7 @@ const CuentaPage: React.FC = () => {
     const [isSubpantallaOpen, setIsSubpantallaOpen] = useState<boolean>(false); // Estado para la subpantalla de reglas
     const [editingRegla, setEditingRegla] = useState<Regla | null>(originalRule);
     const [editingCuenta, setEditingCuenta] = useState<Cuenta | null>(originalObject); // Estado para la cuenta que se está editando
+    const [currentFormulas, setCurrentFormulas] = useState<Formula[]>([]); // Estado para las reglas asociadas a una cuenta
     const [currentReglas, setCurrentReglas] = useState<Regla[]>([]); // Estado para las reglas asociadas a una cuenta
     const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
     const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
@@ -261,8 +262,9 @@ const CuentaPage: React.FC = () => {
          *      ]
          *  }
          */
-        const reglasAsociadas : Regla = [];
-        setCurrentReglas(reglasAsociadas);
+
+        getReglas(cuentaSeleccionada?.cuc_clave).then(resp =>  setCurrentReglas(resp))
+        getFormulas(cuentaSeleccionada?.cuc_clave).then(resp => setCurrentFormulas(resp))
         setCuentaInfo(cuentaSeleccionada)
         setIsSubpantallaOpen(true);
     };
@@ -417,6 +419,7 @@ const CuentaPage: React.FC = () => {
                 onClose={() => setIsSubpantallaOpen(false)}
                 cuenta={cuentaInfo}
                 reglas={currentReglas}
+                formulas={currentFormulas}
                 onSaveRegla={handleSaveRegla}
                 onDeleteRegla={handleDeleteRegla}
             />

@@ -12,5 +12,4 @@ public class FormulasDto {
     private Integer for_tit_columna;
     private Integer for_secuencia;
     private String for_operador;
-
 }

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Cuenta, Regla } from '../../../types';
+import {Cuenta, Formula, Regla} from '../../../types';
 
 // Base URL de la API
 const BASE_URL = 'http://localhost:8080/catalogos/cuentas_regla';
@@ -80,6 +80,11 @@ export const deleteMultipleCuentas = async (ids: number[]): Promise<number[]> =>
 // Obtener reglas por cuenta
 export const fetchReglas = async (cuentaId: number): Promise<Regla[]> => {
   const response = await axios.post(`${BASE_URL}/reglas/get`, { id: cuentaId });
+  return response.data.data;
+};
+// Obtener formulas por cuenta
+export const fetchFormulas = async (cuentaId: number): Promise<Formula[]> => {
+  const response = await axios.post(`${BASE_URL}/formulas/get`, { id: cuentaId });
   return response.data.data;
 };
 

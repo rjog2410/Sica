@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -17,12 +17,13 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
-import {Cuenta, Regla} from '@/types';
+import {Cuenta, Formula, Regla} from '@/types';
 
 interface ReglasSubpantallaModalProps {
     open: boolean;
     onClose: () => void;
     reglas: Regla[];
+    formulas: Formula[];
     cuenta: Cuenta;
     onSaveRegla: (regla: Regla) => void;
     onDeleteRegla: (id: number) => void;
@@ -61,12 +62,15 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                                                            open,
                                                                            onClose,
                                                                            reglas,
+                                                                           formulas,
                                                                            cuenta,
                                                                            onSaveRegla,
                                                                            onDeleteRegla
                                                                        }) => {
     const [editingRegla, setEditingRegla] = useState<Regla | null>(null);
+    const [editingFormula, setEditingFormula] = useState<Formula | null>(null);
     const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [isEditingFormula, setIsEditingFormula] = useState<boolean>(false);
     const [newRegla, setNewRegla] = useState<Partial<Regla>>({});
     const [value, setValue] = React.useState(0);
 
@@ -79,7 +83,16 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
         setIsEditing(true);
     };
 
+    const handleEditFormulaClick = (formula: Formula) => {
+        setEditingFormula(formula);
+        setIsEditingFormula(true);
+    };
+
     const handleDeleteClick = (id: number) => {
+        onDeleteRegla(id);
+    };
+
+    const handleDeleteFormulaClick = (id: number) => {
         onDeleteRegla(id);
     };
 
@@ -140,88 +153,8 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                         <Grid item xs={3}>
                             <TextField
                                 fullWidth
-                                label="Descripcion"
-                                value={cuenta.cuc_mod_sis_clave}
-                                disabled
-                            />
-                        </Grid>
-                        <Grid item xs={3}>
-                            <TextField
-                                fullWidth
                                 label="Cuenta"
                                 value={cuenta.cuc_cuenta}
-                                disabled
-                            />
-                        </Grid>
-                        <Grid item xs={1}>
-                            <TextField
-                                fullWidth
-                                label="S1"
-                                value={cuenta.cuc_scta1}
-                                disabled
-                            />
-                        </Grid>
-                        <Grid item xs={1}>
-                            <TextField
-                                fullWidth
-                                label="S2"
-                                value={cuenta.cuc_scta2}
-                                disabled
-                            />
-                        </Grid>
-                        <Grid item xs={1}>
-                            <TextField
-                                fullWidth
-                                label="S3"
-                                value={cuenta.cuc_scta3}
-                                disabled
-                            />
-                        </Grid>
-                        <Grid item xs={1}>
-                            <TextField
-                                fullWidth
-                                label="S4"
-                                value={cuenta.cuc_scta4}
-                                disabled
-                            />
-                        </Grid>
-                        <Grid item xs={1}>
-                            <TextField
-                                fullWidth
-                                label="S5"
-                                value={cuenta.cuc_scta5}
-                                disabled
-                            />
-                        </Grid>
-                        <Grid item xs={1}>
-                            <TextField
-                                fullWidth
-                                label="S6"
-                                value={cuenta.cuc_scta6}
-                                disabled
-                            />
-                        </Grid>
-                        <Grid item xs={1}>
-                            <TextField
-                                fullWidth
-                                label="S7"
-                                value={cuenta.cuc_scta7}
-                                disabled
-                            />
-                        </Grid>
-                        <Grid item xs={6}>
-                            <TextField
-                                fullWidth
-                                label="Ente"
-                                value={cuenta.cuc_ente}
-                                disabled
-                            />
-                        </Grid>
-                        <Grid item xs={5}>
-                            <TextField
-                                fullWidth
-                                label="Tipo ente"
-                                value={cuenta.cuc_tipo_ente}
                                 disabled
                             />
                         </Grid>
@@ -243,7 +176,7 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {reglas.map((regla) => (
+                                    {reglas?.map((regla) => (
                                         <TableRow key={regla.id}>
                                             <TableCell>
                                                 {isEditing && editingRegla?.id === regla.id ? (
@@ -345,53 +278,43 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {reglas.map((regla) => (
-                                        <TableRow key={regla.id}>
+                                    {formulas?.map((formula) => (
+                                        <TableRow key={formula.for_secuencia}>
                                             <TableCell>
-                                                {isEditing && editingRegla?.id === regla.id ? (
+                                                {isEditingFormula && editingFormula?.for_secuencia === formula.for_secuencia ? (
                                                     <TextField
-                                                        value={editingRegla.reg_secuencia}
+                                                        value={editingFormula.for_secuencia}
                                                         onChange={(e) => handleInputChange('reg_secuencia', Number(e.target.value))}
                                                     />
                                                 ) : (
-                                                    regla.reg_secuencia
+                                                    formula.for_secuencia
                                                 )}
                                             </TableCell>
                                             <TableCell>
-                                                {isEditing && editingRegla?.id === regla.id ? (
+                                                {isEditingFormula && editingFormula?.for_secuencia === formula.for_secuencia ? (
                                                     <TextField
-                                                        value={editingRegla.reg_tit_columna}
+                                                        value={editingFormula.for_tit_columna}
                                                         onChange={(e) => handleInputChange('reg_tit_columna', Number(e.target.value))}
                                                     />
                                                 ) : (
-                                                    regla.reg_tit_columna
+                                                    formula.for_tit_columna
                                                 )}
                                             </TableCell>
                                             <TableCell>
-                                                {isEditing && editingRegla?.id === regla.id ? (
+                                                {isEditingFormula && editingFormula?.for_secuencia === formula.for_secuencia ? (
                                                     <TextField
-                                                        value={editingRegla.reg_operador}
+                                                        value={editingFormula.for_operador}
                                                         onChange={(e) => handleInputChange('reg_operador', e.target.value)}
                                                     />
                                                 ) : (
-                                                    regla.reg_operador
+                                                    formula.for_operador
                                                 )}
                                             </TableCell>
                                             <TableCell>
-                                                {isEditing && editingRegla?.id === regla.id ? (
-                                                    <TextField
-                                                        value={editingRegla.reg_valor}
-                                                        onChange={(e) => handleInputChange('reg_valor', e.target.value)}
-                                                    />
-                                                ) : (
-                                                    regla.reg_valor
-                                                )}
-                                            </TableCell>
-                                            <TableCell>
-                                                <IconButton onClick={() => handleEditClick(regla)} aria-label="edit">
+                                                <IconButton onClick={() => handleEditFormulaClick(formula)} aria-label="edit">
                                                     <EditIcon/>
                                                 </IconButton>
-                                                <IconButton onClick={() => handleDeleteClick(regla.id)}
+                                                <IconButton onClick={() => handleDeleteFormulaClick(formula.for_secuencia)}
                                                             aria-label="delete">
                                                     <DeleteIcon/>
                                                 </IconButton>
@@ -429,6 +352,7 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                 </TableBody>
                             </Table>
                         </CustomTabPanel>
+
                     </Grid>
                 </Grid>
             </DialogContent>
