@@ -100,6 +100,9 @@ const CuentaPage: React.FC = () => {
     const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
+    const [cuentaInfo, setCuentaInfo] = useState<Cuenta>(originalObject);
+
+
     const [value, setValue] = React.useState(0);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -238,15 +241,29 @@ const CuentaPage: React.FC = () => {
     };
 
     const handleViewRules = (id: number) => {
-        const cuentaSeleccionada = cuentas.find(cuenta => cuenta.id === id);
+        const cuentaSeleccionada = cuentas.find(cuenta => cuenta.cuc_clave === id);
 
         if (!cuentaSeleccionada) {
             notify('Cuenta no encontrada', 'error');
             return;
         }
 
-        const reglasAsociadas = reglas.filter(regla => regla.clave_regla === cuentaSeleccionada.clave_regla);
+        //const reglasAsociadas = reglas.filter(regla => regla.clave_regla === cuentaSeleccionada.clave_regla);
+        //Traer las reglase asociadas en la lista de cuentas
+        /**
+         *  Cuenta : {
+         *      ...props,
+         *      Sistema:{
+         *          ...props
+         *      },
+         *      reglas: [
+         *          {},{},{},...
+         *      ]
+         *  }
+         */
+        const reglasAsociadas : Regla = [];
         setCurrentReglas(reglasAsociadas);
+        setCuentaInfo(cuentaSeleccionada)
         setIsSubpantallaOpen(true);
     };
 
@@ -358,28 +375,31 @@ const CuentaPage: React.FC = () => {
                     </Button>
                 </Box>
             </Box>
-            <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+            <CuentasTable
+                ref={tableRef}
+                data={filteredCuentas}
+                onSelectionChange={setSelectedIds}
+                onUpdateCuenta={handleEditCuenta}
+                onDeleteCuenta={handleDeleteRegla}
+                onViewRules={handleViewRules}
+            />
+
+            {/*<ReglasTable
+                data={currentReglas}
+                onUpdateRegla={handleSaveRegla}
+                onDeleteRegla={handleDeleteRegla}
+                onSelectionChange={setSelectedIds}
+            />*/}
+{/*            <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
                 <Tab label="Cuentas" {...a11yProps(0)} />
                 <Tab label="Reglas" {...a11yProps(1)} />
             </Tabs>
             <CustomTabPanel value={value} index={0}>
-                <CuentasTable
-                    ref={tableRef}
-                    data={filteredCuentas}
-                    onSelectionChange={setSelectedIds}
-                    onUpdateCuenta={handleEditCuenta}
-                    onDeleteCuenta={handleDeleteRegla}
-                    onViewRules={handleViewRules}
-                />
+
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
-                <ReglasTable
-                    data={currentReglas}
-                    onUpdateRegla={handleSaveRegla}
-                    onDeleteRegla={handleDeleteRegla}
-                    onSelectionChange={setSelectedIds}
-                />
-            </CustomTabPanel>
+
+            </CustomTabPanel>*/}
             <AddReglaModal
                 open={isModalOpen}
                 onClose={handleCloseModal}
@@ -395,6 +415,7 @@ const CuentaPage: React.FC = () => {
             <ReglasSubpantallaModal
                 open={isSubpantallaOpen}
                 onClose={() => setIsSubpantallaOpen(false)}
+                cuenta={cuentaInfo}
                 reglas={currentReglas}
                 onSaveRegla={handleSaveRegla}
                 onDeleteRegla={handleDeleteRegla}
