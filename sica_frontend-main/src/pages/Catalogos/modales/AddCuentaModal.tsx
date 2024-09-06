@@ -63,7 +63,10 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
 
     useEffect(() => {
         if (initialData) {
-            setCuentaData(initialData);
+            setCuentaData({
+                ...initialData,
+                cuc_inc: initialData.cuc_consolida_ente === 'S' ? 'E' : (initialData.cuc_inc_movs === 'S' ? 'M': (initialData.cuc_inc_saldo === 'S' ? 'S': ""))
+            });
         }
     }, [initialData]);
 

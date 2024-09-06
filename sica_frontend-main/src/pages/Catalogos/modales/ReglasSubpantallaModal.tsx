@@ -80,12 +80,14 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
     });
     const [newFormula, setNewFormula] = useState<Partial<Formula>>({});
     const [value, setValue] = React.useState(0);
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
 
     const handleEditClick = (regla: Regla) => {
+
         setEditingRegla(regla);
         setIsEditing(true);
     };
@@ -104,11 +106,11 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
     };
 
     const handleSaveClick = () => {
-        if (editingRegla) {
+        if (editingRegla && validateNewRegla(editingRegla)) {
             onSaveRegla(editingRegla);
             setEditingRegla(null);
             setIsEditing(false);
-        }else if (editingFormula){
+        } else if (editingFormula && validateNewFormula(editingFormula)) {
             onSaveFormula(editingFormula);
             setEditingFormula(null);
             setIsEditingFormula(false)
@@ -116,34 +118,91 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
     };
 
     const handleAddClick = () => {
-        const regla: Regla = {
-            id: reglas.length + 1,
-            clave_regla: newRegla.clave_regla || '',
-            descripcion: newRegla.descripcion || '',
-            reg_cuc_clave: cuenta.cuc_clave || 0,
-            reg_tit_mod_sis_clave: cuenta.cuc_mod_sis_clave || '',
-            reg_tit_mod_clave: cuenta.cuc_mod_clave || '',
-            reg_tit_columna: newRegla.reg_tit_columna || 0,
-            reg_secuencia: newRegla.reg_secuencia || 0,
-            reg_operador: newRegla.reg_operador || '',
-            reg_valor: newRegla.reg_valor || '',
-        };
-        onSaveRegla(regla);
-        setNewRegla({});
+        if (validateNewRegla(newRegla)) {
+            const regla: Regla = {
+                id: reglas.length + 1,
+                clave_regla: newRegla.clave_regla || '',
+                descripcion: newRegla.descripcion || '',
+                reg_cuc_clave: cuenta.cuc_clave || 0,
+                reg_tit_mod_sis_clave: cuenta.cuc_mod_sis_clave || '',
+                reg_tit_mod_clave: cuenta.cuc_mod_clave || '',
+                reg_tit_columna: newRegla.reg_tit_columna || 0,
+                reg_secuencia: newRegla.reg_secuencia || 0,
+                reg_operador: newRegla.reg_operador || '',
+                reg_valor: newRegla.reg_valor || '',
+            };
+            onSaveRegla(regla);
+            setNewRegla({});
+        }
+
     };
 
     const handleAddFormulaClick = () => {
-        const formula: Formula = {
-            id: formulas.length + 1,
-            for_cuc_clave: cuenta.cuc_clave || 0,
-            for_tit_mod_sis_clave: cuenta.cuc_mod_sis_clave || '',
-            for_tit_mod_clave: cuenta.cuc_mod_clave?.toString() || '',
-            for_tit_columna: newFormula.for_tit_columna || 0,
-            for_secuencia: newFormula.for_secuencia || 0,
-            for_operador: newFormula.for_operador || ''
-        };
-        onSaveFormula(formula);
-        setNewFormula({});
+        if(validateNewFormula(newFormula)){
+            const formula: Formula = {
+                id: formulas.length + 1,
+                for_cuc_clave: cuenta.cuc_clave || 0,
+                for_tit_mod_sis_clave: cuenta.cuc_mod_sis_clave || '',
+                for_tit_mod_clave: cuenta.cuc_mod_clave?.toString() || '',
+                for_tit_columna: newFormula.for_tit_columna || 0,
+                for_secuencia: newFormula.for_secuencia || 0,
+                for_operador: newFormula.for_operador || ''
+            };
+            onSaveFormula(formula);
+            setNewFormula({});
+        }
+    };
+
+    const validateNewRegla = (regla : Regla) => {
+        let tempErrors: { [key: string]: string } = {};
+
+        if (!regla?.reg_secuencia) {
+            tempErrors.reg_secuencia = "Campo obligatorio";
+        }
+        if (regla?.reg_secuencia?.toString()?.length > 6) {
+            tempErrors.reg_secuencia = "Longitud invalida max 6 ";
+        }
+        if (!regla?.reg_tit_columna) {
+            tempErrors.reg_tit_columna = "Campo obligatorio";
+        }
+        if (regla?.reg_tit_columna?.toString()?.length > 2) {
+            tempErrors.reg_tit_columna = "Longitud invalida max 2 ";
+        }
+        if (!regla?.reg_operador) {
+            tempErrors.reg_operador = "Campo obligatorio";
+        }
+        if (!regla?.reg_valor) {
+            tempErrors.reg_valor = "Campo obligatorio";
+        }
+        if (regla?.reg_valor?.toString()?.length > 2) {
+            tempErrors.reg_valor = "Longitud invalida max 2 ";
+        }
+
+        setErrors(tempErrors);
+        return Object.keys(tempErrors).length === 0;
+    };
+
+    const validateNewFormula = (formula : Formula) => {
+        let tempErrors: { [key: string]: string } = {};
+
+        if (!formula?.for_secuencia) {
+            tempErrors.for_secuencia = "Campo obligatorio";
+        }
+        if (formula?.for_secuencia?.toString()?.length > 6) {
+            tempErrors.for_secuencia = "Longitud invalida max 6 ";
+        }
+        if (!formula?.for_tit_columna) {
+            tempErrors.for_tit_columna = "Campo obligatorio";
+        }
+        if (formula?.for_tit_columna?.toString()?.length > 2) {
+            tempErrors.for_tit_columna = "Longitud invalida max 2 ";
+        }
+        if (!formula?.for_operador) {
+            tempErrors.for_operador = "Campo obligatorio";
+        }
+
+        setErrors(tempErrors);
+        return Object.keys(tempErrors).length === 0;
     };
 
     const handleInputChange = (field: keyof Regla, value: string | number) => {
@@ -155,7 +214,7 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
     };
 
     const handleInputFormulaChange = (field: keyof Formula, value: string | number) => {
-        console.log(editingFormula&& isEditingFormula)
+        console.log(editingFormula && isEditingFormula)
         if (editingFormula && isEditingFormula) {
             setEditingFormula({...editingFormula, [field]: value});
         } else {
@@ -219,6 +278,8 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                                     placeholder="Secuencia"
                                                     value={newRegla.reg_secuencia || ''}
                                                     onChange={(e) => handleInputChange('reg_secuencia', Number(e.target.value))}
+                                                    error={!!errors.reg_secuencia}
+                                                    helperText={errors.reg_secuencia}
                                                 />
                                             </TableCell>
                                             <TableCell>
@@ -226,6 +287,8 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                                     placeholder="Columna"
                                                     value={newRegla.reg_tit_columna || ''}
                                                     onChange={(e) => handleInputChange('reg_tit_columna', Number(e.target.value))}
+                                                    error={!!errors.reg_tit_columna}
+                                                    helperText={errors.reg_tit_columna}
                                                 />
                                             </TableCell>
                                             <TableCell>
@@ -233,6 +296,8 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                                     placeholder="Operador"
                                                     value={newRegla.reg_operador || ''}
                                                     onChange={(e) => handleInputChange('reg_operador', e.target.value)}
+                                                    error={!!errors.reg_operador}
+                                                    helperText={errors.reg_operador}
                                                 />
                                             </TableCell>
                                             <TableCell>
@@ -240,6 +305,8 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                                     placeholder="Valor"
                                                     value={newRegla.reg_valor || ''}
                                                     onChange={(e) => handleInputChange('reg_valor', e.target.value)}
+                                                    error={!!errors.reg_valor}
+                                                    helperText={errors.reg_valor}
                                                 />
                                             </TableCell>
                                             <TableCell>
@@ -257,6 +324,8 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                                     <TextField
                                                         value={editingRegla.reg_secuencia}
                                                         onChange={(e) => handleInputChange('reg_secuencia', Number(e.target.value))}
+                                                        error={!!errors.reg_secuencia}
+                                                        helperText={errors.reg_secuencia}
                                                     />
                                                 ) : (
                                                     regla.reg_secuencia
@@ -267,6 +336,8 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                                     <TextField
                                                         value={editingRegla.reg_tit_columna}
                                                         onChange={(e) => handleInputChange('reg_tit_columna', Number(e.target.value))}
+                                                        error={!!errors.reg_tit_columna}
+                                                        helperText={errors.reg_tit_columna}
                                                     />
                                                 ) : (
                                                     regla.reg_tit_columna
@@ -277,6 +348,8 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                                     <TextField
                                                         value={editingRegla.reg_operador}
                                                         onChange={(e) => handleInputChange('reg_operador', e.target.value)}
+                                                        error={!!errors.reg_operador}
+                                                        helperText={errors.reg_operador}
                                                     />
                                                 ) : (
                                                     regla.reg_operador
@@ -287,6 +360,8 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                                     <TextField
                                                         value={editingRegla.reg_valor}
                                                         onChange={(e) => handleInputChange('reg_valor', e.target.value)}
+                                                        error={!!errors.reg_valor}
+                                                        helperText={errors.reg_valor}
                                                     />
                                                 ) : (
                                                     regla.reg_valor
@@ -330,6 +405,8 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                             placeholder="Secuencia"
                                             value={newFormula.for_secuencia || ''}
                                             onChange={(e) => handleInputFormulaChange('for_secuencia', Number(e.target.value))}
+                                            error={!!errors.for_secuencia}
+                                            helperText={errors.for_secuencia}
                                         />
                                     </TableCell>
                                     <TableCell>
@@ -337,6 +414,8 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                             placeholder="Columna"
                                             value={newFormula.for_tit_columna || ''}
                                             onChange={(e) => handleInputFormulaChange('for_tit_columna', Number(e.target.value))}
+                                            error={!!errors.for_tit_columna}
+                                            helperText={errors.for_tit_columna}
                                         />
                                     </TableCell>
                                     <TableCell>
@@ -344,6 +423,8 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                             placeholder="Operador"
                                             value={newFormula.for_operador || ''}
                                             onChange={(e) => handleInputFormulaChange('for_operador', e.target.value)}
+                                            error={!!errors.for_operador}
+                                            helperText={errors.for_operador}
                                         />
                                     </TableCell>
                                     <TableCell>
@@ -360,6 +441,8 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                                     <TextField
                                                         value={editingFormula?.for_secuencia}
                                                         onChange={(e) => handleInputFormulaChange('for_secuencia', Number(e.target.value))}
+                                                        error={!!errors.for_secuencia}
+                                                        helperText={errors.for_secuencia}
                                                     />
                                                 ) : (
                                                     formula.for_secuencia
@@ -370,6 +453,8 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                                     <TextField
                                                         value={editingFormula?.for_tit_columna}
                                                         onChange={(e) => handleInputFormulaChange('for_tit_columna', Number(e.target.value))}
+                                                        error={!!errors.for_tit_columna}
+                                                        helperText={errors.for_tit_columna}
                                                     />
                                                 ) : (
                                                     formula.for_tit_columna
@@ -380,6 +465,8 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                                     <TextField
                                                         value={editingFormula?.for_operador}
                                                         onChange={(e) => handleInputFormulaChange('for_operador', e.target.value)}
+                                                        error={!!errors.for_operador}
+                                                        helperText={errors.for_operador}
                                                     />
                                                 ) : (
                                                     formula.for_operador

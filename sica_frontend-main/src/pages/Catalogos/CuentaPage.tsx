@@ -210,13 +210,12 @@ const CuentaPage: React.FC = () => {
     const handleCloseCuentaModal = () => {
         setIsCuentaModalOpen(false);
     };
-    //Todo: review if method return true
+
     const handleSaveCuenta = async (cuenta: Cuenta) => {
         try {
             await service.createOrUpdateCuentaRegla(cuenta);
-            if (cuenta.id) {
-
-                setCuentas(cuentas.map(c => (c.id === cuenta.id ? cuenta : c)));
+            if (cuenta.cuc_clave) {
+                setCuentas(cuentas.map(c => (c.cuc_clave === cuenta.cuc_clave ? cuenta : c)));
             } else {
                 setCuentas([...cuentas, cuenta]);
             }
