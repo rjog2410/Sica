@@ -112,6 +112,7 @@ export interface Regla {
 }
 
 export interface Formula {
+  id?: number;
   for_cuc_clave: number;
   for_tit_mod_sis_clave: string;
   for_tit_mod_clave: string;

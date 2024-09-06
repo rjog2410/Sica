@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {Box, Button, Tab, Tabs} from '@mui/material';
+import {Box, Button} from '@mui/material';
 import BodyHeader from '../../components/base/BodyHeader';
 import CuentasTable from '../../components/base/tabla/CuentasTable';
-import ReglasTable from '../../components/base/tabla/ReglasTable';
 import ComboBox from '../../components/base/tabla/Combobox';
-import {Cuenta, Regla, Sistema} from '../../types';
+import {Cuenta, Formula, Regla, Sistema} from '../../types';
 import * as service from './selectores/serviceSelectorCuentaRegla';
 import { useNotification } from '../../providers/NotificationProvider';
 import ConfirmDialog from '../../components/base/ConfirmDialog';
@@ -14,6 +13,7 @@ import * as serviceSistema from "@/pages/Catalogos/selectores/serviceSelectorSis
 import ReglasSubpantallaModal from './modales/ReglasSubpantallaModal';
 import {fetchModuloByClave, fetchModulos} from "@/pages/Catalogos/selectores/serviceSelectorModulos.ts";
 import {
+    createOrUpdateFormula,
     getAllCuentas,
     getCuentasBySistema,
     getCuentasBySistemaAndModulo, getFormulas, getReglas
@@ -168,7 +168,6 @@ const CuentaPage: React.FC = () => {
         }
     }, [selectedModulo]);
 
-    console.log("filteredCuentas: ", filteredCuentas)
 
     const handleSistemaSelect = (sistema: string | null) => {
         setSelectedSistema(sistema);
@@ -180,31 +179,63 @@ const CuentaPage: React.FC = () => {
     };
 
     const handleOpenModal = () => {
-        setEditingRegla(null);
         setIsModalOpen(true);
     };
 
     const handleCloseModal = () => {
-        setIsModalOpen(false);
+        setEditingCuenta(null);
     };
 
     const handleSaveRegla = async (newRegla: Regla) => {
         try {
-            if (editingRegla) {
-                await service.createOrUpdateRegla(newRegla, true);
-                setReglas(reglas.map((regla) =>
-                    regla.id === editingRegla.id ? newRegla : regla
-                ));
-                notify('Regla actualizada correctamente', 'success');
+            if (newRegla.id <= currentReglas?.length) {
+                console.log("Actualizando regla")
+                await service.createOrUpdateRegla(newRegla, false).then( resp =>{
+                    if(resp?.data?.status === 400){
+                        notify(resp?.data?.message?.msg, 'error');
+                    }else{
+                        setReglas(reglas.map((regla) =>
+                            regla.id === newRegla.id ? newRegla : regla
+                        ));
+                        notify('Regla actualizada correctamente', 'success');
+                    }
+                });
+
             } else {
-                await service.createOrUpdateRegla(newRegla, false);
-                setReglas([...reglas, newRegla]);
-                notify('Regla agregada correctamente', 'success');
+                console.log("Creando regla")
+                await service.createOrUpdateRegla(newRegla, true).then(resp => {
+                    if(resp?.data?.status === 400){
+                        notify(resp?.data?.message?.msg, 'error');
+                    }else{
+                        setReglas([...reglas, newRegla]);
+                        notify('Regla agregada correctamente', 'success');
+                    }
+                });
+
             }
         } catch (error) {
             notify('Error al guardar la regla', 'error');
         }
-        handleCloseModal();
+
+        getReglas(cuentaInfo?.cuc_clave).then(resp =>  setCurrentReglas(resp?.map((reg,i) =>({...reg,id:i}))))
+
+    };
+
+    const handleSaveFormula = async (newFormula: Formula) => {
+        console.log("newFormula: ",newFormula)
+        try {
+            await service.createOrUpdateFormula(newFormula, true).then( resp =>{
+                if(resp?.data?.status === 400){
+                    notify(resp?.data?.message?.msg, 'error');
+                }else{
+                    notify('Regla actualizada correctamente', 'success');
+                }
+            });
+        } catch (error) {
+            notify('Error al guardar la regla', 'error');
+        }
+
+        getFormulas(cuentaInfo?.cuc_clave).then(resp => setCurrentFormulas(resp?.map((form,index) => ({...form, id:index}))))
     };
 
     const handleOpenCuentaModal = () => {
@@ -219,7 +250,6 @@ const CuentaPage: React.FC = () => {
     const handleSaveCuenta = async (cuenta: Cuenta) => {
         try {
             await service.createOrUpdateCuentaRegla(cuenta);
-            console.log("Cuenta id: ", id)
             if (cuenta.id) {
 
                 setCuentas(cuentas.map(c => (c.id === cuenta.id ? cuenta : c)));
@@ -248,14 +278,14 @@ const CuentaPage: React.FC = () => {
             notify('Cuenta no encontrada', 'error');
             return;
         }
-        getReglas(cuentaSeleccionada?.cuc_clave).then(resp =>  setCurrentReglas(resp))
-        getFormulas(cuentaSeleccionada?.cuc_clave).then(resp => setCurrentFormulas(resp))
+        getReglas(cuentaSeleccionada?.cuc_clave).then(resp =>  setCurrentReglas(resp?.map((reg,i) =>({...reg,id:i}))))
+        getFormulas(cuentaSeleccionada?.cuc_clave).then(resp => setCurrentFormulas(resp?.map((form,index) => ({...form, id:index}))))
         setCuentaInfo(cuentaSeleccionada)
         setIsSubpantallaOpen(true);
     };
 
     const handleDeleteRegla = (id: number) => {
-        const reglaToDelete = reglas.find(regla => regla.id === id);
+        const reglaToDelete = currentReglas.find(regla => regla.id === id);
 
         if (!reglaToDelete) {
             notify('Regla no encontrada', 'error');
@@ -264,8 +294,8 @@ const CuentaPage: React.FC = () => {
 
         setConfirmAction(() => async () => {
             try {
-                await service.removeRegla(reglaToDelete.id);
-                setReglas(reglas.filter((regla) => regla.id !== id));
+                await service.removeRegla(reglaToDelete?.id);
+                //setReglas(reglas.filter((regla) => regla.id !== id));
                 notify('Regla eliminada correctamente', 'success');
             } catch (error) {
                 notify('Error al eliminar la regla', 'error');
@@ -387,12 +417,12 @@ const CuentaPage: React.FC = () => {
             <CustomTabPanel value={value} index={1}>
 
             </CustomTabPanel>*/}
-            <AddReglaModal
+{/*            <AddReglaModal
                 open={isModalOpen}
                 onClose={handleCloseModal}
                 onSave={handleSaveRegla}
                 initialData={editingRegla}
-            />
+            />*/}
             <AddCuentaModal
                 open={isCuentaModalOpen}
                 onClose={handleCloseCuentaModal}
@@ -406,6 +436,7 @@ const CuentaPage: React.FC = () => {
                 reglas={currentReglas}
                 formulas={currentFormulas}
                 onSaveRegla={handleSaveRegla}
+                onSaveFormula={handleSaveFormula}
                 onDeleteRegla={handleDeleteRegla}
             />
             <ConfirmDialog

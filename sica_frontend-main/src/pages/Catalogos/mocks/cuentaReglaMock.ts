@@ -1,4 +1,4 @@
-import { Cuenta, Regla } from "@/types";
+import {Cuenta, Formula, Regla} from "@/types";
 
 // Datos mock
 let cuentasMock: Cuenta[] = [
@@ -90,7 +90,9 @@ export const mockFetchAllCuentas = async (): Promise<Cuenta[]> => {
 export const mockFetchReglas = async (): Promise<Regla[]> => {
   return reglasMock;
 };
-
+export const mockFetchFormulas = async (): Promise<Formula[]> => {
+  return [];
+};
 export const mockFetchModulosBySistema = async (sistema: string): Promise<string[]> => {
   const modulos = cuentasMock
     .filter(cuenta => cuenta.clave_sistema === sistema)
@@ -140,6 +142,10 @@ export const mockCreateOrUpdateRegla = async (regla: Regla): Promise<Regla> => {
     reglasMock.push(regla);
   }
   return regla;
+};
+
+export const mockCreateOrUpdateFormula = async (formula: Formula): Promise<Formula> => {
+  return formula;
 };
 
 export const mockDeleteRegla = async (id: number): Promise<void> => {

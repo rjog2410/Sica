@@ -10,7 +10,7 @@ import {
   mockDeleteMultipleReglas,
   mockFetchModulosBySistema,
   mockFetchCuentasBySistema,
-  mockFetchCuentasBySistemaAndModulo,
+  mockFetchCuentasBySistemaAndModulo, mockCreateOrUpdateFormula, mockFetchFormulas,
 } from '@/pages/Catalogos/mocks/cuentaReglaMock';
 
 import {
@@ -26,7 +26,7 @@ import {
   createRegla,
   updateRegla,
   deleteRegla as realDeleteRegla,
-  deleteMultipleReglas, fetchFormulas,
+  deleteMultipleReglas, fetchFormulas, createFormula,
 } from '@/pages/Catalogos/servicios/cuentasReglaService';
 
 const useMock = false; // Cambia a false para usar la API real, true para usar el mock
@@ -50,10 +50,15 @@ export const removeMultipleCuentas = useMock
   ? mockDeleteMultipleCuentasRegla
   : deleteMultipleCuentas;
 export const getReglas = useMock ? mockFetchReglas : fetchReglas;
-export const getFormulas = useMock ? mockFetchReglas : fetchFormulas;
+export const getFormulas = useMock ? mockFetchFormulas : fetchFormulas;
+
 export const createOrUpdateRegla = useMock
   ? mockCreateOrUpdateRegla
   : createRegla;
+
+export const createOrUpdateFormula = useMock
+    ? mockCreateOrUpdateFormula
+    : createFormula;
 export const removeRegla = useMock ? mockDeleteReglaFunc : realDeleteRegla;
 export const removeMultipleReglas = useMock
   ? mockDeleteMultipleReglas

@@ -83,7 +83,6 @@ const CuentasTable = forwardRef(({
   const isSelected = (id: number) => selected.indexOf(id) !== -1;
 
   const sortedData = useMemo(() => {
-    console.log("memo: ", data)
     return data?.slice().sort((a, b) => {
       const aValue = a[orderBy] ?? ''
       const bValue = b[orderBy] ?? ''; 
@@ -137,8 +136,6 @@ const CuentasTable = forwardRef(({
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-
-  console.log("paginatedData: ", paginatedData)
 
   return (
     <TableContainer component={Paper}>
