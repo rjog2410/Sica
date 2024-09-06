@@ -92,8 +92,10 @@ const CuentasTable = forwardRef(({
   }, [data, order, orderBy]);
 
   const paginatedData = useMemo(() => {
+    setSelected([]);
     return sortedData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
   }, [sortedData, page, rowsPerPage]);
+
 
   useEffect(() => {
 
