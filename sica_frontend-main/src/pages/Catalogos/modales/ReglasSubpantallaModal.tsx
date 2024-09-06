@@ -71,7 +71,11 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
     const [editingFormula, setEditingFormula] = useState<Formula | null>(null);
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isEditingFormula, setIsEditingFormula] = useState<boolean>(false);
-    const [newRegla, setNewRegla] = useState<Partial<Regla>>({});
+    const [newRegla, setNewRegla] = useState<Partial<Regla>>({
+        reg_cuc_clave: cuenta.cuc_clave,
+        reg_tit_mod_clave: cuenta.cuc_mod_clave,//Deberia ser el titulo del modulo no su clave?
+        reg_tit_mod_sis_clave: cuenta.cuc_mod_sis_clave,//Deberia ser el titulo del sistema no su clave?
+    });
     const [value, setValue] = React.useState(0);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -109,9 +113,9 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
             id: reglas.length + 1,
             clave_regla: newRegla.clave_regla || '',
             descripcion: newRegla.descripcion || '',
-            reg_cuc_clave: newRegla.reg_cuc_clave || 0,
-            reg_tit_mod_sis_clave: newRegla.reg_tit_mod_sis_clave || '',
-            reg_tit_mod_clave: newRegla.reg_tit_mod_clave || '',
+            reg_cuc_clave: cuenta.cuc_clave || 0,
+            reg_tit_mod_sis_clave: cuenta.cuc_mod_sis_clave || '',
+            reg_tit_mod_clave: cuenta.cuc_mod_clave || '',
             reg_tit_columna: newRegla.reg_tit_columna || 0,
             reg_secuencia: newRegla.reg_secuencia || 0,
             reg_operador: newRegla.reg_operador || '',

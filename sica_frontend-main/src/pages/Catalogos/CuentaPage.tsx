@@ -248,21 +248,6 @@ const CuentaPage: React.FC = () => {
             notify('Cuenta no encontrada', 'error');
             return;
         }
-
-        //const reglasAsociadas = reglas.filter(regla => regla.clave_regla === cuentaSeleccionada.clave_regla);
-        //Traer las reglase asociadas en la lista de cuentas
-        /**
-         *  Cuenta : {
-         *      ...props,
-         *      Sistema:{
-         *          ...props
-         *      },
-         *      reglas: [
-         *          {},{},{},...
-         *      ]
-         *  }
-         */
-
         getReglas(cuentaSeleccionada?.cuc_clave).then(resp =>  setCurrentReglas(resp))
         getFormulas(cuentaSeleccionada?.cuc_clave).then(resp => setCurrentFormulas(resp))
         setCuentaInfo(cuentaSeleccionada)
