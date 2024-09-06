@@ -32,19 +32,24 @@ import {
 const useMock = false; // Cambia a false para usar la API real, true para usar el mock
 
 export const getSistemas = useMock ? mockFetchSistemas : fetchSistemas;
+
 export const getModulosBySistema = useMock
   ? mockFetchModulosBySistema
   : fetchModulosBySistema;
+
 export const getAllCuentas = useMock ? mockFetchAllCuentas : fetchAllCuentas;
 export const getCuentasBySistema = useMock
   ? mockFetchCuentasBySistema
   : fetchCuentasBySistema;
+
 export const getCuentasBySistemaAndModulo = useMock
   ? mockFetchCuentasBySistemaAndModulo
   : fetchCuentasBySistemaAndModulo;
+
 export const createOrUpdateCuentaRegla = useMock
   ? mockCreateOrUpdateCuentaRegla
   : createCuenta;
+
 export const removeCuenta = useMock ? mockDeleteCuentaRegla : deleteCuenta;
 export const removeMultipleCuentas = useMock
   ? mockDeleteMultipleCuentasRegla

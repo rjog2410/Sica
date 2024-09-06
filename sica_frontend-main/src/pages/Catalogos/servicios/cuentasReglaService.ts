@@ -67,14 +67,15 @@ export const updateCuenta = async (cuenta: Cuenta & { id: number }): Promise<num
 };
 
 // Eliminar una cuenta por ID
-export const deleteCuenta = async (id: number): Promise<void> => {
-    await axios.post(`${BASE_URL}/delete`, {id});
+export const deleteCuenta = async (id: number): Promise<any> => {
+    const response = await axios.post(`${BASE_URL}/delete`, {id});
+    return response.data;
 };
 
 // Eliminar múltiples cuentas por ID
 export const deleteMultipleCuentas = async (ids: number[]): Promise<number[]> => {
     const response = await axios.post(`${BASE_URL}/delete_all`, {ids});
-    return response.data.data; // Retorna los IDs eliminados
+    return response.data; // Retorna los IDs eliminados
 };
 
 // Obtener reglas por cuenta
@@ -116,8 +117,9 @@ export const updateRegla = async (regla: Regla): Promise<void> => {
 };
 
 // Eliminar una regla
-export const deleteRegla = async (regla: Regla): Promise<void> => {
-    await axios.post(`${BASE_URL}/reglas/delete`, {regla});
+export const deleteRegla = async (regla: Regla): Promise<any> => {
+    const response = await axios.post(`${BASE_URL}/reglas/delete`, {regla});
+    return response;
 };
 
 // Eliminar múltiples reglas
