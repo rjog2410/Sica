@@ -152,6 +152,6 @@ export const mockDeleteRegla = async (id: number): Promise<void> => {
   reglasMock = reglasMock.filter(r => r.id !== id);
 };
 
-export const mockDeleteMultipleReglas = async (ids: number[]): Promise<void> => {
+export const mockDeleteMultipleReglas = async (ids: number[]): Promise<any> => {
   reglasMock = reglasMock.filter(r => !ids.includes(r.id));
 };

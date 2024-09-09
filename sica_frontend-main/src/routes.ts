@@ -48,11 +48,6 @@ const routes = [
         name: 'Cuentas',
         component: CuentaPage // Otro ejemplo de subruta
       },
-      {
-        path: '/catalogos/reglas',
-        name: 'Reglas',
-        component: ReglasPage // Otro ejemplo de subruta
-      },
     ]
   },
   { 

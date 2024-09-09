@@ -123,6 +123,7 @@ export const deleteRegla = async (regla: Regla): Promise<any> => {
 };
 
 // Eliminar múltiples reglas
-export const deleteMultipleReglas = async (reglas: Regla[]): Promise<void> => {
-    await axios.post(`${BASE_URL}/reglas/delete_all`, reglas);
+export const deleteMultipleReglas = async (reglas: Regla[]): Promise<any> => {
+    const response = await axios.post(`${BASE_URL}/reglas/delete_all`, reglas);
+    return response.data;
 };

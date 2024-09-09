@@ -12,7 +12,7 @@ import {
     TableRow,
     IconButton,
     TextField,
-    Tabs, Box, Tab, Grid
+    Tabs, Box, Tab, Grid, Checkbox
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -28,6 +28,7 @@ interface ReglasSubpantallaModalProps {
     onSaveRegla: (regla: Regla) => void;
     onSaveFormula: (formula: Formula) => void;
     onDeleteRegla: (id: number) => void;
+    onDeleteAllReglas: (ids: number[]) => void;
 }
 
 interface TabPanelProps {
@@ -67,7 +68,8 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                                                            cuenta,
                                                                            onSaveRegla,
                                                                            onSaveFormula,
-                                                                           onDeleteRegla
+                                                                           onDeleteRegla,
+                                                                           onDeleteAllReglas
                                                                        }) => {
     const [editingRegla, setEditingRegla] = useState<Regla | null>(null);
     const [editingFormula, setEditingFormula] = useState<Formula | null>(null);
@@ -81,6 +83,10 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
     const [newFormula, setNewFormula] = useState<Partial<Formula>>({});
     const [value, setValue] = React.useState(0);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+    const [checked, setChecked] = React.useState(false);
+
+    const [selectedReglas, setSelectedReglas] = useState<Partial<number[]>>([]);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
@@ -98,10 +104,6 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
     };
 
     const handleDeleteClick = (id: number) => {
-        onDeleteRegla(id);
-    };
-
-    const handleDeleteFormulaClick = (id: number) => {
         onDeleteRegla(id);
     };
 
@@ -138,7 +140,7 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
     };
 
     const handleAddFormulaClick = () => {
-        if(validateNewFormula(newFormula)){
+        if (validateNewFormula(newFormula)) {
             const formula: Formula = {
                 id: formulas.length + 1,
                 for_cuc_clave: cuenta.cuc_clave || 0,
@@ -153,7 +155,7 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
         }
     };
 
-    const validateNewRegla = (regla : Regla) => {
+    const validateNewRegla = (regla: Regla) => {
         let tempErrors: { [key: string]: string } = {};
 
         if (!regla?.reg_secuencia) {
@@ -182,7 +184,7 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
         return Object.keys(tempErrors).length === 0;
     };
 
-    const validateNewFormula = (formula : Formula) => {
+    const validateNewFormula = (formula: Formula) => {
         let tempErrors: { [key: string]: string } = {};
 
         if (!formula?.for_secuencia) {
@@ -222,7 +224,27 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
         }
     };
 
+    const handleSelectRegla = (event: React.ChangeEvent<HTMLInputElement>, id: number) => {
+        console.log("isChecked: ", event.target.checked, "id: ", id)
+        if (event.target.checked) {
+            setSelectedReglas([...selectedReglas, id])
+        } else {
+            setSelectedReglas(selectedReglas?.filter(regla => regla !== id))
+        }
+    };
+
+    const handleSelectAllRegla = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.checked) {
+            setSelectedReglas(reglas.map(regla => regla.id))
+        } else {
+            setSelectedReglas([])
+        }
+        setChecked(event.target.checked)
+    };
+
     const isCurrentFormula = (formula: Formula) => isEditingFormula && formula.id === editingFormula?.id
+
+    console.log("Selected reglas; ", selectedReglas)
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
@@ -260,9 +282,27 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                         </Tabs>
 
                         <CustomTabPanel value={value} index={0}>
+                            {selectedReglas.length > 0 &&
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={() => {
+                                        onDeleteAllReglas(selectedReglas)
+                                        setSelectedReglas([])
+                                    }}
+                                    sx={{mr: 1}}>
+                                    Eliminar seleccionados
+                                </Button>}
                             <Table>
                                 <TableHead>
                                     <TableRow>
+                                        <TableCell>
+                                            <Checkbox
+                                                checked={checked}
+                                                onChange={(e) => handleSelectAllRegla(e)}
+                                                inputProps={{'aria-label': 'controlled'}}
+                                            />
+                                        </TableCell>
                                         <TableCell>Secuencia</TableCell>
                                         <TableCell>Columna</TableCell>
                                         <TableCell>Operador</TableCell>
@@ -273,6 +313,8 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                 <TableBody>
                                     {
                                         !isEditing && <TableRow>
+                                            <TableCell>
+                                            </TableCell>
                                             <TableCell>
                                                 <TextField
                                                     placeholder="Secuencia"
@@ -319,6 +361,16 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
 
                                     {reglas?.map((regla) => (
                                         <TableRow key={regla.id}>
+                                            <TableCell>
+                                                {!(isEditing && editingRegla?.id === regla.id) && (
+                                                    <Checkbox
+                                                        checked={selectedReglas.includes(regla.id)}
+                                                        onChange={(e) => handleSelectRegla(e, regla.id)}
+                                                        inputProps={{'aria-label': 'controlled'}}
+                                                    />
+                                                )
+                                                }
+                                            </TableCell>
                                             <TableCell>
                                                 {isEditing && editingRegla?.id === regla.id ? (
                                                     <TextField
@@ -476,11 +528,6 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                                 <IconButton onClick={() => handleEditFormulaClick(formula)}
                                                             aria-label="edit">
                                                     <EditIcon/>
-                                                </IconButton>
-                                                <IconButton
-                                                    onClick={() => handleDeleteFormulaClick(formula.for_secuencia)}
-                                                    aria-label="delete">
-                                                    <DeleteIcon/>
                                                 </IconButton>
                                             </TableCell>
                                         </TableRow>
