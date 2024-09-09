@@ -192,11 +192,11 @@ const CuentaPage: React.FC = () => {
                 if (resp?.data?.status === 400) {
                     notify(resp?.data?.message?.msg, 'error');
                 } else {
-                    notify('Regla actualizada correctamente', 'success');
+                    notify('Formula actualizada correctamente', 'success');
                 }
             });
         } catch (error) {
-            notify('Error al guardar la regla', 'error');
+            notify('Error al guardar la formula', 'error');
         }
 
         getFormulas(cuentaInfo?.cuc_clave).then(resp => setCurrentFormulas(resp?.map((form, index) => ({
