@@ -20,6 +20,7 @@ function ComboBox<T>({
   disabled = false,
   sx, // Pasamos la propiedad sx
 }: ComboBoxProps<T>) {
+
   return (
     <Autocomplete
       options={options}

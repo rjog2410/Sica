@@ -93,7 +93,7 @@ public class CuentasReglaController {
             if (utils.isNullOrEmpty(cuc_mod_sis_clave)) {
                 return response = responseService.buildJsonErrorValidateString();
             }
-            List<CuentasReglaDto> cuentasRegla = cuentasConciliaRepository.get_by_cuc_sis_clave(cuc_mod_sis_clave);
+            List<CuentasConciliaEntity> cuentasRegla = cuentasConciliaRepository.get_by_cuc_sis_clave(cuc_mod_sis_clave);
             response = responseService.buildJsonResponseObject(cuentasRegla);
         } catch (Exception e) {
             response = responseService.buildJsonErrorResponse(e.getMessage());
@@ -110,7 +110,7 @@ public class CuentasReglaController {
             if (utils.isNullOrEmpty(cuc_mod_clave) || utils.isNullOrEmpty(cuc_mod_sis_clave)) {
                 return response = responseService.buildJsonErrorValidateString();
             }
-            List<CuentasReglaDto> cuentasRegla = cuentasConciliaRepository.get_by_cuc_mod_clave(cuc_mod_sis_clave,
+            List<CuentasConciliaEntity> cuentasRegla = cuentasConciliaRepository.get_by_cuc_mod_clave(cuc_mod_sis_clave,
                     cuc_mod_clave);
             response = responseService.buildJsonResponseObject(cuentasRegla);
         } catch (Exception e) {

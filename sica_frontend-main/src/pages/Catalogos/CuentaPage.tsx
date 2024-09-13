@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react';
-import {Box, Button} from '@mui/material';
+import {Autocomplete, Box, Button, TextField} from '@mui/material';
 import BodyHeader from '../../components/base/BodyHeader';
 import CuentasTable from '../../components/base/tabla/CuentasTable';
 import ComboBox from '../../components/base/tabla/Combobox';
@@ -108,10 +108,16 @@ const CuentaPage: React.FC = () => {
             fetchModuloByClave(selectedSistema).then(resp => {
                 setModulos(['ALL', ...Array.from(new Set(resp?.map(modulo => modulo?.mod_clave)))]);
             });
+            getCuentasBySistema(selectedSistema).then(resp => {
+                setFilteredCuentas(resp);
+            })
         } else {
             fetchModulos().then(resp => {
                 setModulos(['ALL', ...Array.from(new Set(resp?.map(modulo => modulo?.clave_modulo)))]);
             });
+            getAllCuentas().then(resp => {
+                setFilteredCuentas(resp);
+            })
         }
         setSelectedModulo('ALL');
     }, [selectedSistema]);
@@ -142,14 +148,6 @@ const CuentaPage: React.FC = () => {
         setSelectedModulo(modulo);
     };
 
-    const handleOpenModal = () => {
-        setIsModalOpen(true);
-    };
-
-    const handleCloseModal = () => {
-        setEditingCuenta(null);
-    };
-
     const handleSaveRegla = async (newRegla: Regla) => {
         try {
             if (newRegla.id <= currentReglas?.length) {
@@ -164,7 +162,6 @@ const CuentaPage: React.FC = () => {
                         notify('Regla actualizada correctamente', 'success');
                     }
                 });
-
             } else {
                 console.log("Creando regla")
                 await service.createOrUpdateRegla(newRegla, true).then(resp => {
@@ -384,20 +381,20 @@ const CuentaPage: React.FC = () => {
                 typographyPropsTitle={{variant: "h3"}}
             />
             <Box mb={2}>
-                <ComboBox
+                <Autocomplete
                     options={['ALL', ...Array.from(new Set(sistemas.map(cuenta => cuenta.sis_clave)))]}
-                    onSelect={handleSistemaSelect}
-                    label="Seleccione un Sistema"
-                    getOptionLabel={(option: string) => option}
+                    onChange={(_event, value) => handleSistemaSelect(value)}
+                    value = {selectedSistema}
+                    renderInput={(params) => <TextField {...params} label={selectedSistema} variant="outlined" />} // Aplicamos la propiedad sx a TextField
                 />
             </Box>
             <Box mb={2}>
-                <ComboBox
+                <Autocomplete
                     options={modulos}
-                    onSelect={handleModuloSelect}
-                    label="Seleccione un Módulo"
-                    getOptionLabel={(option: string) => option}
+                    onChange={(_event, value) => handleModuloSelect(value)}
                     disabled={selectedSistema === 'ALL'}
+                    value = {selectedModulo}
+                    renderInput={(params) => <TextField {...params} label={selectedModulo} variant="outlined" />} // Aplicamos la propiedad sx a TextField
                 />
             </Box>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
