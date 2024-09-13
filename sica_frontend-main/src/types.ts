@@ -131,18 +131,18 @@ export interface ConfirmDialogProps {
 export interface ExtraccionParams {
   sistema: string;
   modulo: string;
-  tipoInformacion: string;
-  fechaInicio: string;
-  fechaFin: string;
-  borrarInformacion: boolean;
+  tipo_informacion: string;
+  fecha_inicial: string;
+  fecha_final: string;
+  borrar_info: string;
 }
 
 export interface TraductorParams {
   sistema: string;
   modulo: string;
-  fechaInicio: string;
-  fechaFin: string;
-  tipoInformacion: string;
+  fecha_inicial: string;
+  fecha_final: string;
+  tipo_informacion: string;
 }
 
 export interface Conciliacion {

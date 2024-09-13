@@ -104,6 +104,7 @@ const ModulosTable = forwardRef(({
     const worksheet = workbook.addWorksheet('Módulos');
 
     worksheet.columns = [
+      { header: 'Sistema', key: 'clave_sistema', width: 30 },
       { header: 'Clave Módulo', key: 'clave_modulo', width: 30 },
       { header: 'Nombre Módulo', key: 'nombre_modulo', width: 30 },
       { header: 'Fecha Carga', key: 'fecha_carga', width: 20 },
