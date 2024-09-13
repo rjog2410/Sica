@@ -168,7 +168,6 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             value={newModulo.fecha_informacion || ''}
             onChange={(e) => handleInputChange('fecha_informacion', e.target.value)}
             fullWidth
-            disabled={!!initialData}
             InputLabelProps={{ shrink: true }}
 
           />
@@ -179,7 +178,6 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             label="Tipo de Transacción"
             value={newModulo.tipo_transaccion || ''}
             onChange={(e) => handleInputChange('tipo_transaccion', e.target.value as 'A' | 'S' | null)}
-            disabled={!!initialData}
             fullWidth
           >
             <MenuItem value="A">Archivo</MenuItem>
@@ -193,7 +191,6 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             value={newModulo.status || ''}
             onChange={(e) => handleInputChange('status', e.target.value as 'S' | 'N' | null)}
             fullWidth
-            disabled={!!initialData}
           >
             <MenuItem value="S">Correcta</MenuItem>
             <MenuItem value="N">Incorrecta</MenuItem>
@@ -206,7 +203,6 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             value={newModulo.agrupacion_reportes || ''}
             onChange={(e) => handleInputChange('agrupacion_reportes', e.target.value)}
             fullWidth
-            disabled={!!initialData}
             >
                <MenuItem value="S">Sí</MenuItem>
                <MenuItem value="N">No</MenuItem>
