@@ -172,7 +172,6 @@ const CuentasTable = forwardRef(({
             return (
               <TableRow
                 hover
-                onClick={(event) => handleClick(event, row.cuc_clave!)}
                 role="checkbox"
                 aria-checked={isItemSelected}
                 tabIndex={-1}
@@ -180,7 +179,17 @@ const CuentasTable = forwardRef(({
                 selected={isItemSelected}
               >
                 <TableCell padding="checkbox">
-                  <Checkbox checked={isItemSelected} />
+                  <Checkbox checked={isItemSelected}
+                  onChange={() => {
+                    if(isItemSelected) {
+                      setSelected(selected?.filter(item => item !==row.cuc_clave))
+                      onSelectionChange(selected?.filter(item => item !==row.cuc_clave));
+                    }else {
+                      setSelected([row.cuc_clave!]);
+                      onSelectionChange([row.cuc_clave!]);
+                    }
+                  }}
+                  />
                 </TableCell>
                 <TableCell>{row.cuc_cuenta}</TableCell>
                 <TableCell>{row.cuc_tipo_ente || 'N/A'}</TableCell>
@@ -188,9 +197,6 @@ const CuentasTable = forwardRef(({
                 <TableCell>{row.cuc_consolida_ente === 'S' ? 'E': (row.cuc_inc_saldo === 'S' ? 'S' : (row.cuc_inc_movs === 'S' && 'M'))}</TableCell>
                 <TableCell>
                   <IconButton onClick={() => {
-                    // Desactivar selección múltiple y seleccionar solo la cuenta en edición
-                    setSelected([row.cuc_clave!]);
-                    onSelectionChange([row.cuc_clave!]);
                     onUpdateCuenta(row);
                   }} aria-label="edit">
                     <EditIcon />
