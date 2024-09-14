@@ -1,16 +1,56 @@
 // src/components/base/tabla/CargaAOTable.tsx
+import React, { forwardRef, useImperativeHandle, useState, useMemo, useCallback, useEffect} from 'react';
 import { styled } from '@mui/material/styles';
-import React from 'react';
 import {
   Table,
   TableBody,
   TableContainer,
   TableHead,
   TableRow,
+  TablePagination,
+  TableFooter,
   Paper,
 } from '@mui/material';
 
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
+import { CargaAOData } from '../../../types';
+
+type Order = 'asc' | 'desc';
+
+interface CargaAOTableProps {
+
+  data: CargaAOData[];
+}
+
+const CargaAOTable = forwardRef(({
+  data,
+}: CargaAOTableProps, ref) => {
+  const [order, setOrder] = useState<Order>('asc');
+  const [orderBy, setOrderBy] = useState<keyof CargaAOData>('fecha_carga');
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  useImperativeHandle(ref, () => ({
+    exportToExcel: handleExportToExcel,
+  }));
+
+  const sortedData = useMemo(() => {
+    return data?.slice().sort((a, b) => {
+      const aValue = a[orderBy] ?? ''
+      const bValue = b[orderBy] ?? ''; 
+  
+      return (aValue < bValue ? -1 : 1) * (order === 'asc' ? 1 : -1);
+    });
+  }, [data, order, orderBy]);
+
+  const paginatedData = useMemo(() => {
+    return sortedData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  }, [sortedData, page, rowsPerPage]);
+
+
+  useEffect(() => {
+  }, [paginatedData]);
+
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -33,22 +73,16 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 
-interface CargaAOTableProps {
 
-  data: {
-    registrosCargados: number,
-    registrosConciliados: number,
-    fecha_informacion: string,
-    mod_sis_clave: string,
-    tipo_salmov: string,
-    mod_clave: string,
-    fecha_carga: string,
-  }[];
-}
+const handleChangePage = (event: unknown, newPage: number) => {
+  setPage(newPage);
+};
 
+const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  setRowsPerPage(parseInt(event.target.value, 10));
+  setPage(0);
+};
 
-const CargaAOTable: React.FC<CargaAOTableProps> = ({ data }) => {
-  console.log("datos table: ",data);
   return (
     <TableContainer component={Paper}>
       <Table>
@@ -64,21 +98,34 @@ const CargaAOTable: React.FC<CargaAOTableProps> = ({ data }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.map((row, index) => (
-            <StyledTableRow  key={index}>            
-              <StyledTableCell >{row.fecha_carga}</StyledTableCell  >
-              <StyledTableCell >{row.mod_sis_clave}</StyledTableCell >
-              <StyledTableCell >{row.mod_clave}</StyledTableCell  >
-              <StyledTableCell >{row.fecha_informacion}</StyledTableCell  >
-              <StyledTableCell >{row.tipo_salmov}</StyledTableCell  >
-              <StyledTableCell >{row.registrosCargados}</StyledTableCell  >
-              <StyledTableCell >{row.registrosConciliados}</StyledTableCell  >
-            </StyledTableRow >
-          ))}
+              {paginatedData.map((row, index) => {
+                 
+                return (
+                  <StyledTableRow  key={index}>            
+                    <StyledTableCell >{row.fecha_carga}</StyledTableCell  >
+                    <StyledTableCell >{row.mod_sis_clave}</StyledTableCell >
+                    <StyledTableCell >{row.mod_clave}</StyledTableCell  >
+                    <StyledTableCell >{row.fecha_informacion}</StyledTableCell  >
+                    <StyledTableCell >{row.tipo_salmov}</StyledTableCell  >
+                    <StyledTableCell >{row.RegistrosCargados}</StyledTableCell  >
+                    <StyledTableCell >{row.RegistrosConciliados}</StyledTableCell  >
+                  </StyledTableRow >
+                );
+                    })}
+
         </TableBody>
-      </Table>
+        </Table>    
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 50, { value: -1, label: 'All' }]}
+              component="div"
+              count={sortedData?.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
     </TableContainer>
   );
-};
+});
 
 export default CargaAOTable;

@@ -12,10 +12,10 @@ export const fetchCargaAreaOperativaApi = async (filtros: any): Promise<any | nu
         var fechaOperativa =filtros.fecha_operativa !== '' ? filtros.fecha_operativa?.split("-") : '';
         const newFiltro={
             fecha_carga: filtros.fecha_carga !== '' ? fechaCarga[2]+"/"+fechaCarga[1]+"/"+fechaCarga[0] :null,
-            sistema: filtros.sistema,
-            modulo: filtros.modulo,
+            sistema: (!!filtros.sistema && filtros.sistema !== '' ? filtros.sistema : null),
+            modulo: (!!filtros.modulo && filtros.modulo !== '' ? filtros.modulo : null),
             fecha_informacion: filtros.fecha_operativa !== '' ? fechaOperativa[2]+"/"+fechaOperativa[1]+"/"+fechaOperativa[0] : null,
-            tipo_salmov: filtros.tipoSalMov,
+            tipo_salmov: (!!filtros.tipoSalMov && filtros.tipoSalMov !== '' ? filtros.tipoSalMov : null),
           }
 
         console.log("enviandodatos : ",newFiltro);

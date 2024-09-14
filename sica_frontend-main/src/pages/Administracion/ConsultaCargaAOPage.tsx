@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Autocomplete, Box, Button, Grid , TextField, Typography} from '@mui/material';
+import { Autocomplete, Box, Button, Grid , TextField} from '@mui/material';
 import BodyHeader from '../../components/base/BodyHeader';
 import ComboBox from '../../components/base/tabla/Combobox';
 import CargaAOTable from '../../components/base/tabla/CargaAOTable';
@@ -11,8 +11,8 @@ import * as serviceCargaAO from '../Administracion/selectores/selectorCargaAreaO
 
 interface CargaAOData {
   data: {
-    registrosCargados: number;
-    registrosConciliados: number;
+    RegistrosCargados: number;
+    RegistrosConciliados: number;
     fecha_informacion: string;
     mod_sis_clave: string;
     tipo_salmov: string;

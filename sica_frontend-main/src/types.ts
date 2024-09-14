@@ -188,11 +188,11 @@ export interface DetalleCuentaConsultas {
 
 
 export interface CargaAOData {
-  fechaCarga: string;
-  sistema: string;
-  modulo: string;
-  fechaOperativa: string;
-  tipoConciliacion: string;
-  registrosCargados: number;
-  registrosConciliados: number;
+  RegistrosCargados: number,
+    RegistrosConciliados: number,
+    fecha_informacion: string,
+    mod_sis_clave: string,
+    tipo_salmov: string,
+    mod_clave: string,
+    fecha_carga: string,
 }
