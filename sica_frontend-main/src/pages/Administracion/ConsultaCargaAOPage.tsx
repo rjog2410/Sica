@@ -3,37 +3,39 @@ import { Autocomplete, Box, Button, Grid , TextField, Typography} from '@mui/mat
 import BodyHeader from '../../components/base/BodyHeader';
 import ComboBox from '../../components/base/tabla/Combobox';
 import CargaAOTable from '../../components/base/tabla/CargaAOTable';
-import { fetchCargaAOData } from '../../mock/aoServiceMock';
 import { useNotification } from '../../providers/NotificationProvider';
 import {  Sistema } from '../../types';
 import * as serviceSistema from '../Catalogos/selectores/serviceSelectorSistemas';
 import * as serviceModulo from '../Catalogos/selectores/serviceSelectorModulos';
+import * as serviceCargaAO from '../Administracion/selectores/selectorCargaAreaOperativa';
 
 interface CargaAOData {
-  fechaCarga: string;
-  sistema: string;
-  modulo: string;
-  fechaOperativa: string;
-  tipoConciliacion: string;
-  registrosCargados: number;
-  registrosConciliados: number;
+  data: {
+    registrosCargados: number;
+    registrosConciliados: number;
+    fecha_informacion: string;
+    mod_sis_clave: string;
+    tipo_salmov: string;
+    mod_clave: string;
+    fecha_carga: string;
+  }[];
 }
 
 interface FiltrosCargaAO {
-  fechaCarga: string;
+  fecha_carga: string;
   sistema: string;
   modulo: string;
-  fechaOperativa: string;
-  tipo: string;
+  fecha_operativa: string;
+  tipoSalMov: string;
 }
 
 const ConsultaCargaAOPage: React.FC = () => {
   const [filtros, setFiltros] = useState<FiltrosCargaAO>({
-    fechaCarga: '',
+    fecha_carga: '',
     sistema: '',
     modulo: '',
-    fechaOperativa: '',
-    tipo: '',
+    fecha_operativa: '',
+    tipoSalMov: '',
   });
 
   const [cargaData, setCargaData] = useState<CargaAOData[]>([]);
@@ -48,7 +50,7 @@ const ConsultaCargaAOPage: React.FC = () => {
     try {
     const dataSist= await serviceSistema.fetchSistemas();
     if(!!dataSist && dataSist.length>0){
-      console.log("sistemas recuperados: ",dataSist);
+      //console.log("sistemas recuperados: ",dataSist);
       setSistemas(dataSist);
       setSelectedSistema(dataSist[0].sis_clave);
       handleFiltroChange('sistema', dataSist[0].sis_clave || '');
@@ -130,9 +132,22 @@ const ConsultaCargaAOPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const data = await fetchCargaAOData(filtros);
-      setCargaData(data);
-      notify('Consulta realizada con éxito', 'success');
+      serviceCargaAO.fetchCargaAreaOperativa(filtros).then(resp => {
+        console.log("respuesta: ",resp);
+        if(!!resp && resp.status == 200){
+          setCargaData(resp?.data);
+          notify('Consulta realizada con éxito', 'success');
+        }else{
+          setCargaData([]);
+          notify((!!resp && !!resp.message ? resp.message : 'Error al consultar la carga de área operativa'), 'info');
+        }
+        
+       
+      }).catch(error=>{
+        console.error('Error al consultar los datos de craga area operativa', error);
+        notify('Error al consultar los datos de craga area operativa' , 'error');
+      });
+     
     } catch (error) {
       notify('Error al obtener los datos de carga AO.', 'error');
     } finally {
@@ -142,14 +157,22 @@ const ConsultaCargaAOPage: React.FC = () => {
 
   const handleLimpiar = () => {
     setFiltros({
-      fechaCarga: '',
+      fecha_carga: '',
       sistema: '',
       modulo: '',
-      fechaOperativa: '',
-      tipo: '',
+      fecha_operativa: '',
+      tipoSalMov: '',
     });
     setSelectedSistema('');
     setCargaData([]);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFiltros((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   return (
@@ -162,13 +185,17 @@ const ConsultaCargaAOPage: React.FC = () => {
         typographyPropsTitle={{ variant: "h3" }}
       />
       <Grid container spacing={2} mb={2}>
-        <Grid item xs={12} sm={4}>          
-          <Typography>Fecha de Carga</Typography>
-          <input
+        <Grid item xs={12} sm={4}> 
+          <TextField
+            label="Fecha de Carga"
             type="date"
-            value={filtros.fechaCarga}
-            onChange={(e) => handleFiltroChange('fechaCarga', e.target.value)}
-          />
+            name="fecha_carga"
+            value={filtros.fecha_carga}
+            onChange={handleInputChange}
+            InputLabelProps={{ shrink: true }}
+            fullWidth
+           
+          />                  
         </Grid>
         <Grid item xs={12} sm={4}>
         <Autocomplete
@@ -188,17 +215,20 @@ const ConsultaCargaAOPage: React.FC = () => {
                 />
         </Grid>
         <Grid item xs={12} sm={4}>
-        <Typography>Fecha Operativa</Typography>
-          <input
+        <TextField
+            label="Fecha Operativa"
             type="date"
-            value={filtros.fechaOperativa}
-            onChange={(e) => handleFiltroChange('fechaOperativa', e.target.value)}
-          />          
+            name="fecha_operativa"
+            value={filtros.fecha_operativa}
+            onChange={handleInputChange}
+            InputLabelProps={{ shrink: true }}
+            fullWidth   
+          /> 
         </Grid>
         <Grid item xs={12} sm={4}>
           <ComboBox
             options={["S", "M"]}
-            onSelect={(value) => handleFiltroChange('tipo', value || '')}
+            onSelect={(value) => handleFiltroChange('tipoSalMov', value || '')}
             label="Tipo de Conciliación"
             getOptionLabel={(option) => option}
           />

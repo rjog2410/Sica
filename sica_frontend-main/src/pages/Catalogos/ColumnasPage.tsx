@@ -72,7 +72,7 @@ const ColumnasPage: React.FC = () => {
           console.log(resp);
           setColumnas(resp);
           notify("consultando columnas por sistema: "+selectedSistema, 'success');
-        }).catch(resp=>{
+        }).catch(error=>{
           console.error('Error al cargar los datos de columnas para el sistema: '+selectedSistema, error);
           notify('Error al cargar los datos de columnas para el sistema: '+selectedSistema , 'error');
         });

@@ -5,20 +5,22 @@ export const fetchCargaSIFData = async (filtros: any) => {
     
     return [
       {
-        sistema: 'SIF',
-        modulo: 'MOD1',
-        fechaConciliacion: '2024-08-01',
-        fechaCarga: '2024-08-02',
-        registros: 120,
-        tipo: 'S'
+        registrosCargados: 219,
+        registrosConciliados: 148,
+        fecha_informacion: '02/05/2023',
+        mod_sis_clave: 'SIF',
+        tipo_salmov: 'S',
+        mod_clave: 'MOD1',
+        fecha_carga: '03/05/2023',
       },
       {
-        sistema: 'SIF',
-        modulo: 'MOD2',
-        fechaConciliacion: '2024-08-01',
-        fechaCarga: '2024-08-02',
-        registros: 150,
-        tipo: 'M'
+        registrosCargados: 345,
+        registrosConciliados: 327,
+        fecha_informacion: '02/05/2023',
+        mod_sis_clave: 'SIF',
+        tipo_salmov: 'S',
+        mod_clave: 'MOD2',
+        fecha_carga: '03/05/2023',
       }
       // ... más datos
     ];
