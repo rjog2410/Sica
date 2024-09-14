@@ -102,8 +102,11 @@ const ModulosTable = forwardRef(({
   const handleExportToExcel = useCallback(async () => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Módulos');
-
+   const data= filteredData.slice().sort((a, b) => {
+        return (a['clave_sistema'] < b['clave_sistema'] ? -1 : 1) * (order === 'asc' ? 1 : -1);
+    });
     worksheet.columns = [
+      { header: 'Sistema', key: 'clave_sistema', width: 30 },
       { header: 'Clave Módulo', key: 'clave_modulo', width: 30 },
       { header: 'Nombre Módulo', key: 'nombre_modulo', width: 30 },
       { header: 'Fecha Carga', key: 'fecha_carga', width: 20 },
@@ -114,7 +117,7 @@ const ModulosTable = forwardRef(({
       { header: 'Agrupación Reportes', key: 'agrupacion_reportes', width: 20 },
     ];
 
-    sortedData.forEach((modulo) => {
+    data.forEach((modulo) => {
       worksheet.addRow(modulo);
     });
 
