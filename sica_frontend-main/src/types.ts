@@ -196,3 +196,28 @@ export interface CargaAOData {
     mod_clave: string,
     fecha_carga: string,
 }
+
+export interface FiltrosCargaAO {
+  fecha_carga: string;
+  sistema: string;
+  modulo: string;
+  fecha_operativa: string;
+  tipoSalMov: string;
+}
+
+export interface CargaSIFData {
+  sis_clave: string;
+  mod_clave: string;
+  fecha_conciliacion: string;
+  fecha_carga: string;
+  RegistrosCargados: number;
+  tipo_salmov: string;
+}
+
+export interface FiltrosCargaSIF {
+  sistema: string;
+  modulo: string;
+  fecha_informacion: string;
+  fecha_carga: string;
+  tipo_salmov: string;
+}

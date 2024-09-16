@@ -8,26 +8,10 @@ import {  Sistema } from '../../types';
 import * as serviceSistema from '../Catalogos/selectores/serviceSelectorSistemas';
 import * as serviceModulo from '../Catalogos/selectores/serviceSelectorModulos';
 import * as serviceCargaAO from '../Administracion/selectores/selectorCargaAreaOperativa';
+import { CargaAOData, FiltrosCargaAO } from '../../types';
 
-interface CargaAOData {
-  data: {
-    RegistrosCargados: number;
-    RegistrosConciliados: number;
-    fecha_informacion: string;
-    mod_sis_clave: string;
-    tipo_salmov: string;
-    mod_clave: string;
-    fecha_carga: string;
-  }[];
-}
 
-interface FiltrosCargaAO {
-  fecha_carga: string;
-  sistema: string;
-  modulo: string;
-  fecha_operativa: string;
-  tipoSalMov: string;
-}
+
 
 const ConsultaCargaAOPage: React.FC = () => {
   const [filtros, setFiltros] = useState<FiltrosCargaAO>({
@@ -136,7 +120,11 @@ const ConsultaCargaAOPage: React.FC = () => {
         console.log("respuesta: ",resp);
         if(!!resp && resp.status == 200){
           setCargaData(resp?.data);
-          notify('Consulta realizada con éxito', 'success');
+          if(resp?.data.length>0){
+            notify('Consulta realizada con éxito. '+resp?.data.length +' registros recuperados.' , 'success');
+          }else{
+            notify('No existe información para los criterios de búsqueda seleccionados.', 'info');
+          }         
         }else{
           setCargaData([]);
           notify((!!resp && !!resp.message ? resp.message : 'Error al consultar la carga de área operativa'), 'info');

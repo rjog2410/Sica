@@ -3,28 +3,21 @@ import {  Autocomplete, Box, Button, Grid , TextField } from '@mui/material';
 import BodyHeader from '../../components/base/BodyHeader';
 import ComboBox from '../../components/base/tabla/Combobox';
 import CargaSIFTable from '../../components/base/tabla/CargaSIFTable';
-import { fetchCargaSIFData } from './conciliacionServiceMock';
-import { CargaSIFData } from './inteface';
+import { CargaSIFData, FiltrosCargaSIF } from '../../types';
 import { useNotification } from '../../providers/NotificationProvider';
 import {  Sistema } from '../../types';
 import * as serviceSistema from '../Catalogos/selectores/serviceSelectorSistemas';
 import * as serviceModulo from '../Catalogos/selectores/serviceSelectorModulos';
+import * as serviceCargaSIF from '../Administracion/selectores/selectorCargaSIF';
 
-interface FiltrosCargaSIF {
-  sistema: string;
-  modulo: string;
-  fechaConciliacion: string;
-  fechaCarga: string;
-  tipo: string;
-}
 
 const ConsultaCargaSIFPage: React.FC = () => {
   const [filtros, setFiltros] = useState<FiltrosCargaSIF>({
     sistema: '',
     modulo: '',
-    fechaConciliacion: '',
-    fechaCarga: '',
-    tipo: '',
+    fecha_informacion: '',
+    fecha_carga: '',
+    tipo_salmov: '',
   });
 
   const [cargaData, setCargaData] = useState<CargaSIFData[]>([]);
@@ -90,13 +83,13 @@ const ConsultaCargaSIFPage: React.FC = () => {
 
   const handleSistemaSelect = (sistema: string | null) => {
     setSelectedSistema(sistema);
-    setSelectedModulo('');
-     
-    
+    handleFiltroChange('sistema', sistema || '');
+     setSelectedModulo('');
   };
 
   const handleModuloSelect = (modulo: string | null) => {
     setSelectedModulo(modulo);
+    handleFiltroChange('modulo', modulo || '');
   };
 
   const handleFiltroChange = (name: string, value: string) => {
@@ -111,13 +104,39 @@ const ConsultaCargaSIFPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const data = await fetchCargaSIFData(filtros);
-      setCargaData(data);
+      serviceCargaSIF.fetchCargaSIF(filtros).then(resp => {
+        console.log("respuesta: ",resp);
+        if(!!resp && resp.status == 200){
+          setCargaData(resp?.data);
+          if(resp?.data.length>0){
+            notify('Consulta realizada con éxito. '+resp?.data.length +' registros recuperados.' , 'success');
+          }else{
+            notify('No existe información para los criterios de búsqueda seleccionados.', 'info');
+          }
+          
+        }else{
+          setCargaData([]);
+          notify((!!resp && !!resp.message ? resp.message : 'Error al consultar los datos de carga SIF'), 'info');
+        }
+        
+       
+      }).catch(error=>{
+        console.error('Error al consultar los datos de carga SIF', error);
+        notify('Error al consultar los datos de carga SIF' , 'error');
+      });
     } catch (error) {
       notify('Error al obtener los datos de carga SIF.', 'error');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFiltros((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   return (
@@ -148,25 +167,32 @@ const ConsultaCargaSIFPage: React.FC = () => {
                 />
         </Grid>
         <Grid item xs={12} sm={4}>
-          <ComboBox
-            options={["2024-08-01", "2024-08-02"]}
-            onSelect={(value) => handleFiltroChange('fechaConciliacion', value || '')}
+        <TextField
             label="Fecha Conciliación"
-            getOptionLabel={(option) => option}
-          />
+            type="date"
+            name="fecha_informacion"
+            value={filtros.fecha_informacion}
+            onChange={handleInputChange}
+            InputLabelProps={{ shrink: true }}
+            fullWidth   
+          /> 
         </Grid>
         <Grid item xs={12} sm={4}>
-          <ComboBox
-            options={["2024-08-01", "2024-08-02"]}
-            onSelect={(value) => handleFiltroChange('fechaCarga', value || '')}
-            label="Fecha Carga"
-            getOptionLabel={(option) => option}
-          />
+        <TextField
+            label="Fecha de Carga"
+            type="date"
+            name="fecha_carga"
+            value={filtros.fecha_carga}
+            onChange={handleInputChange}
+            InputLabelProps={{ shrink: true }}
+            fullWidth
+           
+          />      
         </Grid>
         <Grid item xs={12} sm={4}>
           <ComboBox
             options={["S", "M"]}
-            onSelect={(value) => handleFiltroChange('tipo', value || '')}
+            onSelect={(value) => handleFiltroChange('tipo_salmov', value || '')}
             label="Tipo de Conciliación"
             getOptionLabel={(option) => option}
           />
