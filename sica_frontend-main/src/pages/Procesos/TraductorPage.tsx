@@ -1,30 +1,73 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Button, Select, MenuItem, TextField, FormControl, InputLabel } from '@mui/material';
 import { sistemasMock, modulosMock } from './serviceSelectorTraductor';
 import * as service from './serviceSelectorTraductor';
-import { TraductorParams } from '../../types';
+import { Modulo, TraductorParams } from '../../types';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { useNotification } from '../../providers/NotificationProvider';
 import BodyHeader from '../../components/base/BodyHeader';
+import ComboBox from '@/components/base/tabla/Combobox';
 
 const TraductorPage: React.FC = () => {
   const [params, setParams] = useState<TraductorParams>({
     sistema: '',
     modulo: '',
-    fechaInicio: '',
-    fechaFin: '',
-    tipoInformacion: '',
+    tipo_informacion: '',
+    fecha_inicial: '',
+    fecha_final: '',
   });
+  const [modulos, setModulos] = useState<Modulo[]>([]);
+  const [selectedSistema, setSelectedSistema] = useState<string | null>('ALL');
+  const [secondFilterOptions, setSecondFilterOptions] = useState<string[]>([]);
+  const [selectedModulo, setSelectedModulo] = useState<string>('ALL');
+  
+  const [filterValue, setFilterValue] = useState<string>('ALL');
+
 
   const { notify } = useNotification();
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await service.fetchModulos();
+        setModulos(data);
+        notify('Datos de Traductor Cargados', 'info');
+      } catch (error) {
+        notify('Error al cargar los datos de Traductor', 'error');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleSelectChange = (event: SelectChangeEvent<string>) => {
-    const { name, value } = event.target;
-    setParams((prev) => ({
-      ...prev,
-      [name!]: value,
-    }));
+    fetchData();
+  }, [notify]);
+
+  const handleSistemaSelect = (sistema: string | null) => {
+    setSelectedSistema(sistema);
+    if (sistema && sistema !== 'ALL') {
+      const filteredModules = modulos.filter(m => m.clave_sistema === sistema);
+      const newOptions = ['ALL', ...new Set(filteredModules.map(m => m.clave_modulo))];
+      params.sistema=sistema;
+      setSecondFilterOptions(newOptions);
+      setSelectedModulo('ALL');
+    } else {
+      setSecondFilterOptions([]);
+      setSelectedModulo('ALL');
+    }
   };
+
+  const handleModuloSelect = (modulo: string | null) => {
+    
+    params.modulo=modulo;
+    setSelectedModulo(modulo || 'ALL');
+    setFilterValue(modulo ? modulo : 'ALL');
+
+  };
+
+  const filteredModulos = modulos.filter(modulo => {
+    const matchSistema = selectedSistema === 'ALL' || modulo.clave_sistema === selectedSistema;
+    const matchModulo = selectedModulo === 'ALL' || modulo.clave_modulo === selectedModulo;
+    return matchSistema && matchModulo;
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -34,19 +77,20 @@ const TraductorPage: React.FC = () => {
     }));
   };
 
+
   const validateParams = (): boolean => {
-    const { fechaInicio, fechaFin } = params;
-    const startDate = new Date(fechaInicio);
-    const endDate = new Date(fechaFin);
+    const { fecha_inicial, fecha_final } = params;
+    const startDate = new Date(fecha_inicial);
+    const endDate = new Date(fecha_final);
+
+    if (startDate.getDate() !== 1) {
+      notify('La fecha de inicio debe ser el primer día del mes', 'error');
+      return true;
+    }
 
     if (endDate < startDate) {
       notify('La fecha final debe ser mayor o igual a la fecha de inicio', 'error');
-      return false;
-    }
-
-    if (!params.tipoInformacion) {
-      notify('Debe seleccionar un tipo de información (Saldos o Movimientos)', 'error');
-      return false;
+      return true;
     }
 
     return true;
@@ -63,7 +107,17 @@ const TraductorPage: React.FC = () => {
     }
   };
 
+  const handleSelectChange = (event: SelectChangeEvent<string>) => {
+    const { name, value } = event.target;
+    setParams((prev) => ({
+      ...prev,
+      [name!]: value === 'TODOS' ? '%' : value, // Asignamos "%" si selecciona "TODOS"
+    }));
+  };
+
+
   return (
+    
     <Box sx={{ p: 3 }}>
       <BodyHeader
         headerRoute="Procesos / Traductor"
@@ -72,71 +126,62 @@ const TraductorPage: React.FC = () => {
         typographyPropsRoute={{ variant: "h6" }}
         typographyPropsTitle={{ variant: "h3" }}
       />
-
-      <FormControl fullWidth margin="normal">
-        <InputLabel>Sistema</InputLabel>
-        <Select
-          name="sistema"
-          value={params.sistema}
-          onChange={handleSelectChange}
-        >
-          {sistemasMock.map((sistema) => (
-            <MenuItem key={sistema.clave} value={sistema.clave}>
-              {sistema.nombre}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-
-      <FormControl fullWidth margin="normal">
-        <InputLabel>Módulo</InputLabel>
-        <Select
-          name="modulo"
-          value={params.modulo}
-          onChange={handleSelectChange}
-        >
-          {modulosMock.map((modulo) => (
-            <MenuItem key={modulo.clave} value={modulo.clave}>
-              {modulo.nombre}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-
-      <FormControl fullWidth margin="normal">
-        <InputLabel>Tipo de Información</InputLabel>
-        <Select
-          name="tipoInformacion"
-          value={params.tipoInformacion}
-          onChange={handleSelectChange}
-        >
-          <MenuItem value="S">Saldos</MenuItem>
-          <MenuItem value="M">Movimientos</MenuItem>
-        </Select>
-      </FormControl>
-
-      <TextField
+ <Box mb={2}>
+            <ComboBox
+              options={['ALL', ...Array.from(new Set(modulos.map(modulo => modulo.clave_sistema)))]}
+              onSelect={handleSistemaSelect}
+              label="Seleccione un Sistema"
+              getOptionLabel={(option: string) => option}
+            />
+          </Box>
+          <Box mb={2}>
+            <ComboBox
+              options={secondFilterOptions}
+              onSelect={handleModuloSelect}
+              label="Filtrar por Clave de Módulo"
+              getOptionLabel={(option: string) => option}
+              disabled={selectedSistema === 'ALL' || secondFilterOptions.length === 0}
+            />
+          </Box>
+          <Box mb={2}>
+          <TextField
+            select
+            label="Tipo Información"
+            name="tipo_informacion"
+          value={params.tipo_informacion}
+            onChange={handleSelectChange}
+            fullWidth
+          >
+             <MenuItem value="S">Saldos</MenuItem>
+             <MenuItem value="M">Movimientos</MenuItem>
+          </TextField>
+        </Box>
+        <Box mb={2}>
+        <TextField
         label="Fecha Inicio"
         type="date"
-        name="fechaInicio"
-        value={params.fechaInicio}
+        name="fecha_inicial"
+        value={params.fecha_inicial}
         onChange={handleInputChange}
         InputLabelProps={{ shrink: true }}
         fullWidth
         margin="normal"
       />
-
-      <TextField
+        </Box>
+        <Box mb={2}>
+        <TextField
         label="Fecha Fin"
         type="date"
-        name="fechaFin"
-        value={params.fechaFin}
+        name="fecha_final"
+        value={params.fecha_final}
         onChange={handleInputChange}
         InputLabelProps={{ shrink: true }}
         fullWidth
         margin="normal"
       />
-
+      
+        </Box>
+   
       <Box sx={{ mt: 3 }}>
         <Button variant="contained" color="primary" onClick={handleExecute}>
           Ejecutar
@@ -145,5 +190,4 @@ const TraductorPage: React.FC = () => {
     </Box>
   );
 };
-
 export default TraductorPage;

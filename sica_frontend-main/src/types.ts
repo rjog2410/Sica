@@ -131,18 +131,18 @@ export interface ConfirmDialogProps {
 export interface ExtraccionParams {
   sistema: string;
   modulo: string;
-  tipoInformacion: string;
-  fechaInicio: string;
-  fechaFin: string;
-  borrarInformacion: boolean;
+  tipo_informacion: string;
+  fecha_inicial: string;
+  fecha_final: string;
+  borrar_info: string;
 }
 
 export interface TraductorParams {
   sistema: string;
   modulo: string;
-  fechaInicio: string;
-  fechaFin: string;
-  tipoInformacion: string;
+  fecha_inicial: string;
+  fecha_final: string;
+  tipo_informacion: string;
 }
 
 export interface Conciliacion {
@@ -188,13 +188,38 @@ export interface DetalleCuentaConsultas {
 
 
 export interface CargaAOData {
-  fechaCarga: string;
+  RegistrosCargados: number,
+    RegistrosConciliados: number,
+    fecha_informacion: string,
+    mod_sis_clave: string,
+    tipo_salmov: string,
+    mod_clave: string,
+    fecha_carga: string,
+}
+
+export interface FiltrosCargaAO {
+  fecha_carga: string;
   sistema: string;
   modulo: string;
-  fechaOperativa: string;
-  tipoConciliacion: string;
-  registrosCargados: number;
-  registrosConciliados: number;
+  fecha_operativa: string;
+  tipoSalMov: string;
+}
+
+export interface CargaSIFData {
+  sis_clave: string;
+  mod_clave: string;
+  fecha_conciliacion: string;
+  fecha_carga: string;
+  RegistrosCargados: number;
+  tipo_salmov: string;
+}
+
+export interface FiltrosCargaSIF {
+  sistema: string;
+  modulo: string;
+  fecha_informacion: string;
+  fecha_carga: string;
+  tipo_salmov: string;
 }
 
 export interface  ConciliacionCuenta {

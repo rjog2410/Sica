@@ -93,6 +93,10 @@ const ColumnasTable = forwardRef(({
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Columnas');
 
+    const datos= ColumnasTable.slice().sort((a, b) => {
+      return (a['clave_sistema'] < b['clave_sistema'] ? -1 : 1) * (order === 'asc' ? 1 : -1);
+  });
+
     worksheet.columns = [
       { header: 'Clave Sistema', key: 'clave_sistema', width: 30 },
       { header: 'Clave Módulo', key: 'clave_modulo', width: 30 },
@@ -100,7 +104,7 @@ const ColumnasTable = forwardRef(({
       { header: 'Título', key: 'titulo', width: 50 },
     ];
 
-    sortedData.forEach((columna) => {
+    datos.forEach((columna) => {
       worksheet.addRow(columna);
     });
 

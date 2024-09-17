@@ -1,56 +1,129 @@
-import React from 'react';
+import React, { forwardRef, useImperativeHandle, useState, useMemo, useCallback, useEffect} from 'react';
+import { styled } from '@mui/material/styles';
 import {
   Table,
   TableBody,
-  TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper
+  TablePagination,
+  TableFooter,
+  Paper,
 } from '@mui/material';
 
-interface CargaSIFData {
-  sistema: string;
-  modulo: string;
-  fechaConciliacion: string;
-  fechaCarga: string;
-  registros: number;
-  tipo: string;
-}
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
+import { CargaSIFData } from '../../../types';
+
+type Order = 'asc' | 'desc';
+
 
 interface CargaSIFTableProps {
+
   data: CargaSIFData[];
 }
 
-const CargaSIFTable: React.FC<CargaSIFTableProps> = ({ data }) => {
+const CargaSIFTable = forwardRef(({
+  data,
+}: CargaSIFTableProps, ref) => {
+  const [order, setOrder] = useState<Order>('asc');
+  const [orderBy, setOrderBy] = useState<keyof CargaSIFData>('sis_clave');
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  useImperativeHandle(ref, () => ({
+    exportToExcel: handleExportToExcel,
+  }));
+
+  const sortedData = useMemo(() => {
+    return data?.slice().sort((a, b) => {
+      const aValue = a[orderBy] ?? ''
+      const bValue = b[orderBy] ?? ''; 
+  
+      return (aValue < bValue ? -1 : 1) * (order === 'asc' ? 1 : -1);
+    });
+  }, [data, order, orderBy]);
+
+  const paginatedData = useMemo(() => {
+    return sortedData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  }, [sortedData, page, rowsPerPage]);
+
+
+  useEffect(() => {
+  }, [paginatedData]);
+
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  '&:nth-of-type(odd)': {
+    backgroundColor: theme.palette.action.hover,
+  },
+  // hide last border
+  '&:last-child td, &:last-child th': {
+    border: 0,
+  },
+}));
+
+
+
+const handleChangePage = (event: unknown, newPage: number) => {
+  setPage(newPage);
+};
+
+const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  setRowsPerPage(parseInt(event.target.value, 10));
+  setPage(0);
+};
+
   return (
     <TableContainer component={Paper}>
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Sistema</TableCell>
-            <TableCell>Módulo</TableCell>
-            <TableCell>Fecha Conciliación</TableCell>
-            <TableCell>Fecha Carga</TableCell>
-            <TableCell>No. Registros</TableCell>
-            <TableCell>Tipo</TableCell>
+            <StyledTableCell>Sistema</StyledTableCell>
+            <StyledTableCell>Módulo</StyledTableCell>
+            <StyledTableCell>Fecha Conciliación</StyledTableCell>
+            <StyledTableCell>Fecha Carga</StyledTableCell>
+            <StyledTableCell>No. Registros</StyledTableCell>
+            <StyledTableCell>Tipo</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.map((row, index) => (
-            <TableRow key={index}>
-              <TableCell>{row.sistema}</TableCell>
-              <TableCell>{row.modulo}</TableCell>
-              <TableCell>{row.fechaConciliacion}</TableCell>
-              <TableCell>{row.fechaCarga}</TableCell>
-              <TableCell>{row.registros}</TableCell>
-              <TableCell>{row.tipo}</TableCell>
-            </TableRow>
-          ))}
+              {paginatedData.map((row, index) => {
+                 
+                return (
+                  <StyledTableRow  key={index}>            
+                    <StyledTableCell>{row.sis_clave}</StyledTableCell>
+                    <StyledTableCell>{row.mod_clave}</StyledTableCell>
+                    <StyledTableCell>{row.fecha_conciliacion}</StyledTableCell>
+                    <StyledTableCell>{row.fecha_carga}</StyledTableCell>
+                    <StyledTableCell>{row.RegistrosCargados}</StyledTableCell>
+                    <StyledTableCell>{row?.tipo_salmov}</StyledTableCell>
+                  </StyledTableRow >
+                );
+                    })}
+
         </TableBody>
-      </Table>
+        </Table>    
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 50, { value: -1, label: 'All' }]}
+              component="div"
+              count={sortedData?.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
     </TableContainer>
   );
-};
+});
 
 export default CargaSIFTable;

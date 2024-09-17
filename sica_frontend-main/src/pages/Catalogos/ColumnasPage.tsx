@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Box, Button } from '@mui/material';
+import {Autocomplete, Box, Button, TextField} from '@mui/material';
 import BodyHeader from '../../components/base/BodyHeader';
 import ColumnasTable from '../../components/base/tabla/ColumnasTable';
 import ComboBox from '../../components/base/tabla/Combobox';
@@ -15,8 +15,8 @@ const ColumnasPage: React.FC = () => {
   const [sistemas, setSistemas] = useState<Sistema[]>([]); 
   const [modulos, setModulos] = useState<String[]>([]);
   const [columnas, setColumnas] = useState<Columna[]>([]);
-  const [selectedSistema, setSelectedSistema] = useState<string>();
-  const [selectedModulo, setSelectedModulo] = useState<string>();
+  const [selectedSistema, setSelectedSistema] = useState<string>('ALL');
+  const [selectedModulo, setSelectedModulo] = useState<string>('ALL');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [editingColumna, setEditingColumna] = useState<Columna | null>(null);
   const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
@@ -34,15 +34,17 @@ const ColumnasPage: React.FC = () => {
     serviceSistema.fetchSistemas().then(resp=>{
       if(!!resp && resp.length>0){
         setSistemas(resp);
-        
+        /*
         serviceColumna.fetchColumnas().then(resp => {
           console.log(resp);
           setColumnas(resp); 
+          setSelectedModulo('ALL');
           notify("consultando todas las columnas", 'success');              
         }).catch(resp =>{
           console.error('Error al cargar los datos de columnas para todos los sistemas', error);
         notify('Error al cargar los datos de columnas para todos los sistemas', 'error');
         });
+        */
         
       }
     }).catch (error =>{
@@ -64,19 +66,24 @@ const ColumnasPage: React.FC = () => {
       if(!!dataMod && dataMod.length>0){
         console.log("respuesta modulos para sistema {}: {}",selectedSistema,dataMod);
         setModulos(['ALL', ...Array.from(new Set(dataMod.map(obj => obj?.mod_clave)))]);
-        setSelectedModulo('');
+        setSelectedModulo('ALL');
+        
+        serviceColumna.fetchColumnaByCveSistema(selectedSistema).then(resp =>{
+          console.log(resp);
+          setColumnas(resp);
+          notify("consultando columnas por sistema: "+selectedSistema, 'success');
+        }).catch(error=>{
+          console.error('Error al cargar los datos de columnas para el sistema: '+selectedSistema, error);
+          notify('Error al cargar los datos de columnas para el sistema: '+selectedSistema , 'error');
+        });
+        
       }else{
         setModulos(['ALL']);
         setSelectedModulo('ALL');
       }
-      serviceColumna.fetchColumnaByCveSistema(selectedSistema).then(resp =>{
-        console.log(resp);
-        setColumnas(resp);
-        notify("consultando columnas por sistema: "+selectedSistema, 'success');
-      }).catch(resp=>{
-        console.error('Error al cargar los datos de columnas para el sistema: '+selectedSistema, error);
-        notify('Error al cargar los datos de columnas para el sistema: '+selectedSistema , 'error');
-      });
+    
+      
+    
       
     } catch (error) {
       console.error('Error al cargar los datos de modulos para el sistema: '+selectedSistema, error);
@@ -92,9 +99,9 @@ const ColumnasPage: React.FC = () => {
       
     } else {
       console.log("consultando all columnas");
-  
           serviceColumna.fetchColumnas().then(resp => {
             setColumnas(resp);    
+            setSelectedModulo('ALL');
             notify("consultando todas las columnas", 'success');             
           }).catch(resp =>{
             console.error('Error al cargar los datos de columnas todos los sistemas', error);
@@ -106,51 +113,33 @@ const ColumnasPage: React.FC = () => {
 
   const consultaCols = () => {
     setColumnas([]);
-      if(!!selectedModulo && selectedModulo === 'ALL'){
+      if(!!selectedSistema && selectedSistema !=='ALL'){
         console.log("consultando columnas por sistema: "+selectedSistema);
-       if(!!selectedSistema && selectedSistema ==='ALL'){
-        serviceColumna.fetchColumnas().then(resp => {
-          console.log(resp);
-          setColumnas(resp); 
-          notify("consultando todas las columnas", 'success');              
-        }).catch(resp =>{
-          console.error('Error al cargar los datos de columnas todos los sistemas', error);
-          notify('Error al cargar los datos de columnas todos los sistemas', 'error');
-        });
-       }else{
-          if(!!selectedSistema){
-            serviceColumna.fetchColumnaByCveSistema(selectedSistema).then(resp =>{
-              console.log(resp);
-              setColumnas(resp);
-              notify("consultando columnas por sistema: "+selectedSistema, 'success');
-            }).catch(resp=>{
-              console.error('Error al cargar los datos de columnas para el sistema: '+selectedSistema, error);
-              notify('Error al cargar los datos de columnas para el sistema: '+selectedSistema , 'error');
-            });
-          }
-        }
-      }else{
-        if(!!selectedModulo && !!selectedSistema){
+        
           console.log("consultando columnas por sistema: "+selectedSistema +' y modulo: '+selectedModulo);
           serviceColumna.fetchColumnasBySisCveAndModCve(selectedSistema, selectedModulo).then(resp =>{
             console.log(resp);
             setColumnas(resp);
             notify("consultando columnas por sistema: "+selectedSistema +' y modulo: '+selectedModulo, 'success');
           }).catch(resp=>{
-            console.error('Error al cargar los datos de columnas para el sistema: '+selectedSistema +' y modulo: '+selectedModulo, error);
+            console.error('Error al cargar los datos de columnas para el sistema: '+selectedSistema +' y modulo: '+selectedModulo, resp);
             notify('Error al cargar los datos de columnas para el sistema: '+selectedSistema +' y modulo: '+selectedModulo, 'error');
           });
-        }
+        
       }
   };
 
   useEffect(() => {
-    consultaCols();
+    
+      consultaCols();
+   
+   
   }, [selectedModulo]);
 
 
   const handleSistemaSelect = (sistema: string | null) => {
     setSelectedSistema(sistema);
+    setSelectedModulo('ALL');
     
   };
 
@@ -295,21 +284,22 @@ const ColumnasPage: React.FC = () => {
         typographyPropsTitle={{ variant: "h3" }}
       />
       <Box mb={2}>
-        <ComboBox        
-          options={['ALL', ...Array.from(new Set(sistemas.map(sistema => sistema.sis_clave)))]}
-          onSelect={handleSistemaSelect}
-          label="Seleccione un Sistema"
-          getOptionLabel={(option: string) => option}
-        />
+      <Autocomplete
+                    options={['ALL', ...Array.from(new Set(sistemas.map(sistema => sistema.sis_clave)))]}
+                    onChange={(_event, value) => handleSistemaSelect(value)}
+                    value = {selectedSistema}
+                    renderInput={(params) => <TextField {...params} label={selectedSistema} variant="outlined" />} // Aplicamos la propiedad sx a TextField
+                />
       </Box>
       <Box mb={2}>
-        <ComboBox
-             options={modulos}
-          onSelect={handleModuloSelect}
-          label="Seleccione un Módulo"
-          getOptionLabel={(option: string) => option}
-          disabled={selectedSistema === 'ALL'}
-        />
+      <Autocomplete
+                    options={modulos}
+                    onChange={(_event, value) => handleModuloSelect(value)}
+                    disabled={selectedSistema === 'ALL'}
+                    value = {selectedModulo}
+                    renderInput={(params) => <TextField {...params} label={selectedModulo} variant="outlined" />} // Aplicamos la propiedad sx a TextField
+                />
+        
       </Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Box>
