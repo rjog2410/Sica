@@ -1,13 +1,33 @@
 import axios from "axios";
-import { ReporteConciliacion, ReporteConciliacionFiltros } from "./interfaces";
-  
-  export const fetchReporteConciliacionSaldos = async (filtros: ReporteConciliacionFiltros): Promise<ReporteConciliacion[]> => {
+import {ReporteConciliacion, ReporteConciliacionFiltros} from "./interfaces";
+
+const BASE_URL = 'http://localhost:8080';
+
+export const fetchReporteConciliacionSaldos = async (filtros: ReporteConciliacionFiltros): Promise<ReporteConciliacion[]> => {
     try {
-      const response = await axios.post('/api/conciliacion/saldos', filtros);
-      return response.data;
+        const tempDate = filtros?.fecha_informacion?.split('-')
+        const temp = {
+            ...filtros,
+            fecha_informacion: `${tempDate[2]}/${tempDate[1]}/${tempDate[0]}`,
+            moneda: filtros?.moneda * 1,
+            oficina: filtros?.oficina * 1
+        }
+        const response = await axios.post(`${BASE_URL}/consultas/conciliacion_saldos/get_data`, temp);
+        return response.data;
     } catch (error) {
-      console.error('Error fetching report data from API', error);
-      throw error;
+        console.error('Error fetching report data from API', error);
+        throw error;
     }
-  };
+};
+
+// Obtener el listado de sistemas
+export const fetchSistemas = async (): Promise<{ clave: string }[]> => {
+    const response = await axios.post(`${BASE_URL}/catalogos/sistemas/get_all`);
+    return response.data.data;
+};
+
+export const fetchModulosBySistema = async (sistemaClave: string): Promise<{ mod_clave: string }[]> => {
+    const response = await axios.post(`${BASE_URL}/catalogos/cuentas_regla/get_modules_filter`, {cuc_mod_sis_clave: sistemaClave});
+    return response.data.data;
+};
   

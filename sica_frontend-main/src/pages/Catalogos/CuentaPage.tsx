@@ -2,7 +2,6 @@ import React, {useState, useEffect, useRef} from 'react';
 import {Autocomplete, Box, Button, TextField} from '@mui/material';
 import BodyHeader from '../../components/base/BodyHeader';
 import CuentasTable from '../../components/base/tabla/CuentasTable';
-import ComboBox from '../../components/base/tabla/Combobox';
 import {Cuenta, Formula, Regla, Sistema} from '../../types';
 import * as service from './selectores/serviceSelectorCuentaRegla';
 import {useNotification} from '../../providers/NotificationProvider';
@@ -12,7 +11,6 @@ import * as serviceSistema from "@/pages/Catalogos/selectores/serviceSelectorSis
 import ReglasSubpantallaModal from './modales/ReglasSubpantallaModal';
 import {fetchModuloByClave, fetchModulos} from "@/pages/Catalogos/selectores/serviceSelectorModulos.ts";
 import {
-    createOrUpdateFormula,
     getAllCuentas,
     getCuentasBySistema,
     getCuentasBySistemaAndModulo, getFormulas, getReglas, removeCuenta, removeMultipleCuentas

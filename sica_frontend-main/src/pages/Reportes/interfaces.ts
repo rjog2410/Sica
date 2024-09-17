@@ -14,6 +14,7 @@ export interface ReporteConciliacion {
 export interface ReporteConciliacionFiltros {
   sistema: string;
   modulo: string;
-  fecha: string;
-  agrupacion: 'Cuenta' | 'Ente';
+  fecha_informacion: string;
+  oficina:  number;
+  moneda: number
 }

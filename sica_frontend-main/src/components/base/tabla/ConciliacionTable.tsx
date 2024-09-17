@@ -13,6 +13,13 @@ const ConciliacionTable: React.FC<Props> = ({ data }) => {
         <TableHead>
           <TableRow>
             <TableCell>Cuenta Contable</TableCell>
+            <TableCell>S1</TableCell>
+            <TableCell>S2</TableCell>
+            <TableCell>S3</TableCell>
+            <TableCell>S4</TableCell>
+            <TableCell>S5</TableCell>
+            <TableCell>S6</TableCell>
+            <TableCell>S7</TableCell>
             <TableCell>Tipo Ente</TableCell>
             <TableCell>Ente</TableCell>
             <TableCell>Importe SIF</TableCell>

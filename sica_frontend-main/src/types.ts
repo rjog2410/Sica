@@ -196,3 +196,25 @@ export interface CargaAOData {
   registrosCargados: number;
   registrosConciliados: number;
 }
+
+export interface  ConciliacionCuenta {
+  con_mod_sis_clave: string,
+  con_mod_clave: string,
+  con_fecha: string,
+  con_oficina: number,
+  con_moneda: number,
+  con_cuenta: number,
+  con_scta1: number,
+  con_scta2: number,
+  con_scta3: number,
+  con_scta4: number,
+  con_scta5: number,
+  con_scta6: number,
+  con_scta7: number,
+  con_fecha_carga: string,
+  con_tipo_ente: number,
+  con_ente: number,
+  con_importe_sif: number,
+  con_importe_ao: number,
+  con_dif: number
+}
