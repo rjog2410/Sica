@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Autocomplete, Box, Button, Grid, Typography , TextField} from '@mui/material';
+import { Autocomplete, Box, Button, Grid , TextField} from '@mui/material';
 import BodyHeader from '../../components/base/BodyHeader';
 import {  saveBatchProcess } from '../../api/batchService';
 import { useNotification } from '../../providers/NotificationProvider';
@@ -7,16 +7,18 @@ import ComboBox from '../../components/base/tabla/Combobox';
 import {  Sistema } from '../../types';
 import * as serviceSistema from '../Catalogos/selectores/serviceSelectorSistemas';
 import * as serviceModulo from '../Catalogos/selectores/serviceSelectorModulos';
+import { FiltrosConsultaBatch } from '../../types';
+import * as serviceConsultaBatch from '../Administracion/selectores/selectorConsultaBatch';
 
 const ConsultaBatchPage: React.FC = () => {
-  const [filtros, setFiltros] = useState({
+  const [filtros, setFiltros] = useState<FiltrosConsultaBatch>({
     proceso: '',
     sistema: '',
     modulo: '',
-    tipoInformacion: '',
-    borrarInformacion: '',
-    fechaInicio: '',
-    fechaFin: '',
+    tipo_informacion: '',
+    borrar: '',
+    fecha_ini: '',
+    fecha_fin: '',
   });
 
   
@@ -25,6 +27,7 @@ const ConsultaBatchPage: React.FC = () => {
   const [modulos, setModulos] = useState<String[]>([]);
   const [selectedSistema, setSelectedSistema] = useState<string>('');
   const [selectedModulo, setSelectedModulo] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -33,9 +36,11 @@ const ConsultaBatchPage: React.FC = () => {
       console.log("sistemas recuperados: ",dataSist);
       setSistemas(dataSist);
       setSelectedSistema(dataSist[0].sis_clave);
+      handleFiltroChange('sistema', dataSist[0].sis_clave || '');
       setSelectedModulo('');
       setModulos([]);
     }else{
+      handleFiltroChange('sistema', '');
       setSistemas([]);
       setModulos([]);
       setSelectedSistema('');
@@ -55,10 +60,12 @@ const ConsultaBatchPage: React.FC = () => {
     if(!dataModXSist || dataModXSist.length == 0 ){
       setModulos([]);
       setSelectedModulo('');
+      handleFiltroChange('modulo', '');
       notify('No existen módulos para sistema: '+selectedSistema, 'info');
     }else{
       setModulos(Array.from(new Set(dataModXSist.map(obj => obj?.mod_clave))));
-      setSelectedModulo(dataModXSist[0].mod_clave);;
+      setSelectedModulo(dataModXSist[0].mod_clave);
+      handleFiltroChange('modulo', dataModXSist[0].mod_clave || '');
     }
    
     } catch (error) {
@@ -86,43 +93,66 @@ const ConsultaBatchPage: React.FC = () => {
   const handleSistemaSelect = (sistema: string | null) => {
     setSelectedSistema(sistema);
     setSelectedModulo('');
+    handleFiltroChange('mosdulo', '');
+    handleFiltroChange('sistema', sistema || '');
      
   };
 
   const handleModuloSelect = (modulo: string | null) => {
     setSelectedModulo(modulo);
+    handleFiltroChange('modulo', modulo || '');
   };
 
   const handleGuardar = async () => {
-    if (!filtros.proceso || !filtros.sistema || !filtros.modulo || !filtros.tipoInformacion || !filtros.fechaInicio || !filtros.fechaFin) {
+    console.log('filtros: ', filtros);
+    if (!filtros.proceso || !filtros.sistema || !filtros.modulo || !filtros.borrar || !filtros.tipo_informacion || !filtros.fecha_ini || !filtros.fecha_fin) {
       notify('Todos los campos son obligatorios', 'warning');
       return;
     }
-
-    // Validaciones específicas para cada proceso
-    if (filtros.proceso === 'SICAP001') {
-      if (new Date(filtros.fechaFin) < new Date(filtros.fechaInicio)) {
-        notify('La fecha final debe ser mayor o igual a la fecha de inicio.', 'warning');
+    if(!!filtros.fecha_ini && !!filtros.fecha_fin && filtros.fecha_fin!== '' && filtros.fecha_ini !== ''){
+      if (new Date(filtros.fecha_fin) < new Date(filtros.fecha_ini)) {
+        notify('La fecha de termino debe ser mayor o igual a la fecha de inicio.', 'warning');
         return;
       }
-    } else if (filtros.proceso === 'SICAP002') {
-      const startDate = new Date(filtros.fechaInicio);
+    };
+
+    // Validaciones específicas para cada proceso
+    /*
+    if (filtros.proceso === 'SICAP002') {
+      const startDate = new Date(filtros.fecha_ini);
+      console.log("start date: ",startDate);
       if (startDate.getDate() !== 1) {
         notify('La fecha inicial debe corresponder al primer día del mes.', 'warning');
         return;
       }
-    }
-
+    }*/
+    
+    setIsLoading(true);
     try {
-      const response = await saveBatchProcess(filtros);
-      if (response && response.success) {
-        notify('Proceso Batch guardado correctamente', 'success');
-      } else {
-        notify('Error al guardar el proceso Batch', 'error');
-      }
+      serviceConsultaBatch.saveBatchProcess(filtros).then(resp => {
+        console.log("respuesta: ",resp);
+        if(!!resp && resp.status == 200){
+          notify('Proceso Batch '+ filtros.proceso+' guardado correctamente.' , 'success');
+        }else{
+          notify((!!resp && !!resp.message ? resp.message : 'Error al guardar el proceso batch '+ filtros.proceso +'.'), 'warning');
+        }
+      }).catch(error=>{
+        console.error('Error al guardar el proceso batch '+ filtros.proceso +'.', error);
+        notify('Error al guardar el proceso batch '+ filtros.proceso +'.' , 'error');
+      });
     } catch (error) {
-      notify('Ocurrió un error al guardar el proceso Batch', 'error');
+      notify('Error al guardar el proceso batch '+ filtros.proceso +'.' , 'error');
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFiltros((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   return (
@@ -176,7 +206,7 @@ const ConsultaBatchPage: React.FC = () => {
                   { label: 'Saldos', value: 'S' },
                   { label: 'Movimientos', value: 'M' },
                 ]}
-                onSelect={(value) => handleFiltroChange('tipoInformacion', value?.value || '')}
+                onSelect={(value) => handleFiltroChange('tipo_informacion', value?.value || '')}
                 label="Tipo de Información"
                 getOptionLabel={(option) => option.label}
               />
@@ -187,7 +217,7 @@ const ConsultaBatchPage: React.FC = () => {
                   { label: 'Sí', value: 'S' },
                   { label: 'No', value: 'N' },
                 ]}
-                onSelect={(value) => handleFiltroChange('borrarInformacion', value?.value || '')}
+                onSelect={(value) => handleFiltroChange('borrar', value?.value || '')}
                 label="Borrar Información"
                 getOptionLabel={(option) => option.label}
               />
@@ -195,20 +225,26 @@ const ConsultaBatchPage: React.FC = () => {
           </>
         )}
         <Grid item xs={12} sm={6}>
-          <Typography>Fecha de Inicio</Typography>
-          <input
+        <TextField
+            label="Fecha de Inicio"
             type="date"
-            value={filtros.fechaInicio}
-            onChange={(e) => handleFiltroChange('fechaInicio', e.target.value)}
-          />
+            name="fecha_ini"
+            value={filtros.fecha_ini}
+            onChange={handleInputChange}
+            InputLabelProps={{ shrink: true }}
+            fullWidth   
+          /> 
         </Grid>
         <Grid item xs={12} sm={6}>
-          <Typography>Fecha de Fin</Typography>
-          <input
+        <TextField
+            label="Fecha de Termino"
             type="date"
-            value={filtros.fechaFin}
-            onChange={(e) => handleFiltroChange('fechaFin', e.target.value)}
-          />
+            name="fecha_fin"
+            value={filtros.fecha_fin}
+            onChange={handleInputChange}
+            InputLabelProps={{ shrink: true }}
+            fullWidth   
+          /> 
         </Grid>
       </Grid>
       <Box mt={2}>
