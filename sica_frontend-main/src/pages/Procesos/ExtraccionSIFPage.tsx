@@ -9,6 +9,14 @@ import { Modulo } from '@/utils/types';
 import ComboBox from '@/components/base/tabla/Combobox';
 
 const ExtraccionSIFPage: React.FC = () => {
+  const originalObject = {
+    sistema: '',
+    modulo: '',
+    tipo_informacion: '',
+    fecha_inicial: '',
+    fecha_final: '',
+    borrar_info: '',
+  }
   const [params, setParams] = useState<ExtraccionParams>({
     sistema: 'TODOS',
     modulo: 'TODOS',
@@ -35,9 +43,7 @@ const ExtraccionSIFPage: React.FC = () => {
         notify('Datos de Extracción SIF Cargados', 'info');
       } catch (error) {
         notify('Error al cargar los datos de Extracción SIF', 'error');
-      } finally {
-        setLoading(false);
-      }
+      } 
     };
 
     fetchData();
@@ -82,7 +88,7 @@ const ExtraccionSIFPage: React.FC = () => {
 
   const validateParams = (): boolean => {
     var fecha =params.fecha_inicial?.split("-");
-    params.fecha_inicial=fecha[2]+"/"+fecha[1]+"/"+fecha[0];
+    
 
     console.log(fecha[2])
 
@@ -91,7 +97,7 @@ const ExtraccionSIFPage: React.FC = () => {
       return false;
     }
 
-    if (endDate < startDate) {
+    if (params.fecha_final < params.fecha_inicial) {
       notify('La fecha final debe ser mayor o igual a la fecha de inicio', 'error');
       return false;
     }
@@ -103,6 +109,7 @@ const ExtraccionSIFPage: React.FC = () => {
     if (!validateParams()) return;
 
       await service.executeExtraccionSIF(params).then(resp =>{
+        console.log("",resp)
         if(resp.status === 200){
 
             notify('Módulo agregado correctamente', 'success');
@@ -116,7 +123,7 @@ const ExtraccionSIFPage: React.FC = () => {
         notify(error.response.data.message, 'error');
         console.log("ocurrio un error",error.response.data.message);
       }) 
-
+     setParams(originalObject);
   };
 
   const handleSelectChange = (event: SelectChangeEvent<string>) => {
@@ -143,6 +150,7 @@ const ExtraccionSIFPage: React.FC = () => {
               options={['ALL', ...Array.from(new Set(modulos.map(modulo => modulo.clave_sistema)))]}
               onSelect={handleSistemaSelect}
               label="Seleccione un Sistema"
+              
               getOptionLabel={(option: string) => option}
             />
           </Box>
@@ -160,6 +168,8 @@ const ExtraccionSIFPage: React.FC = () => {
             select
             label="Tipo Información"
             name="tipo_informacion"
+            required 
+
           value={params.tipo_informacion}
             onChange={handleSelectChange}
             fullWidth
@@ -173,6 +183,7 @@ const ExtraccionSIFPage: React.FC = () => {
         label="Fecha Inicio"
         type="date"
         name="fecha_inicial"
+        required 
         value={params.fecha_inicial}
         onChange={handleInputChange}
         InputLabelProps={{ shrink: true }}
@@ -189,6 +200,7 @@ const ExtraccionSIFPage: React.FC = () => {
         onChange={handleInputChange}
         InputLabelProps={{ shrink: true }}
         fullWidth
+        required 
         margin="normal"
       />
       
@@ -199,6 +211,8 @@ const ExtraccionSIFPage: React.FC = () => {
             label="Borrar Información"
             name="borrar_info"
             value={params.borrar_info}
+            required 
+
             onChange={handleSelectChange}
             fullWidth
           >

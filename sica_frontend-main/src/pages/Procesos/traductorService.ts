@@ -6,7 +6,7 @@ const API_URL = 'http://localhost:8080/procesos/traductor/get';
 
 const API_URL_MODULOS = 'http://localhost:8080/catalogos/modulos';
 
-export const executeTraductor = async (params: TraductorParams): Promise<void> => {
+export const executeTraductor = async (params: TraductorParams): Promise<Modulo[]> => {
   var fecha =params.fecha_inicial?.split("-");
   params.fecha_inicial=fecha[2]+"/"+fecha[1]+"/"+fecha[0];
 
@@ -17,6 +17,7 @@ export const executeTraductor = async (params: TraductorParams): Promise<void> =
     const response = await axios.post(API_URL, params);
     
     console.log('Proceso ejecutado con éxito:', response.data);
+    return response.data;
   } catch (error) {
     console.error('Error ejecutando el traductor:', error);
     throw error;

@@ -6,7 +6,7 @@ import { ExtraccionParams, Modulo, Sistema } from '../../types';
 const API_URL = 'http://localhost:8080/procesos/extractor_sif/get';
 const API_URL_MODULOS = 'http://localhost:8080/catalogos/modulos';
 
-export const executeExtraccionSIF = async (params: ExtraccionParams): Promise<void> => {
+export const executeExtraccionSIF = async (params: ExtraccionParams): Promise<Modulo[]> => {
 
   var fecha =params.fecha_inicial?.split("-");
   params.fecha_inicial=fecha[2]+"/"+fecha[1]+"/"+fecha[0];
@@ -15,9 +15,11 @@ export const executeExtraccionSIF = async (params: ExtraccionParams): Promise<vo
     params.fecha_final=fecha[2]+"/"+fecha[1]+"/"+fecha[0];
     
   try {
-    const response = await axios.post(API_URL, params);
+    /*const response = await axios.post(API_URL, params);*/
+    const response = await axios.post<{ data: any[], status: number }>(`${API_URL}`);
 
     console.log('Proceso ejecutado con éxito:', response.data);
+    return response.data;
   } catch (error) {
     console.error('Error ejecutando la extracción SIF:', error);
     throw error; // Esto permite capturar el error en la UI y manejarlo apropiadamente
