@@ -93,7 +93,7 @@ const ConsultaBatchPage: React.FC = () => {
   const handleSistemaSelect = (sistema: string | null) => {
     setSelectedSistema(sistema);
     setSelectedModulo('');
-    handleFiltroChange('mosdulo', '');
+    handleFiltroChange('modulo', '');
     handleFiltroChange('sistema', sistema || '');
      
   };
@@ -105,10 +105,19 @@ const ConsultaBatchPage: React.FC = () => {
 
   const handleGuardar = async () => {
     console.log('filtros: ', filtros);
-    if (!filtros.proceso || !filtros.sistema || !filtros.modulo || !filtros.borrar || !filtros.tipo_informacion || !filtros.fecha_ini || !filtros.fecha_fin) {
-      notify('Todos los campos son obligatorios', 'warning');
-      return;
+
+    if (filtros.proceso === 'SICAP004') {     
+      if (!filtros.proceso || !filtros.fecha_ini || !filtros.fecha_fin) {
+        notify('Todos los campos son obligatorios', 'warning');
+        return;
+      }
+    }else{
+      if (!filtros.proceso || !filtros.sistema || !filtros.modulo || !filtros.borrar || !filtros.tipo_informacion || !filtros.fecha_ini || !filtros.fecha_fin) {
+        notify('Todos los campos son obligatorios', 'warning');
+        return;
+      }
     }
+    
     if(!!filtros.fecha_ini && !!filtros.fecha_fin && filtros.fecha_fin!== '' && filtros.fecha_ini !== ''){
       if (new Date(filtros.fecha_fin) < new Date(filtros.fecha_ini)) {
         notify('La fecha de termino debe ser mayor o igual a la fecha de inicio.', 'warning');
@@ -117,15 +126,8 @@ const ConsultaBatchPage: React.FC = () => {
     };
 
     // Validaciones específicas para cada proceso
-    /*
-    if (filtros.proceso === 'SICAP002') {
-      const startDate = new Date(filtros.fecha_ini);
-      console.log("start date: ",startDate);
-      if (startDate.getDate() !== 1) {
-        notify('La fecha inicial debe corresponder al primer día del mes.', 'warning');
-        return;
-      }
-    }*/
+    
+    
     
     setIsLoading(true);
     try {
