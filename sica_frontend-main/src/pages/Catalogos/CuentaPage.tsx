@@ -13,7 +13,7 @@ import {fetchModuloByClave, fetchModulos} from "@/pages/Catalogos/selectores/ser
 import {
     getAllCuentas,
     getCuentasBySistema,
-    getCuentasBySistemaAndModulo, getFormulas, getReglas, removeCuenta, removeMultipleCuentas
+    getCuentasBySistemaAndModulo, getFormulas, getReglas
 } from "./selectores/serviceSelectorCuentaRegla"; // Asumiendo que tienes este modal para manejar las reglas
 
 
@@ -206,7 +206,9 @@ const CuentaPage: React.FC = () => {
     };
 
     const handleCloseCuentaModal = () => {
+        setEditingCuenta(originalObject);
         setIsCuentaModalOpen(false);
+
     };
 
     const handleSaveCuenta = async (cuenta: Cuenta) => {
@@ -261,11 +263,15 @@ const CuentaPage: React.FC = () => {
 
         setConfirmAction(() => async () => {
             try {
-                await service.removeRegla(reglaToDelete?.id).then(resp => {
+                await service.removeRegla(reglaToDelete).then(resp => {
                     console.log("DeleteReg: ", resp)
+                    if(resp?.status === 200){
+                        setCurrentReglas(currentReglas.filter(regla => reglaToDelete?.id !== regla.id))
+                        notify('Regla eliminada correctamente', 'success');
+                    }else {
+                        notify('Error al eliminar la regla', 'error');
+                    }
                 });
-                //setReglas(reglas.filter((regla) => regla.id !== id));
-                notify('Regla eliminada correctamente', 'success');
             } catch (error) {
                 notify('Error al eliminar la regla', 'error');
             }
@@ -275,7 +281,6 @@ const CuentaPage: React.FC = () => {
 
 
     const handleDeleteCuenta = (id: number) => {
-        console.log("Borrando cuenta: ", id)
         const cuentaToDelete = filteredCuentas.find(cuenta => cuenta.cuc_clave === id);
         console.log("Cuenta encontrada: ", cuentaToDelete)
         if (!cuentaToDelete) {
@@ -288,7 +293,7 @@ const CuentaPage: React.FC = () => {
                 await service.removeCuenta(cuentaToDelete?.cuc_clave).then(resp => {
                     if (resp?.status === 200) {
                         notify('Cuenta eliminada correctamente', 'success');
-                        setFilteredCuentas(filteredCuentas?.filter(cuenta => cuenta.cuc_cuenta !== id))
+                        setFilteredCuentas(filteredCuentas?.filter(cuenta => cuenta.cuc_clave !== id))
                     } else {
                         notify('Error al eliminar la cuenta', 'error');
                     }
@@ -338,7 +343,6 @@ const CuentaPage: React.FC = () => {
         setConfirmAction(() => async () => {
             try {
                 await service.removeMultipleReglas(reglasToDelete).then(resp => {
-                    console.log("Resp: ", resp)
                     if(resp?.status === 200){
                         setCurrentReglas(currentReglas.filter(regla => !ids.includes(regla.id)))
                         notify('Reglas eliminadas correctamente', 'success');
@@ -370,7 +374,7 @@ const CuentaPage: React.FC = () => {
     };
 
     return (
-        <Box>
+        <Box sx={{ overflow: 'auto' }}>
             <BodyHeader
                 headerRoute="Catálogos / Cuentas y Reglas"
                 TitlePage="Cuentas y Reglas"

@@ -50,7 +50,7 @@ export const createOrUpdateCuentaRegla = useMock
   ? mockCreateOrUpdateCuentaRegla
   : createCuenta;
 
-export const removeCuenta = useMock ? mockDeleteCuentaRegla : deleteCuenta;
+export const removeCuenta = deleteCuenta;
 export const removeMultipleCuentas = useMock
   ? mockDeleteMultipleCuentasRegla
   : deleteMultipleCuentas;
@@ -64,7 +64,7 @@ export const createOrUpdateRegla = useMock
 export const createOrUpdateFormula = useMock
     ? mockCreateOrUpdateFormula
     : createFormula;
-export const removeRegla = useMock ? mockDeleteReglaFunc : realDeleteRegla;
+export const removeRegla =  realDeleteRegla;
 export const removeMultipleReglas = useMock
   ? mockDeleteMultipleReglas
   : deleteMultipleReglas;

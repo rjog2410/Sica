@@ -12,7 +12,7 @@ import {
     TableRow,
     IconButton,
     TextField,
-    Tabs, Box, Tab, Grid, Checkbox
+    Tabs, Box, Tab, Grid, Checkbox, MenuItem
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -87,6 +87,8 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
     const [checked, setChecked] = React.useState(false);
 
     const [selectedReglas, setSelectedReglas] = useState<Partial<number[]>>([]);
+
+    const operators: string[] = ["+","-","*","/"];
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
@@ -244,7 +246,6 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
 
     const isCurrentFormula = (formula: Formula) => isEditingFormula && formula.id === editingFormula?.id
 
-    console.log("Selected reglas; ", selectedReglas)
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
@@ -335,12 +336,18 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                             </TableCell>
                                             <TableCell>
                                                 <TextField
+                                                    select
                                                     placeholder="Operador"
                                                     value={newRegla.reg_operador || ''}
                                                     onChange={(e) => handleInputChange('reg_operador', e.target.value)}
                                                     error={!!errors.reg_operador}
                                                     helperText={errors.reg_operador}
-                                                />
+                                                >
+                                                    {
+                                                        operators?.map(op => <MenuItem
+                                                            value={op}>{op}</MenuItem>)
+                                                    }
+                                                </TextField>
                                             </TableCell>
                                             <TableCell>
                                                 <TextField
@@ -398,11 +405,17 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                             <TableCell>
                                                 {isEditing && editingRegla?.id === regla.id ? (
                                                     <TextField
+                                                        select
                                                         value={editingRegla.reg_operador}
                                                         onChange={(e) => handleInputChange('reg_operador', e.target.value)}
                                                         error={!!errors.reg_operador}
                                                         helperText={errors.reg_operador}
-                                                    />
+                                                    >
+                                                        {
+                                                            operators?.map(op => <MenuItem
+                                                                value={op}>{op}</MenuItem>)
+                                                        }
+                                                    </TextField>
                                                 ) : (
                                                     regla.reg_operador
                                                 )}
@@ -472,12 +485,18 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                     </TableCell>
                                     <TableCell>
                                         <TextField
+                                            select
                                             placeholder="Operador"
                                             value={newFormula.for_operador || ''}
                                             onChange={(e) => handleInputFormulaChange('for_operador', e.target.value)}
                                             error={!!errors.for_operador}
                                             helperText={errors.for_operador}
-                                        />
+                                        >
+                                            {
+                                                operators?.map(op => <MenuItem
+                                                    value={op}>{op}</MenuItem>)
+                                            }
+                                        </TextField>
                                     </TableCell>
                                     <TableCell>
                                         <IconButton onClick={handleAddFormulaClick} aria-label="add">
@@ -519,7 +538,12 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                                         onChange={(e) => handleInputFormulaChange('for_operador', e.target.value)}
                                                         error={!!errors.for_operador}
                                                         helperText={errors.for_operador}
-                                                    />
+                                                    >
+                                                        {
+                                                            operators?.map(op => <MenuItem
+                                                                value={op}>{op}</MenuItem>)
+                                                        }
+                                                    </TextField>
                                                 ) : (
                                                     formula.for_operador
                                                 )}
@@ -539,10 +563,14 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                 </Grid>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose} color="primary">
+                <Button onClick={() => {
+                    setIsEditingFormula(false)
+                    setIsEditing(false)
+                    onClose()
+                }} color="primary">
                     Cerrar
                 </Button>
-                {isEditing || isEditingFormula && (
+                {(isEditing || isEditingFormula) && (
                     <Button onClick={handleSaveClick} color="primary">
                         Guardar
                     </Button>

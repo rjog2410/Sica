@@ -23,6 +23,7 @@ interface AddCuentaModalProps {
 
 const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, initialData}) => {
 
+
     const originalObject: Cuenta = {
         cuc_clave: 0,
         cuc_mod_sis_clave: '',
@@ -35,37 +36,39 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
         cuc_scta5: '',
         cuc_scta6: '',
         cuc_scta7: '',
-        cuc_tipo_ente : 0,
-        cuc_ente : 0,
-        cuc_consolida_ente : 'N',
-        cuc_inc_saldo : 'N',
-        cuc_inc_movs : 'N',
-        cuc_inc : ''
+        cuc_tipo_ente: 0,
+        cuc_ente: 0,
+        cuc_consolida_ente: 'N',
+        cuc_inc_saldo: 'N',
+        cuc_inc_movs: 'N',
+        cuc_inc: ''
     }
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [cuentaData, setCuentaData] = useState<Cuenta>(initialData);
     const [sistemas, setSistemas] = useState<Sistema[]>([]);
     const [modulos, setModulos] = useState<ModuloO[]>([]);
 
-    console.log("cuentaData: ", cuentaData)
-
     useEffect(() => {
-        fetchSistemas().then( resp =>{
+        fetchSistemas().then(resp => {
             setSistemas(resp);
         })
     }, []);
 
     useEffect(() => {
-        fetchModuloByClave(cuentaData?.cuc_mod_sis_clave).then( resp =>{
+        fetchModuloByClave(cuentaData?.cuc_mod_sis_clave).then(resp => {
             setModulos(resp)
         })
     }, [cuentaData?.cuc_mod_sis_clave]);
 
     useEffect(() => {
         if (initialData) {
+            console.log("initialData: ", initialData)
+            console.log("cuc_ente: ", initialData?.cuc_ente)
             setCuentaData({
                 ...initialData,
-                cuc_inc: initialData.cuc_consolida_ente === 'S' ? 'E' : (initialData.cuc_inc_movs === 'S' ? 'M': (initialData.cuc_inc_saldo === 'S' ? 'S': ""))
+                cuc_ente: (initialData?.cuc_ente === null || initialData?.cuc_ente === undefined) ? 0 : initialData?.cuc_ente,
+                cuc_tipo_ente: (initialData?.cuc_tipo_ente === null || initialData?.cuc_tipo_ente === undefined) ? 0 : initialData?.cuc_tipo_ente,
+                cuc_inc: initialData.cuc_consolida_ente === 'S' ? 'E' : (initialData.cuc_inc_movs === 'S' ? 'M' : (initialData.cuc_inc_saldo === 'S' ? 'S' : ""))
             });
         }
     }, [initialData]);
@@ -100,7 +103,7 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
         if (!/^[0-9]*$/gm.test(cuentaData?.cuc_ente?.toString())) {
             tempErrors.cuc_ente = "Solo numeros";
         }
-        if(!cuentaData?.cuc_inc){
+        if (!cuentaData?.cuc_inc) {
             tempErrors.cuc_inc = "Requerido";
         }
 
@@ -121,9 +124,9 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
         setCuentaData({
             ...cuentaData,
             [name]: value,
-            cuc_consolida_ente:value === 'E' ? 'S':'N' ,
-            cuc_inc_saldo:value === 'S' ? 'S':'N',
-            cuc_inc_movs:value === 'M' ? 'S':'N'
+            cuc_consolida_ente: value === 'E' ? 'S' : 'N',
+            cuc_inc_saldo: value === 'S' ? 'S' : 'N',
+            cuc_inc_movs: value === 'M' ? 'S' : 'N'
         });
     };
 
@@ -136,8 +139,8 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
 
     return (
         <Dialog open={open} onClose={onClose}>
-            <DialogTitle>{initialData !== originalObject ? 'Editar Cuenta' : 'Agregar Cuenta'}</DialogTitle>
-            <DialogContent>
+            <DialogTitle>{initialData?.cuc_clave !== 0 ? 'Editar Cuenta' : 'Agregar Cuenta'}</DialogTitle>
+            <DialogContent style={{padding: "15px"}}>
                 <Grid container spacing={1} display="flex" justifyContent="center" alignItems="center">
                     <Grid item xs={12}>
                         <TextField
@@ -152,7 +155,8 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
                             helperText={errors.clave_sistema}
                         >
                             {
-                                sistemas?.map(sistema => <MenuItem value={sistema.sis_clave}>{sistema.sis_clave} - {sistema.sis_nombre}</MenuItem>)
+                                sistemas?.map(sistema => <MenuItem
+                                    value={sistema.sis_clave}>{sistema.sis_clave} - {sistema.sis_nombre}</MenuItem>)
                             }
                         </TextField>
                     </Grid>
@@ -285,7 +289,7 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
                         />
                     </Grid>
                     <Grid item xs={12} display="flex" justifyContent="center" alignItems="center">
-                        <FormControl  error={!!errors.cuc_inc}>
+                        <FormControl error={!!errors.cuc_inc}>
                             <FormLabel id="demo-row-radio-buttons-group-label">Cons</FormLabel>
                             <RadioGroup
                                 row

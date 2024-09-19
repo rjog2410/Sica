@@ -140,8 +140,8 @@ const CuentasTable = forwardRef(({
   };
 
   return (
-    <TableContainer component={Paper}>
-      <Table>
+    <TableContainer component={Paper} style={{ height: '450px', width: '100%' }}>
+      <Table stickyHeader>
         <TableHead>
           <TableRow>
             <TableCell padding="checkbox">
