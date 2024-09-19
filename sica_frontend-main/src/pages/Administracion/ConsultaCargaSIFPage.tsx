@@ -208,7 +208,7 @@ const ConsultaCargaSIFPage: React.FC = () => {
           {isLoading ? 'Consultando...' : 'Consultar'}
         </Button>
       </Box>
-      <CargaSIFTable data={cargaData} />
+      <CargaSIFTable data={cargaData} tipo_salmov={filtros?.tipo_salmov} />
     </Box>
   );
 };

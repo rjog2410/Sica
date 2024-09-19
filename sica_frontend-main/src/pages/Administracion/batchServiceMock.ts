@@ -16,8 +16,11 @@ export const fetchModulos = async (sistema: string): Promise<{ label: string; va
   ];
 };
 
-export const saveBatchProcess = async (data: any): Promise<{ success: boolean }> => {
-  // Aquí deberías hacer una llamada a la API real para guardar el proceso batch
-  // Este es un mock por ahora
-  return { success: true };
-};
+export const saveBatchProcessMock = async (filtros: any) => {
+    console.log("filtros",filtros);
+    
+    return {
+      message: 'OK',
+      status: 200
+    } ;
+  };

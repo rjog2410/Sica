@@ -9,6 +9,13 @@ import BodyHeader from '../../components/base/BodyHeader';
 import ComboBox from '@/components/base/tabla/Combobox';
 
 const TraductorPage: React.FC = () => {
+  const originalObject = {
+    sistema: 'ALL',
+    modulo: '',
+    tipo_informacion: '',
+    fecha_inicial: '',
+    fecha_final: '',
+  }
   const [params, setParams] = useState<TraductorParams>({
     sistema: '',
     modulo: '',
@@ -33,9 +40,7 @@ const TraductorPage: React.FC = () => {
         notify('Datos de Traductor Cargados', 'info');
       } catch (error) {
         notify('Error al cargar los datos de Traductor', 'error');
-      } finally {
-        setLoading(false);
-      }
+      } 
     };
 
     fetchData();
@@ -79,18 +84,11 @@ const TraductorPage: React.FC = () => {
 
 
   const validateParams = (): boolean => {
-    const { fecha_inicial, fecha_final } = params;
-    const startDate = new Date(fecha_inicial);
-    const endDate = new Date(fecha_final);
+    
 
-    if (startDate.getDate() !== 1) {
-      notify('La fecha de inicio debe ser el primer día del mes', 'error');
-      return true;
-    }
-
-    if (endDate < startDate) {
+    if (params.fecha_final < params.fecha_inicial) {
       notify('La fecha final debe ser mayor o igual a la fecha de inicio', 'error');
-      return true;
+      return false;
     }
 
     return true;
@@ -99,12 +97,23 @@ const TraductorPage: React.FC = () => {
   const handleExecute = async () => {
     if (!validateParams()) return;
 
-    try {
-      await service.executeTraductor(params);
-      notify('Proceso ejecutado con éxito', 'success');
-    } catch (error) {
-      notify('Error ejecutando el proceso', 'error');
-    }
+    
+    service.executeTraductor(params).then(resp =>{
+      if(resp.status === 200){
+
+          notify('Traductor ejecutado correctamente', 'success');
+        
+
+      }else{
+        notify(resp.message, 'info');
+        console.log("ocurrio un error: ",resp.message);
+      }
+       }).catch(error =>{
+      notify(error.response.data.message, 'error');
+      console.log("ocurrio un error",error.response.data.message);
+    }) 
+    setParams(originalObject);
+
   };
 
   const handleSelectChange = (event: SelectChangeEvent<string>) => {

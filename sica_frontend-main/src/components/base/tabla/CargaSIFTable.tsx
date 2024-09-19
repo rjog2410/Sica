@@ -20,10 +20,12 @@ type Order = 'asc' | 'desc';
 interface CargaSIFTableProps {
 
   data: CargaSIFData[];
+  tipo_salmov: string;
 }
 
 const CargaSIFTable = forwardRef(({
   data,
+  tipo_salmov,
 }: CargaSIFTableProps, ref) => {
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof CargaSIFData>('sis_clave');
@@ -106,7 +108,7 @@ const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => 
                     <StyledTableCell>{row.fecha_conciliacion}</StyledTableCell>
                     <StyledTableCell>{row.fecha_carga}</StyledTableCell>
                     <StyledTableCell>{row.RegistrosCargados}</StyledTableCell>
-                    <StyledTableCell>{row?.tipo_salmov}</StyledTableCell>
+                    <StyledTableCell>{tipo_salmov}</StyledTableCell>
                   </StyledTableRow >
                 );
                     })}

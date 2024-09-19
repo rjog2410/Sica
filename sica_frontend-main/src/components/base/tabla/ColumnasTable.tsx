@@ -93,7 +93,7 @@ const ColumnasTable = forwardRef(({
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Columnas');
 
-    const datos= ColumnasTable.slice().sort((a, b) => {
+    const datos= data.slice().sort((a, b) => {
       return (a['clave_sistema'] < b['clave_sistema'] ? -1 : 1) * (order === 'asc' ? 1 : -1);
   });
 

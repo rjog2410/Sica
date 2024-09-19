@@ -243,3 +243,13 @@ export interface  ConciliacionCuenta {
   con_importe_ao: number,
   con_dif: number
 }
+
+export interface FiltrosConsultaBatch {
+  proceso: string,
+  sistema: string,
+  modulo: string,
+  tipo_informacion: string,
+  borrar: string,
+  fecha_ini: string,
+  fecha_fin: string,
+}
