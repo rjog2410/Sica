@@ -32,13 +32,13 @@ const ConciliacionSaldosPage: React.FC = () => {
         if (!!filtros?.sistema) {
             fetchModulosBySistema(filtros?.sistema).then(resp => {
                 setData({...data, modulos: resp})
+                setFiltros({...filtros, modulo: ''})
             })
         }
     }, [filtros?.sistema]);
 
 
     const handleFiltroChange = (name: string, value: any) => {
-        console.log("Value: ", value)
         setFiltros(prev => ({...prev, [name]: value}));
     };
 
@@ -60,6 +60,14 @@ const ConciliacionSaldosPage: React.FC = () => {
             );
         });
     }, [filtros]);
+
+    const searchSaldos = ()=>{
+        if (!!filtros?.sistema && !!filtros?.modulo && !!filtros?.fecha_informacion && !!filtros?.oficina && !!filtros?.moneda) {
+            fetchReporteConciliacionSaldos(filtros).then(resp => {
+                console.log("Response: ", resp)
+            })
+        }
+    }
 
     const handleExportModule = () => {
         // Implementar la lógica para exportar por módulo
@@ -101,7 +109,7 @@ const ConciliacionSaldosPage: React.FC = () => {
                                                             variant="outlined"/>} // Aplicamos la propiedad sx a TextField
                     />
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={3}>
                     <TextField
                         placeholder={"Fecha"}
                         type={"date"}
@@ -109,7 +117,7 @@ const ConciliacionSaldosPage: React.FC = () => {
                         onChange={(e) => handleFiltroChange('fecha_informacion', e?.target?.value || '')}
                     />
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={3}>
                     <TextField
                         placeholder={"Oficina"}
                         type={"text"}
@@ -117,13 +125,18 @@ const ConciliacionSaldosPage: React.FC = () => {
                         onChange={(e) => handleFiltroChange('oficina', e?.target?.value || '')}
                     />
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={3}>
                     <TextField
                         placeholder={"Moneda"}
                         type={"number"}
                         value={filtros?.moneda}
                         onChange={(e) => handleFiltroChange('moneda', e?.target?.value || '')}
                     />
+                </Grid>
+                <Grid item xs={3}>
+                    <Button variant="contained" color="primary" onClick={searchSaldos} sx={{mr: 1}}>
+                        Buscar
+                    </Button>
                 </Grid>
             </Grid>
             <ConciliacionTable data={conciliacionesFiltradas}/>
