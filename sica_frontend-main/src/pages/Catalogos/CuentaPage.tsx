@@ -14,7 +14,8 @@ import {
     getAllCuentas,
     getCuentasBySistema,
     getCuentasBySistemaAndModulo, getFormulas, getReglas
-} from "./selectores/serviceSelectorCuentaRegla"; // Asumiendo que tienes este modal para manejar las reglas
+} from "./selectores/serviceSelectorCuentaRegla";
+import {createFormula, deleteFormula, deleteMultipleFormula} from "@/pages/Catalogos/servicios/cuentasReglaService.ts"; // Asumiendo que tienes este modal para manejar las reglas
 
 
 const CuentaPage: React.FC = () => {
@@ -180,14 +181,14 @@ const CuentaPage: React.FC = () => {
 
     };
 
-    const handleSaveFormula = async (newFormula: Formula) => {
+    const handleSaveFormula = async (newFormula: Formula, isUpdate: boolean) => {
         console.log("newFormula: ", newFormula)
         try {
-            await service.createOrUpdateFormula(newFormula, true).then(resp => {
+            await createFormula(newFormula, isUpdate).then(resp => {
                 if (resp?.data?.status === 400) {
                     notify(resp?.data?.message?.msg, 'error');
                 } else {
-                    notify('Formula actualizada correctamente', 'success');
+                    notify(!isUpdate ? 'Formula actualizada correctamente': 'Formula creada correctamente', 'success');
                 }
             });
         } catch (error) {
@@ -199,6 +200,7 @@ const CuentaPage: React.FC = () => {
             id: index
         }))))
     };
+
 
     const handleOpenCuentaModal = () => {
         setEditingCuenta(editingCuenta);
@@ -213,7 +215,9 @@ const CuentaPage: React.FC = () => {
 
     const handleSaveCuenta = async (cuenta: Cuenta) => {
         try {
-            await service.createOrUpdateCuentaRegla(cuenta);
+            await service.createOrUpdateCuentaRegla(cuenta).then(resp =>{
+                console.log("Response: ", resp)
+            });
             if (cuenta.cuc_clave) {
                 setCuentas(cuentas.map(c => (c.cuc_clave === cuenta.cuc_clave ? cuenta : c)));
             } else {
@@ -358,6 +362,61 @@ const CuentaPage: React.FC = () => {
         setConfirmOpen(true);
     };
 
+    const handleDeleteFormula = (id: number) => {
+        const formulaToDelete = currentFormulas.find(formula => formula.id === id);
+
+        if (!formulaToDelete) {
+            notify('Formula no encontrada', 'error');
+            return;
+        }
+
+        setConfirmAction(() => async () => {
+            try {
+                await deleteFormula(formulaToDelete).then(resp => {
+                    console.log("DeleteFormula: ", resp)
+                    if(resp?.status === 200){
+                        getFormulas(cuentaInfo?.cuc_clave).then(resp => setCurrentFormulas(resp?.map((form, index) => ({
+                            ...form,
+                            id: index
+                        }))))
+                        notify('Formula eliminada correctamente', 'success');
+                    }else {
+                        notify('Error al eliminar la formula', 'error');
+                    }
+                });
+            } catch (error) {
+                notify('Error al eliminar la formula', 'error');
+            }
+        });
+        setConfirmOpen(true);
+    }
+
+    const handleDeleteMultipleFormula = (ids: number[]) => {
+        const formulasToDelete : Formula [] = currentFormulas.filter(formula => ids.includes(formula?.id));
+
+        if (formulasToDelete.length === 0) {
+            notify('No se encontraron formulas para eliminar', 'error');
+            return;
+        }
+
+        setConfirmAction(() => async () => {
+            try {
+                await deleteMultipleFormula(formulasToDelete).then(resp => {
+                    if(resp?.status === 200){
+                        setCurrentFormulas(currentFormulas.filter(form => !ids.includes(form?.id)))
+                        notify('Formulas eliminadas correctamente', 'success');
+                    }else {
+                        notify('Error al eliminar las formulas', 'error');
+                    }
+                });
+
+            } catch (error) {
+                notify('Error al eliminar las formulas', 'error');
+            }
+        });
+        setConfirmOpen(true);
+    };
+
     const handleExportExcel = () => {
         if (tableRef.current) {
             try {
@@ -446,7 +505,9 @@ const CuentaPage: React.FC = () => {
                 onSaveRegla={handleSaveRegla}
                 onSaveFormula={handleSaveFormula}
                 onDeleteRegla={handleDeleteRegla}
+                onDeleteFormula={handleDeleteFormula}
                 onDeleteAllReglas={handleDeleteMultipleReglas}
+                onDeleteAllFormula={handleDeleteMultipleFormula}
             />
             <ConfirmDialog
                 open={confirmOpen}

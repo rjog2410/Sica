@@ -78,6 +78,17 @@ export const deleteMultipleCuentas = async (ids: number[]): Promise<number[]> =>
     return response.data; // Retorna los IDs eliminados
 };
 
+export const deleteFormula = async (formula: Formula): Promise<any> => {
+    const response = await axios.post(`${BASE_URL}/formulas/delete`,formula);
+    return response.data;
+};
+
+//
+export const deleteMultipleFormula = async (formulas: Formula[]): Promise<number[]> => {
+    const response = await axios.post(`${BASE_URL}/formulas/delete_all`, formulas);
+    return response.data; // Retorna los IDs eliminados
+};
+
 // Obtener reglas por cuenta
 export const fetchReglas = async (cuentaId: number): Promise<Regla[]> => {
     const response = await axios.post(`${BASE_URL}/reglas/get`, {id: cuentaId});
@@ -110,6 +121,7 @@ export const createFormula = async (formula: Formula, p0: boolean): Promise<any>
         return response;
     }
 };
+
 
 // Actualizar una regla
 export const updateRegla = async (regla: Regla): Promise<void> => {

@@ -55,17 +55,18 @@ export const removeMultipleCuentas = useMock
   ? mockDeleteMultipleCuentasRegla
   : deleteMultipleCuentas;
 export const getReglas = useMock ? mockFetchReglas : fetchReglas;
+
 export const getFormulas = useMock ? mockFetchFormulas : fetchFormulas;
 
 export const createOrUpdateRegla = useMock
   ? mockCreateOrUpdateRegla
   : createRegla;
 
-export const createOrUpdateFormula = useMock
-    ? mockCreateOrUpdateFormula
-    : createFormula;
+
 export const removeRegla =  realDeleteRegla;
+
 export const removeMultipleReglas = useMock
   ? mockDeleteMultipleReglas
   : deleteMultipleReglas;
+
 export { updateRegla };
