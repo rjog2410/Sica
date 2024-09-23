@@ -19,6 +19,13 @@ public class ResponseDtoService {
         response.setMessage("OK");
         return response;
     }
+     // 200 con array de datos
+     public ResponseDto buildJsonResponseString(String msg) {
+        ResponseDto response = new ResponseDto();
+        response.setStatus(200);
+        response.setMessage(msg);
+        return response;
+    }
 
     // 200 con array de datos
     public ResponseDto buildJsonResponseObject(Object object) {

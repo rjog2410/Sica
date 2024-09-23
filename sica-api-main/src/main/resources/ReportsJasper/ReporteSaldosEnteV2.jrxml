@@ -1,0 +1,133 @@
+<!-- Created with Jaspersoft Studio version 7.0.0.final using JasperReports Library version 7.0.0-b478feaa9aab4375eba71de77b4ca138ad2f62aa  -->
+<jasperReport name="ReporteSaldos" language="java" columnCount="1" pageWidth="792" pageHeight="612" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6a812f1b-b292-4bcc-bb6d-65c7d9d628e3">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<dataset name="Detallesds" uuid="9d7e1b5f-ebb5-46bb-9e12-a434053402da">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+		<query language="sql"><![CDATA[]]></query>
+		<field name="ENTE" class="java.lang.String"/>
+		<field name="ENTE_NOMBRE" class="java.lang.String"/>
+		<field name="IMPORTE_SIF" class="java.lang.String"/>
+		<field name="IMPORTE_AO" class="java.lang.String"/>
+		<field name="DIFERENCIA" class="java.lang.String"/>
+		<field name="CUENTA" class="java.lang.String"/>
+		<field name="SCTA1" class="java.lang.String"/>
+		<field name="SCTA2" class="java.lang.String"/>
+		<field name="SCTA3" class="java.lang.String"/>
+		<field name="SCTA4" class="java.lang.String"/>
+	</dataset>
+	<parameter name="fecha_principal" class="java.lang.String"/>
+	<parameter name="fecha_proceso" class="java.lang.String"/>
+	<parameter name="hora_proceso" class="java.lang.String"/>
+	<parameter name="imgLogo" class="java.io.InputStream"/>
+	<query language="sql"><![CDATA[]]></query>
+	<field name="SISTEMA" class="java.lang.String"/>
+	<field name="MODULO" class="java.lang.String"/>
+	<field name="OFICINA" class="java.math.BigDecimal"/>
+	<field name="MONEDA" class="java.math.BigDecimal"/>
+	<field name="NOMBRE_OFICINA" class="java.lang.String"/>
+	<field name="NOMBRE_MONEDA" class="java.lang.String"/>
+	<field name="detalles" class="java.util.List"/>
+	<field name="TOTAL_SIF" class="java.lang.String"/>
+	<field name="TOTAL_AO" class="java.lang.String"/>
+	<field name="TOTAL_DIF" class="java.lang.String"/>
+	<field name="CUENTA" class="java.lang.String"/>
+	<field name="SCTA1" class="java.lang.String"/>
+	<field name="SCTA2" class="java.lang.String"/>
+	<field name="SCTA3" class="java.lang.String"/>
+	<field name="SCTA4" class="java.lang.String"/>
+	<field name="cuentas" class="java.util.List"/>
+	<group name="Group1" startNewPage="true">
+		<expression><![CDATA[$F{SISTEMA} + $F{MODULO} + $F{OFICINA} + $F{MONEDA}]]></expression>
+		<groupHeader>
+			<band height="80">
+				<element kind="rectangle" uuid="1eb6a34b-9a8b-477f-8319-d15aa503755c" x="0" y="0" width="572" height="69"/>
+				<element kind="textField" uuid="f4a1d153-aef1-4da9-bccb-d66a8c1ab309" x="90" y="0" width="100" height="30" hTextAlign="Center" vTextAlign="Middle">
+					<expression><![CDATA[$F{SISTEMA}]]></expression>
+				</element>
+				<element kind="textField" uuid="c9c63475-054c-4d41-8119-7581675e4ddf" x="90" y="40" width="100" height="30" hTextAlign="Center" vTextAlign="Middle">
+					<expression><![CDATA[$F{MODULO}]]></expression>
+				</element>
+				<element kind="textField" uuid="289f25cf-074d-4481-904e-36f57da15a0b" x="290" y="0" width="54" height="30" hTextAlign="Center" vTextAlign="Middle">
+					<expression><![CDATA[$F{OFICINA}]]></expression>
+				</element>
+				<element kind="textField" uuid="a37b7418-8c51-41b2-a9b5-4f5acab6e767" x="290" y="40" width="54" height="30" hTextAlign="Center" vTextAlign="Middle">
+					<expression><![CDATA[$F{MONEDA}]]></expression>
+				</element>
+				<element kind="staticText" uuid="db13a16e-5c93-4c29-8d13-7028e7be651c" x="0" y="0" width="90" height="30" bold="true" hTextAlign="Center" vTextAlign="Middle">
+					<text><![CDATA[Sistema : ]]></text>
+				</element>
+				<element kind="staticText" uuid="f887f2c2-251a-449f-8bec-56bc231303bb" x="0" y="40" width="90" height="30" bold="true" hTextAlign="Center" vTextAlign="Middle">
+					<text><![CDATA[Módulo : ]]></text>
+				</element>
+				<element kind="staticText" uuid="88712630-32a6-4efa-86be-e9ea5ba08660" x="200" y="0" width="90" height="30" bold="true" hTextAlign="Center" vTextAlign="Middle">
+					<text><![CDATA[Oficina :]]></text>
+				</element>
+				<element kind="staticText" uuid="15fed82d-2967-4710-8365-e0aaed8dc767" x="200" y="40" width="90" height="30" bold="true" hTextAlign="Center" vTextAlign="Middle">
+					<text><![CDATA[Moneda :]]></text>
+				</element>
+				<element kind="textField" uuid="7ae49bb2-fb75-4dcb-85af-8cc415d37cab" x="344" y="0" width="228" height="30" hTextAlign="Left" vTextAlign="Middle">
+					<expression><![CDATA[$F{NOMBRE_OFICINA}]]></expression>
+				</element>
+				<element kind="textField" uuid="fa088bfc-6a40-4d42-8bfe-13c66f82da17" x="344" y="40" width="228" height="30" vTextAlign="Middle">
+					<expression><![CDATA[$F{NOMBRE_MONEDA}]]></expression>
+				</element>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="45"/>
+		</groupFooter>
+	</group>
+	<background splitType="Stretch"/>
+	<pageHeader height="81">
+		<element kind="staticText" uuid="4f0d1629-df55-48db-aa8e-7684eb081f6d" x="256" y="30" width="164" height="30" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[CONCILIACIÓN DE SALDOS AL]]></text>
+		</element>
+		<element kind="textField" uuid="a35252e1-8316-4c5b-aa53-29e14566bdba" x="420" y="30" width="65" height="30" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<expression><![CDATA[$P{fecha_principal}]]></expression>
+		</element>
+		<element kind="staticText" uuid="619314c0-9500-448e-baeb-ebf2eb9f4626" x="295" y="0" width="125" height="30" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[CONTADURIA GENERAL]]></text>
+		</element>
+		<element kind="textField" uuid="5f8cf5d0-0f47-4249-9015-700241649185" x="670" y="5" width="58" height="20" linkType="None" linkTarget="Self" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<expression><![CDATA[$V{PAGE_NUMBER}]]></expression>
+		</element>
+		<element kind="staticText" uuid="20066950-edc1-4723-b2d2-b19c06a3cdc1" x="570" y="5" width="42" height="20" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[HOJA :]]></text>
+		</element>
+		<element kind="staticText" uuid="b926e6e9-4c3a-461a-a903-89a79f7bb5df" x="570" y="25" width="100" height="20" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[FECHA PROCESO:]]></text>
+		</element>
+		<element kind="staticText" uuid="bddcbb9f-5910-44f0-adda-3d5a33ba7108" x="570" y="45" width="100" height="20" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[HORA PROCESO:]]></text>
+		</element>
+		<element kind="textField" uuid="c2fadd7b-3379-4112-b595-648054268dda" x="670" y="25" width="58" height="20" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<expression><![CDATA[$P{fecha_proceso}]]></expression>
+		</element>
+		<element kind="textField" uuid="0f126ead-5cfe-4595-86a6-578c2907612b" x="670" y="45" width="58" height="20" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<expression><![CDATA[$P{hora_proceso}]]></expression>
+		</element>
+		<element kind="image" uuid="e89d7cef-0bfa-4af0-814b-c499c1791890" x="71" y="0" width="150" height="60">
+			<expression><![CDATA[$P{imgLogo}]]></expression>
+		</element>
+	</pageHeader>
+	<detail>
+		<band height="237" splitType="Stretch">
+			<element kind="subreport" uuid="5002ed0b-b7b2-40a5-84ba-9eb0c697634e" x="0" y="10" width="750" height="200">
+				<dataSourceExpression><![CDATA[$F{cuentas}]]></dataSourceExpression>
+				<expression><![CDATA["subReportCuentas.jasper"]]></expression>
+			</element>
+		</band>
+	</detail>
+	<columnFooter height="45" splitType="Stretch"/>
+	<pageFooter height="54" splitType="Stretch"/>
+	<summary height="42" splitType="Stretch"/>
+</jasperReport>

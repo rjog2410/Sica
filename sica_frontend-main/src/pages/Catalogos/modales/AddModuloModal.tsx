@@ -170,6 +170,7 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             onChange={(e) => handleInputChange('fecha_informacion', e.target.value)}
             fullWidth
             InputLabelProps={{ shrink: true }}
+            disabled={!!initialData}
 
           />
         </Box>

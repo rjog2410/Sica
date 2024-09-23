@@ -16,7 +16,7 @@ export const executeExtraccionSIF = async (params: ExtraccionParams): Promise<Mo
     
   try {
     /*const response = await axios.post(API_URL, params);*/
-    const response = await axios.post<{ data: any[], status: number }>(`${API_URL}`);
+    const response = await axios.post<{ data: any[], status: number }>(`${API_URL}`,params);
 
     console.log('Proceso ejecutado con éxito:', response.data);
     return response.data;

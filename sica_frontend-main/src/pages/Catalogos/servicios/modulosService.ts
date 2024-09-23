@@ -74,12 +74,19 @@ export const createOrUpdateModulo = async (modulo: Modulo, isUpdate: boolean = f
       mod_agrup_rep: modulo.agrupacion_reportes
     }
     
-    var fecha =modulo.fecha_informacion?.split("-");
-    newModulo.mod_fecha_info=fecha[2]+"/"+fecha[1]+"/"+fecha[0];
+if(modulo.fecha_informacion!=null){
+  var fecha =modulo.fecha_informacion?.split("-");
+  newModulo.mod_fecha_info=fecha[2]+"/"+fecha[1]+"/"+fecha[0];
+}   else{
+  newModulo.mod_fecha_info="";
+}
+if(modulo.fecha_carga!=null){
 
     var fecha =modulo.fecha_carga?.split("-");
     newModulo.mod_fecha_carga=fecha[2]+"/"+fecha[1]+"/"+fecha[0];
-
+}else{
+  newModulo.mod_fecha_carga="";
+}
     console.log(newModulo.mod_sis_clave)
     const response = await axios.post<{ status: number; message: string }>(`${API_URL_MODULOS}/${endpoint}`, newModulo);
     return response.data;

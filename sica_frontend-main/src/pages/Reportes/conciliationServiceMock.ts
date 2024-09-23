@@ -1,4 +1,6 @@
+import axios from 'axios';
 import { ReporteConciliacion, ReporteConciliacionFiltros } from './interfaces';
+import pdfMake from 'pdfmake/build/pdfmake';
 
 const mockData: ReporteConciliacion[] = [
   {
@@ -92,16 +94,28 @@ const mockData: ReporteConciliacion[] = [
   // Agrega más datos simulados si es necesario...
 ];
 
+const API_URL = 'http://localhost:8080/reportes/reporte';
+
 export const fetchReporteConciliacionSaldos = async (
   filtros: ReporteConciliacionFiltros
 ): Promise<ReporteConciliacion[]> => {
-  return mockData.filter(
-    (item) =>
-      (filtros.sistema === 'TODOS' || item.sistema === filtros.sistema) &&
-      (filtros.modulo === 'TODOS' || item.modulo === filtros.modulo) &&
-      (filtros.fecha === '' || item.fecha === filtros.fecha) &&
-      item.nivel_agrupacion === filtros.agrupacion
-  );
+
+console.log(filtros)
+  try {
+    /*const response = await axios.post(API_URL, params);*/
+    const response = await axios.post<{ data: any[], status: number }>(`${API_URL}`,filtros);
+
+    console.log('Proceso ejecutado con éxito:', response.data);
+
+    pdfMake.createPdf(response.data).download("exporta.pdf");
+
+  } catch (error) {
+    console.error('Error ejecutando la extracción SIF:', error);
+    throw error; // Esto permite capturar el error en la UI y manejarlo apropiadamente
+  }
+  
+
+
 };
 
 export const getDistinctValues = async (key: keyof ReporteConciliacion): Promise<string[]> => {

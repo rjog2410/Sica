@@ -46,6 +46,9 @@ public interface ConciliacionesRepository extends CrudRepository<ConciliacionesE
         @Query(value = "SELECT c.con_mod_sis_clave, c.con_mod_clave ,c.con_oficina, o.nombre, c.con_moneda, m.mon_nombre, c.con_cuenta, cm.cue_nombre , "
                         + " (CASE WHEN c.con_importe_sif IS NULL THEN 0 ELSE c.con_importe_sif END), "
                         + " (CASE WHEN c.con_importe_ao IS NULL THEN 0 ELSE c.con_importe_ao END) "
+                        + " , c.con_scta1, c.con_scta2 , c.con_scta3 ,c.con_scta4 " 
+                        + " , c.con_tipo_ente, c.con_ente "
+                        + " , e.ent_nombre "
                         + "FROM sica_conciliaciones c "
                         + " JOIN sica_v_oficinas o ON o.clave_particular = c.con_oficina "
                         + " JOIN sica_monedas m ON m.mon_clave = c.con_moneda "
@@ -55,14 +58,17 @@ public interface ConciliacionesRepository extends CrudRepository<ConciliacionesE
                         + " join sica_cuentas c3 on c3.cue_mayor = c.con_cuenta and c3.cue_scta1 = c.con_scta1 and c3.cue_scta2 = c.con_scta2 and c3.cue_scta3 = c.con_scta3 and c3.cue_scta4 = '00' "
                         + " join sica_cuentas c4 on c4.cue_mayor = c.con_cuenta and c4.cue_scta1 = c.con_scta1 and c4.cue_scta2 = c.con_scta2 and c4.cue_scta3 = c.con_scta3 and c4.cue_scta4 = c.con_scta4 "
                         + " join sica_entes e on e.ent_numero = c.con_ente and e.tpe_clave = c.con_tipo_ente"
-                        + " WHERE c.con_mod_sis_clave = :modSisClave AND c.con_mod_clave = :modClave and c.con_fecha = :fecha AND ROWNUM <= 2000"
-                        + " and e.ofi_clave = o.clave_oficina and e.ofi_tipo = o.tipo", nativeQuery = true)
+                        + " WHERE c.con_mod_sis_clave = :modSisClave AND c.con_mod_clave = :modClave "
+                        + " and e.ofi_clave = o.clave_oficina and e.ofi_tipo = o.tipo ORDER BY c.con_mod_sis_clave asc, c.con_mod_clave asc,c.con_oficina asc,  c.con_moneda ASC, c.con_cuenta asc", nativeQuery = true)
         List<Object[]> get_reporte_one(@Param("modSisClave") String con_mod_sis_clave,
-                        @Param("modClave") String con_mod_clave, @Param("fecha") LocalDate date);
+                        @Param("modClave") String con_mod_clave);
 
         @Query(value = "SELECT c.con_mod_sis_clave, c.con_mod_clave ,c.con_oficina, o.nombre, c.con_moneda, m.mon_nombre, c.con_cuenta, cm.cue_nombre , "
                         + " (CASE WHEN c.con_importe_sif IS NULL THEN 0 ELSE c.con_importe_sif END), "
                         + " (CASE WHEN c.con_importe_ao IS NULL THEN 0 ELSE c.con_importe_ao END) "
+                        + " , c.con_scta1, c.con_scta2 , c.con_scta3 ,c.con_scta4 " 
+                        + " , c.con_tipo_ente, c.con_ente "
+                        + " , ' ' "
                         + "FROM sica_conciliaciones c "
                         + " JOIN sica_v_oficinas o ON o.clave_particular = c.con_oficina "
                         + " JOIN sica_monedas m ON m.mon_clave = c.con_moneda "
@@ -71,13 +77,17 @@ public interface ConciliacionesRepository extends CrudRepository<ConciliacionesE
                         + " join sica_cuentas c2 on c2.cue_mayor = c.con_cuenta and c2.cue_scta1 = c.con_scta1 and c2.cue_scta2 = c.con_scta2 and c2.cue_scta3 = '00' and c2.cue_scta4 = '00' "
                         + " join sica_cuentas c3 on c3.cue_mayor = c.con_cuenta and c3.cue_scta1 = c.con_scta1 and c3.cue_scta2 = c.con_scta2 and c3.cue_scta3 = c.con_scta3 and c3.cue_scta4 = '00' "
                         + " join sica_cuentas c4 on c4.cue_mayor = c.con_cuenta and c4.cue_scta1 = c.con_scta1 and c4.cue_scta2 = c.con_scta2 and c4.cue_scta3 = c.con_scta3 and c4.cue_scta4 = c.con_scta4 "
-                        + " WHERE c.con_ente is null and c.con_mod_sis_clave = :modSisClave AND c.con_mod_clave = :modClave and c.con_fecha = :fecha and ROWNUM <= 2000", nativeQuery = true)
+                        + " WHERE c.con_ente is null and c.con_mod_sis_clave = :modSisClave AND c.con_mod_clave = :modClave ORDER BY c.con_mod_sis_clave asc, c.con_mod_clave asc,c.con_oficina asc,  c.con_moneda ASC, c.con_cuenta asc", nativeQuery = true)
         List<Object[]> get_reporte_two(@Param("modSisClave") String con_mod_sis_clave,
-                        @Param("modClave") String con_mod_clave, @Param("fecha") LocalDate date);
+                        @Param("modClave") String con_mod_clave);
+
 
         @Query(value = "SELECT c.con_mod_sis_clave, c.con_mod_clave ,c.con_oficina, o.nombre, c.con_moneda, m.mon_nombre, c.con_cuenta, cm.cue_nombre , "
                         + " (CASE WHEN c.con_importe_sif IS NULL THEN 0 ELSE c.con_importe_sif END), "
                         + " (CASE WHEN c.con_importe_ao IS NULL THEN 0 ELSE c.con_importe_ao END) "
+                        + " , c.con_scta1, c.con_scta2 , c.con_scta3 ,c.con_scta4 " 
+                        + " , c.con_tipo_ente, c.con_ente "
+                        + " , e.ent_nombre "
                         + "FROM sica_conciliaciones c "
                         + " JOIN sica_v_oficinas o ON o.clave_particular = c.con_oficina "
                         + " JOIN sica_monedas m ON m.mon_clave = c.con_moneda "
@@ -87,14 +97,18 @@ public interface ConciliacionesRepository extends CrudRepository<ConciliacionesE
                         + " join sica_cuentas c3 on c3.cue_mayor = c.con_cuenta and c3.cue_scta1 = c.con_scta1 and c3.cue_scta2 = c.con_scta2 and c3.cue_scta3 = c.con_scta3 and c3.cue_scta4 = '00' "
                         + " join sica_cuentas c4 on c4.cue_mayor = c.con_cuenta and c4.cue_scta1 = c.con_scta1 and c4.cue_scta2 = c.con_scta2 and c4.cue_scta3 = c.con_scta3 and c4.cue_scta4 = c.con_scta4 "
                         + " join sica_entes e on e.ent_numero = c.con_ente and e.tpe_clave = c.con_tipo_ente"
-                        + " WHERE c.con_mod_sis_clave = :modSisClave and c.con_fecha = :fecha"
-                        + " and e.ofi_clave = o.clave_oficina and e.ofi_tipo = o.tipo", nativeQuery = true)
+                        + " WHERE c.con_mod_sis_clave = :modSisClave "
+                        + " and e.ofi_clave = o.clave_oficina and e.ofi_tipo = o.tipo and c.con_fecha = :fecha ORDER BY c.con_mod_sis_clave asc, c.con_mod_clave asc,c.con_oficina asc,  c.con_moneda desc", nativeQuery = true)
         List<Object[]> get_reporte_one_sistem(@Param("modSisClave") String con_mod_sis_clave,
                         @Param("fecha") LocalDate fecha);
 
+
         @Query(value = "SELECT c.con_mod_sis_clave, c.con_mod_clave ,c.con_oficina, o.nombre, c.con_moneda, m.mon_nombre, c.con_cuenta, cm.cue_nombre , "
                         + " (CASE WHEN c.con_importe_sif IS NULL THEN 0 ELSE c.con_importe_sif END), "
                         + " (CASE WHEN c.con_importe_ao IS NULL THEN 0 ELSE c.con_importe_ao END) "
+                        + " , c.con_scta1, c.con_scta2 , c.con_scta3 ,c.con_scta4 " 
+                        + " , c.con_tipo_ente, c.con_ente "
+                        + " , ' ' "
                         + "FROM sica_conciliaciones c "
                         + " JOIN sica_v_oficinas o ON o.clave_particular = c.con_oficina "
                         + " JOIN sica_monedas m ON m.mon_clave = c.con_moneda "
@@ -103,13 +117,17 @@ public interface ConciliacionesRepository extends CrudRepository<ConciliacionesE
                         + " join sica_cuentas c2 on c2.cue_mayor = c.con_cuenta and c2.cue_scta1 = c.con_scta1 and c2.cue_scta2 = c.con_scta2 and c2.cue_scta3 = '00' and c2.cue_scta4 = '00' "
                         + " join sica_cuentas c3 on c3.cue_mayor = c.con_cuenta and c3.cue_scta1 = c.con_scta1 and c3.cue_scta2 = c.con_scta2 and c3.cue_scta3 = c.con_scta3 and c3.cue_scta4 = '00' "
                         + " join sica_cuentas c4 on c4.cue_mayor = c.con_cuenta and c4.cue_scta1 = c.con_scta1 and c4.cue_scta2 = c.con_scta2 and c4.cue_scta3 = c.con_scta3 and c4.cue_scta4 = c.con_scta4 "
-                        + " WHERE c.con_ente is null and c.con_mod_sis_clave = :modSisClave and c.con_fecha = :fecha", nativeQuery = true)
+                        + " WHERE c.con_ente is null and c.con_mod_sis_clave = :modSisClave and c.con_fecha = :fecha ", nativeQuery = true)
         List<Object[]> get_reporte_two_sistem(@Param("modSisClave") String con_mod_sis_clave,
                         @Param("fecha") LocalDate fecha);
+
 
         @Query(value = "SELECT c.con_mod_sis_clave, c.con_mod_clave ,c.con_oficina, o.nombre, c.con_moneda, m.mon_nombre, c.con_cuenta, cm.cue_nombre , "
                         + " (CASE WHEN c.con_importe_sif IS NULL THEN 0 ELSE c.con_importe_sif END), "
                         + " (CASE WHEN c.con_importe_ao IS NULL THEN 0 ELSE c.con_importe_ao END) "
+                        + " , c.con_scta1, c.con_scta2 , c.con_scta3 ,c.con_scta4 " 
+                        + " , c.con_tipo_ente, c.con_ente "
+                        + " , e.ent_nombre "
                         + "FROM sica_conciliaciones c "
                         + " JOIN sica_v_oficinas o ON o.clave_particular = c.con_oficina "
                         + " JOIN sica_monedas m ON m.mon_clave = c.con_moneda "
@@ -119,12 +137,15 @@ public interface ConciliacionesRepository extends CrudRepository<ConciliacionesE
                         + " join sica_cuentas c3 on c3.cue_mayor = c.con_cuenta and c3.cue_scta1 = c.con_scta1 and c3.cue_scta2 = c.con_scta2 and c3.cue_scta3 = c.con_scta3 and c3.cue_scta4 = '00' "
                         + " join sica_cuentas c4 on c4.cue_mayor = c.con_cuenta and c4.cue_scta1 = c.con_scta1 and c4.cue_scta2 = c.con_scta2 and c4.cue_scta3 = c.con_scta3 and c4.cue_scta4 = c.con_scta4 "
                         + " join sica_entes e on e.ent_numero = c.con_ente and e.tpe_clave = c.con_tipo_ente"
-                        + " where e.ofi_clave = o.clave_oficina and e.ofi_tipo = o.tipo and c.con_fecha = :fecha AND ROWNUM <= 3", nativeQuery = true)
-        List<Object[]> get_reporte_one_all(@Param("fecha") LocalDate date);
+                        + " where e.ofi_clave = o.clave_oficina and e.ofi_tipo = o.tipo and c.con_fecha = :fecha ORDER BY c.con_mod_sis_clave asc, c.con_mod_clave asc,c.con_oficina asc,  c.con_moneda desc", nativeQuery = true)
+        List<Object[]> get_reporte_one_all(@Param("fecha") LocalDate fecha);
 
         @Query(value = "SELECT c.con_mod_sis_clave, c.con_mod_clave ,c.con_oficina, o.nombre, c.con_moneda, m.mon_nombre, c.con_cuenta, cm.cue_nombre , "
                         + " (CASE WHEN c.con_importe_sif IS NULL THEN 0 ELSE c.con_importe_sif END), "
                         + " (CASE WHEN c.con_importe_ao IS NULL THEN 0 ELSE c.con_importe_ao END) "
+                        + " , c.con_scta1, c.con_scta2 , c.con_scta3 ,c.con_scta4 " 
+                        + " , c.con_tipo_ente, c.con_ente "
+                        + " , ' ' "
                         + "FROM sica_conciliaciones c "
                         + " JOIN sica_v_oficinas o ON o.clave_particular = c.con_oficina "
                         + " JOIN sica_monedas m ON m.mon_clave = c.con_moneda "
@@ -133,7 +154,8 @@ public interface ConciliacionesRepository extends CrudRepository<ConciliacionesE
                         + " join sica_cuentas c2 on c2.cue_mayor = c.con_cuenta and c2.cue_scta1 = c.con_scta1 and c2.cue_scta2 = c.con_scta2 and c2.cue_scta3 = '00' and c2.cue_scta4 = '00' "
                         + " join sica_cuentas c3 on c3.cue_mayor = c.con_cuenta and c3.cue_scta1 = c.con_scta1 and c3.cue_scta2 = c.con_scta2 and c3.cue_scta3 = c.con_scta3 and c3.cue_scta4 = '00' "
                         + " join sica_cuentas c4 on c4.cue_mayor = c.con_cuenta and c4.cue_scta1 = c.con_scta1 and c4.cue_scta2 = c.con_scta2 and c4.cue_scta3 = c.con_scta3 and c4.cue_scta4 = c.con_scta4 "
-                        + " WHERE c.con_ente is null and c.con_fecha = :fecha and ROWNUM <= 3 ", nativeQuery = true)
-        List<Object[]> get_reporte_two_all(@Param("fecha") LocalDate date);
+                        + " WHERE c.con_ente is null and c.con_fecha = :fecha ORDER BY c.con_mod_sis_clave asc , c.con_mod_clave asc ,c.con_oficina asc,  c.con_moneda desc", nativeQuery = true)
+        List<Object[]> get_reporte_two_all(@Param("fecha") LocalDate fecha);
+
 
 }

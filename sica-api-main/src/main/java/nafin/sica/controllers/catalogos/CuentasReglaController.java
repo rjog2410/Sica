@@ -124,8 +124,14 @@ public class CuentasReglaController {
     public Map<String, Object> create_cuentas_regla(@RequestBody @Valid CuentasConciliaEntity cuentasConciliaEntity) {
         Map<String, Object> response = new HashMap<>();
         try {
-            CuentasConciliaEntity newCuentasConciliaEntity = cuentasConciliaRepository.save(cuentasConciliaEntity);
-            response = responseService.buildJsonResponseInt(newCuentasConciliaEntity.getCuc_clave());
+            System.out.println(cuentasConciliaEntity.getCuc_clave().toString());
+            if(utils.isNullOrEmpty(cuentasConciliaEntity.getCuc_clave().toString()) || utils.isNullOrZero(cuentasConciliaEntity.getCuc_clave())){
+                CuentasConciliaEntity newCuentasConciliaEntity = cuentasConciliaRepository.save(cuentasConciliaEntity);
+                response = responseService.buildJsonResponseInt(newCuentasConciliaEntity.getCuc_clave());
+            }else{
+                response = responseService.buildJsonErrorValidateResponse("Ya existen datos con ese registro.");
+            }
+           
         } catch (Exception e) {
             response = responseService.buildJsonErrorResponse(e.getMessage());
         }
@@ -136,8 +142,13 @@ public class CuentasReglaController {
     public Map<String, Object> update_cuentas_regla(@RequestBody @Valid CuentasConciliaEntity cuentasConciliaEntity) {
         Map<String, Object> response = new HashMap<>();
         try {
-            CuentasConciliaEntity newCuentasConciliaEntity = cuentasConciliaRepository.save(cuentasConciliaEntity);
-            response = responseService.buildJsonResponseInt(newCuentasConciliaEntity.getCuc_clave());
+            if(utils.isNullOrEmpty(cuentasConciliaEntity.getCuc_clave().toString()) || utils.isNullOrZero(cuentasConciliaEntity.getCuc_clave())){
+                response = responseService.buildJsonErrorValidateResponse("No existe registro previo de la cuenta a actualizar.");
+            }else{
+                CuentasConciliaEntity newCuentasConciliaEntity = cuentasConciliaRepository.save(cuentasConciliaEntity);
+                response = responseService.buildJsonResponseInt(newCuentasConciliaEntity.getCuc_clave());
+            }
+            
         } catch (Exception e) {
             response = responseService.buildJsonErrorResponse(e.getMessage());
         }

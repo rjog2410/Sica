@@ -2,6 +2,7 @@ package nafin.sica.service;
 
 import java.text.DecimalFormat;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 import org.springframework.stereotype.Service;
@@ -80,6 +81,18 @@ public class Utils {
     public String format_moneda(Double value) {
         DecimalFormat formato = new DecimalFormat("#,###,###,###,###.00");
         return formato.format(value);
+    }
+
+    public String fecha_actual() {
+        LocalDate fecha_proceso_date = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        return fecha_proceso_date.format(formatter);
+    }
+
+    public String hora_actual() {
+        LocalTime hora_proceso_time = LocalTime.now();
+        DateTimeFormatter formatter_time = DateTimeFormatter.ofPattern("hh:mm:ss");
+        return hora_proceso_time.format(formatter_time);
     }
 
 }

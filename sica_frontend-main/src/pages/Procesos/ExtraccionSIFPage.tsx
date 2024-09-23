@@ -124,6 +124,9 @@ const ExtraccionSIFPage: React.FC = () => {
         console.log("ocurrio un error",error.response.data.message);
       }) 
      setParams(originalObject);
+     setSelectedSistema('ALL');
+     setSecondFilterOptions([]);
+     setSelectedModulo('ALL');
   };
 
   const handleSelectChange = (event: SelectChangeEvent<string>) => {
@@ -150,7 +153,7 @@ const ExtraccionSIFPage: React.FC = () => {
               options={['ALL', ...Array.from(new Set(modulos.map(modulo => modulo.clave_sistema)))]}
               onSelect={handleSistemaSelect}
               label="Seleccione un Sistema"
-              
+              value={selectedSistema}
               getOptionLabel={(option: string) => option}
             />
           </Box>
