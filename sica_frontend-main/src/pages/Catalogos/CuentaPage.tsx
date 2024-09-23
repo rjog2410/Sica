@@ -15,7 +15,12 @@ import {
     getCuentasBySistema,
     getCuentasBySistemaAndModulo, getFormulas, getReglas
 } from "./selectores/serviceSelectorCuentaRegla";
-import {createFormula, deleteFormula, deleteMultipleFormula} from "@/pages/Catalogos/servicios/cuentasReglaService.ts"; // Asumiendo que tienes este modal para manejar las reglas
+import {
+    createFormula,
+    deleteFormula,
+    deleteMultipleFormula,
+    updateCuenta
+} from "@/pages/Catalogos/servicios/cuentasReglaService.ts"; // Asumiendo que tienes este modal para manejar las reglas
 
 
 const CuentaPage: React.FC = () => {
@@ -60,7 +65,6 @@ const CuentaPage: React.FC = () => {
     const [selectedModulo, setSelectedModulo] = useState<string | null>('ALL');
     const [filteredCuentas, setFilteredCuentas] = useState<Cuenta[]>([]);
     const [modulos, setModulos] = useState<string[]>([]);
-    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [isCuentaModalOpen, setIsCuentaModalOpen] = useState<boolean>(false); // Estado para el modal de cuentas
     const [isSubpantallaOpen, setIsSubpantallaOpen] = useState<boolean>(false); // Estado para la subpantalla de reglas
     const [editingCuenta, setEditingCuenta] = useState<Cuenta | null>(originalObject); // Estado para la cuenta que se está editando
@@ -158,7 +162,7 @@ const CuentaPage: React.FC = () => {
                         setReglas(reglas.map((regla) =>
                             regla.id === newRegla.id ? newRegla : regla
                         ));
-                        notify('Regla actualizada correctamente', 'success');
+                        notify(resp?.data?.message?.msg, 'success');
                     }
                 });
             } else {
@@ -168,13 +172,13 @@ const CuentaPage: React.FC = () => {
                         notify(resp?.data?.message?.msg, 'error');
                     } else {
                         setReglas([...reglas, newRegla]);
-                        notify('Regla agregada correctamente', 'success');
+                        notify(resp?.data?.message?.msg, 'success');
                     }
                 });
 
             }
         } catch (error) {
-            notify('Error al guardar la regla', 'error');
+            notify(error, 'error');
         }
 
         getReglas(cuentaInfo?.cuc_clave).then(resp => setCurrentReglas(resp?.map((reg, i) => ({...reg, id: i}))))
@@ -188,7 +192,7 @@ const CuentaPage: React.FC = () => {
                 if (resp?.data?.status === 400) {
                     notify(resp?.data?.message?.msg, 'error');
                 } else {
-                    notify(!isUpdate ? 'Formula actualizada correctamente': 'Formula creada correctamente', 'success');
+                    notify(resp?.data?.message?.msg, 'success');
                 }
             });
         } catch (error) {
@@ -213,17 +217,24 @@ const CuentaPage: React.FC = () => {
 
     };
 
-    const handleSaveCuenta = async (cuenta: Cuenta) => {
+    const handleSaveCuenta = async (cuenta: Cuenta, isUpdate : boolean) => {
         try {
-            await service.createOrUpdateCuentaRegla(cuenta).then(resp =>{
-                console.log("Response: ", resp)
-            });
-            if (cuenta.cuc_clave) {
-                setCuentas(cuentas.map(c => (c.cuc_clave === cuenta.cuc_clave ? cuenta : c)));
-            } else {
-                setCuentas([...cuentas, cuenta]);
+            if(!isUpdate){
+                await service.createOrUpdateCuentaRegla(cuenta).then(resp =>{
+                    if(resp?.data?.status ===200){
+                        setCuentas([...cuentas, cuenta]);
+                        notify(resp?.data?.message, 'success');
+                    }
+                });
+            }else{
+                console.log("Updating new account")
+                await updateCuenta(cuenta).then(resp =>{
+                    if(resp?.data?.status ===200){
+                        setCuentas(cuentas.map(c => (c.cuc_clave === cuenta.cuc_clave ? cuenta : c)));
+                        notify(resp?.data?.message, 'success');
+                    }
+                });
             }
-            notify('Cuenta guardada correctamente', 'success');
         } catch (error) {
             notify('Error al guardar la cuenta', 'error');
         }
@@ -271,9 +282,9 @@ const CuentaPage: React.FC = () => {
                     console.log("DeleteReg: ", resp)
                     if(resp?.status === 200){
                         setCurrentReglas(currentReglas.filter(regla => reglaToDelete?.id !== regla.id))
-                        notify('Regla eliminada correctamente', 'success');
+                        notify(resp?.message, 'success');
                     }else {
-                        notify('Error al eliminar la regla', 'error');
+                        notify(resp?.message, 'error');
                     }
                 });
             } catch (error) {
@@ -296,10 +307,10 @@ const CuentaPage: React.FC = () => {
             try {
                 await service.removeCuenta(cuentaToDelete?.cuc_clave).then(resp => {
                     if (resp?.status === 200) {
-                        notify('Cuenta eliminada correctamente', 'success');
+                        notify(resp?.message, 'success');
                         setFilteredCuentas(filteredCuentas?.filter(cuenta => cuenta.cuc_clave !== id))
                     } else {
-                        notify('Error al eliminar la cuenta', 'error');
+                        notify(resp?.message, 'error');
                     }
                 });
             } catch (error) {
@@ -317,15 +328,14 @@ const CuentaPage: React.FC = () => {
             notify('No se encontraron cuentas para eliminar', 'error');
             return;
         }
-
         setConfirmAction(() => async () => {
             try {
                 await service.removeMultipleCuentas(ids).then(res => {
                     if (res?.status === 200) {
                         setFilteredCuentas(filteredCuentas?.filter(cuenta => !ids?.includes(cuenta?.cuc_clave)))
-                        notify('Cuentas eliminadas correctamente', 'success');
+                        //notify('Cuentas eliminadas correctamente', 'success');
                     } else {
-                        notify('Error al eliminar las cuentas', 'error');
+                        //notify('Error al eliminar las cuentas', 'error');
                     }
                 });
             } catch (error) {
@@ -349,9 +359,9 @@ const CuentaPage: React.FC = () => {
                 await service.removeMultipleReglas(reglasToDelete).then(resp => {
                     if(resp?.status === 200){
                         setCurrentReglas(currentReglas.filter(regla => !ids.includes(regla.id)))
-                        notify('Reglas eliminadas correctamente', 'success');
+                        notify(resp?.message, 'success');
                     }else {
-                        notify('Error al eliminar las reglas', 'error');
+                        notify(resp?.message, 'error');
                     }
                 });
 
@@ -379,9 +389,9 @@ const CuentaPage: React.FC = () => {
                             ...form,
                             id: index
                         }))))
-                        notify('Formula eliminada correctamente', 'success');
+                        notify(resp?.message, 'success');
                     }else {
-                        notify('Error al eliminar la formula', 'error');
+                        notify(resp?.message, 'error');
                     }
                 });
             } catch (error) {
@@ -404,9 +414,9 @@ const CuentaPage: React.FC = () => {
                 await deleteMultipleFormula(formulasToDelete).then(resp => {
                     if(resp?.status === 200){
                         setCurrentFormulas(currentFormulas.filter(form => !ids.includes(form?.id)))
-                        notify('Formulas eliminadas correctamente', 'success');
+                        notify(resp?.message, 'success');
                     }else {
-                        notify('Error al eliminar las formulas', 'error');
+                        notify(resp?.message, 'error');
                     }
                 });
 

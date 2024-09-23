@@ -8,15 +8,17 @@ import {
     fetchReporteConciliacionSaldos,
     fetchSistemas
 } from "@/pages/Reportes/conciliationService.ts";
+import {useNotification} from "@/providers/NotificationProvider.tsx";
 
 const ConciliacionSaldosPage: React.FC = () => {
     const [filtros, setFiltros] = useState({
         sistema: '',
         modulo: '',
         fecha_informacion: '',
-        oficina: '',
-        moneda: '',
+        oficina: 90,
+        moneda: 1,
     });
+    const {notify} = useNotification();
     const [data, setData] = useState({
         sistemas: [],
         modulos: []
@@ -66,6 +68,14 @@ const ConciliacionSaldosPage: React.FC = () => {
             fetchReporteConciliacionSaldos(filtros).then(resp => {
                 console.log("Response: ", resp)
             })
+        }else{
+            if(!filtros?.oficina || !filtros?.moneda){
+                notify("Los campos de oficina y moneda son requeridos", "error")
+                notify("Buscando con valores por defecto", "warning")
+                fetchReporteConciliacionSaldos({...filtros,oficina:90,moneda:1}).then(resp => {
+                    console.log("Response: ", resp)
+                })
+            }
         }
     }
 

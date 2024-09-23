@@ -17,7 +17,7 @@ import {fetchModuloByClave} from "@/pages/Catalogos/selectores/serviceSelectorMo
 interface AddCuentaModalProps {
     open: boolean;
     onClose: () => void;
-    onSave: (cuenta: Cuenta) => void;
+    onSave: (cuenta: Cuenta, isUpdate: boolean) => void;
     initialData?: Cuenta | null;
 }
 
@@ -47,6 +47,7 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
     const [cuentaData, setCuentaData] = useState<Cuenta>(initialData);
     const [sistemas, setSistemas] = useState<Sistema[]>([]);
     const [modulos, setModulos] = useState<ModuloO[]>([]);
+    const [isUpdate, setIsUpdate] = useState<boolean>(false);
 
     useEffect(() => {
         fetchSistemas().then(resp => {
@@ -61,9 +62,9 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
     }, [cuentaData?.cuc_mod_sis_clave]);
 
     useEffect(() => {
-        if (initialData) {
-            console.log("initialData: ", initialData)
-            console.log("cuc_ente: ", initialData?.cuc_ente)
+        if (initialData.cuc_clave !== 0) {
+            console.log("InitialData: ", initialData)
+            setIsUpdate(true)
             setCuentaData({
                 ...initialData,
                 cuc_ente: (initialData?.cuc_ente === null || initialData?.cuc_ente === undefined) ? 0 : initialData?.cuc_ente,
@@ -132,7 +133,7 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
 
     const handleSave = () => {
         if (validate()) {
-            onSave(cuentaData);
+            onSave(cuentaData, isUpdate);
             onClose();
         }
     };

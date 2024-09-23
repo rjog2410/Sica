@@ -38,32 +38,32 @@ export const fetchCuentasBySistemaAndModulo = async (sistemaClave: string, modul
 };
 
 // Crear una nueva cuenta
-export const createCuenta = async (cuenta: Cuenta): Promise<number> => {
+export const createCuenta = async (cuenta: Cuenta): Promise<any> => {
     const response = await axios.post(`${BASE_URL}/create`, cuenta);
-    return response.data.info; // Retorna el ID creado
+    return response; // Retorna el ID creado
 };
 
 // Actualizar una cuenta
-export const updateCuenta = async (cuenta: Cuenta & { id: number }): Promise<number> => {
+export const updateCuenta = async (cuenta: Cuenta): Promise<any> => {
     const response = await axios.post(`${BASE_URL}/update`, {
-        cuc_clave: cuenta.id,  // ID de la cuenta
-        cuc_mod_sis_clave: cuenta.clave_sistema,
-        cuc_mod_clave: cuenta.clave_modulo,
-        cuc_cuenta: cuenta.cuenta,
-        cuc_scta1: cuenta.subcta1,
-        cuc_scta2: cuenta.subcta2,
-        cuc_scta3: cuenta.subcta3,
-        cuc_scta4: cuenta.subcta4,
-        cuc_scta5: cuenta.subcta5,
-        cuc_scta6: cuenta.subcta6,
-        cuc_scta7: cuenta.subcta7,
-        cuc_tipo_ente: cuenta.tipo_ente,
-        cuc_ente: cuenta.ente,
-        cuc_consolida_ente: cuenta.consolida_ente,
-        cuc_inc_saldo: cuenta.inc_saldo,
-        cuc_inc_movs: cuenta.inc_movs,
+        cuc_clave: cuenta.cuc_clave,  // ID de la cuenta
+        cuc_mod_sis_clave: cuenta.cuc_mod_sis_clave,
+        cuc_mod_clave: cuenta.cuc_mod_clave,
+        cuc_cuenta: cuenta.cuc_cuenta,
+        cuc_scta1: cuenta.cuc_scta1,
+        cuc_scta2: cuenta.cuc_scta2,
+        cuc_scta3: cuenta.cuc_scta3,
+        cuc_scta4: cuenta.cuc_scta4,
+        cuc_scta5: cuenta.cuc_scta5,
+        cuc_scta6: cuenta.cuc_scta6,
+        cuc_scta7: cuenta.cuc_scta7,
+        cuc_tipo_ente: cuenta.cuc_tipo_ente,
+        cuc_ente: cuenta.cuc_ente,
+        cuc_consolida_ente: cuenta.cuc_consolida_ente,
+        cuc_inc_saldo: cuenta.cuc_inc_saldo,
+        cuc_inc_movs: cuenta.cuc_inc_movs,
     });
-    return response.data.info; // Retorna el ID actualizado
+    return response;
 };
 
 // Eliminar una cuenta por ID

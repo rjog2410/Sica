@@ -163,6 +163,10 @@ const CuentasTable = forwardRef(({
             <TableCell>Tipo Ente</TableCell>
             <TableCell>Ente</TableCell>
             <TableCell>Tipo Conciliación</TableCell>
+            <TableCell>S1</TableCell>
+            <TableCell>S2</TableCell>
+            <TableCell>S3</TableCell>
+            <TableCell>S4</TableCell>
             <TableCell>Acciones</TableCell>
           </TableRow>
         </TableHead>
@@ -185,7 +189,7 @@ const CuentasTable = forwardRef(({
                       setSelected(selected?.filter(item => item !==row.cuc_clave))
                       onSelectionChange(selected?.filter(item => item !==row.cuc_clave));
                     }else {
-                      setSelected([row.cuc_clave!]);
+                      setSelected([...selected,row.cuc_clave]);
                       onSelectionChange([row.cuc_clave!]);
                     }
                   }}
@@ -195,6 +199,10 @@ const CuentasTable = forwardRef(({
                 <TableCell>{row.cuc_tipo_ente || 'N/A'}</TableCell>
                 <TableCell>{row.cuc_ente || 'N/A'}</TableCell>
                 <TableCell>{row.cuc_consolida_ente === 'S' ? 'E': (row.cuc_inc_saldo === 'S' ? 'S' : (row.cuc_inc_movs === 'S' && 'M'))}</TableCell>
+                <TableCell>{row.cuc_scta1}</TableCell>
+                <TableCell>{row.cuc_scta2}</TableCell>
+                <TableCell>{row.cuc_scta3}</TableCell>
+                <TableCell>{row.cuc_scta4}</TableCell>
                 <TableCell>
                   <IconButton onClick={() => {
                     onUpdateCuenta(row);
