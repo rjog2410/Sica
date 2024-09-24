@@ -290,7 +290,7 @@ const CuentaPage: React.FC = () => {
                     console.log("DeleteReg: ", resp)
                     if(resp?.status === 200){
                         setCurrentReglas(currentReglas.filter(regla => reglaToDelete?.id !== regla.id))
-                        notify(resp?.message, 'success');
+                        notify(resp?.data?.message, 'success');
                     }else {
                         notify(resp?.message, 'error');
                     }
@@ -518,8 +518,8 @@ const CuentaPage: React.FC = () => {
                 open={isSubpantallaOpen}
                 onClose={() => setIsSubpantallaOpen(false)}
                 cuenta={cuentaInfo}
-                reglas={[...currentReglas]}
-                formulas={[...currentFormulas]}
+                reglas={currentReglas}
+                formulas={currentFormulas}
                 onSaveRegla={handleSaveRegla}
                 onSaveFormula={handleSaveFormula}
                 onDeleteRegla={handleDeleteRegla}

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -12,7 +12,7 @@ import {
     TableRow,
     IconButton,
     TextField,
-    Tabs, Box, Tab, Grid, Checkbox, MenuItem
+    Tabs, Box, Tab, Grid, Checkbox, MenuItem, Paper, TableSortLabel, TablePagination, TableContainer
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -62,6 +62,8 @@ function a11yProps(index: number) {
     };
 }
 
+type Order = 'asc' | 'desc';
+
 const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                                                            open,
                                                                            onClose,
@@ -88,21 +90,21 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
     const [value, setValue] = React.useState(0);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-    const [checked, setChecked] = React.useState(false);
-    const [checkedFormula, setCheckedFormula] = React.useState(false);
-
     const [selectedReglas, setSelectedReglas] = useState<Partial<number[]>>([]);
     const [selectedFormula, setSelectedFormula] = useState<Partial<number[]>>([]);
 
-    const [currentFormulas, setCurrentFormulas] = useState<Formula[]>([]); // Estado para las reglas asociadas a una cuenta
-    const [currentReglas, setCurrentReglas] = useState<Regla[]>([]); // Estado para las reglas asociadas a una cuenta
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [order, setOrder] = useState<Order>('asc');
+    const [orderBy, setOrderBy] = useState<keyof Regla>('reg_secuencia');
+
+
+    const [pageFor, setPageFor] = useState(0);
+    const [rowsPerPageFor, setRowsPerPageFor] = useState(10);
+    const [orderFor, setOrderFor] = useState<Order>('asc');
+    const [orderByFor, setOrderByFor] = useState<keyof Formula>('for_secuencia');
 
     const operators: string[] = ["+", "-", "*", "/"];
-
-    useEffect(() => {
-        setCurrentFormulas(formulas)
-        setCurrentReglas(reglas)
-    }, [reglas,formulas]);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
@@ -265,20 +267,74 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
         } else {
             setSelectedReglas([])
         }
-        setChecked(event.target.checked)
     };
     const handleSelectAllFormula = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked) {
             setSelectedFormula(formulas.map(formula => formula.id))
-
         } else {
             setSelectedFormula([])
         }
-        setCheckedFormula(event.target.checked)
     };
 
     const isCurrentFormula = (formula: Formula) => isEditingFormula && formula.id === editingFormula?.id
 
+    const handleChangePage = (_event: unknown, newPage: number) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+
+    const handleChangePageFor = (_event: unknown, newPage: number) => {
+        setPageFor(newPage);
+    };
+
+    const handleChangeRowsPerPageFor = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setRowsPerPageFor(parseInt(event.target.value, 10));
+        setPageFor(0);
+    };
+
+    const handleRequestSort = (property: keyof Regla) => {
+        const isAsc = orderBy === property && order === 'asc';
+        setOrder(isAsc ? 'desc' : 'asc');
+        setOrderBy(property);
+    };
+
+    const handleRequestSortFor = (property: keyof Formula) => {
+        const isAsc = orderByFor === property && order === 'asc';
+        setOrderFor(isAsc ? 'desc' : 'asc');
+        setOrderByFor(property);
+    };
+
+    const sortedDataReglas = useMemo(() => {
+        return reglas?.slice().sort((a, b) => {
+            const aValue = a[orderBy] ?? ''
+            const bValue = b[orderBy] ?? '';
+
+            return (aValue < bValue ? -1 : 1) * (order === 'asc' ? 1 : -1);
+        });
+    }, [reglas, order, orderBy]);
+
+    const paginatedDataReglas = useMemo(() => {
+        setSelectedReglas([]);
+        return sortedDataReglas?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+    }, [sortedDataReglas, page, rowsPerPage]);
+
+    const sortedDataFormulas = useMemo(() => {
+        return formulas?.slice().sort((a, b) => {
+            const aValue = a[orderByFor] ?? ''
+            const bValue = b[orderByFor] ?? '';
+
+            return (aValue < bValue ? -1 : 1) * (order === 'asc' ? 1 : -1);
+        });
+    }, [formulas, orderFor, orderByFor]);
+
+    const paginatedDataFormulas = useMemo(() => {
+        setSelectedFormula([]);
+        return sortedDataFormulas?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+    }, [sortedDataFormulas, pageFor, rowsPerPageFor]);
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
@@ -328,120 +384,59 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                     Eliminar seleccionados
                                 </Button>
                             }
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>
-                                            {
-                                                !isEditing &&
+                            <TableContainer component={Paper} >
+                                <Table stickyHeader>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell padding="checkbox">
                                                 <Checkbox
-                                                    checked={checked}
-                                                    onChange={(e) => handleSelectAllRegla(e)}
-                                                    inputProps={{'aria-label': 'controlled'}}
-                                                />
-                                            }
-                                            Secuencia
-                                        </TableCell>
-                                        <TableCell>Columna</TableCell>
-                                        <TableCell>Operador</TableCell>
-                                        <TableCell>Valor</TableCell>
-                                        <TableCell>Acciones</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {
-                                        !isEditing && <TableRow>
-                                            <TableCell>
-                                                <TextField
-                                                    placeholder="Secuencia"
-                                                    value={newRegla.reg_secuencia || ''}
-                                                    onChange={(e) => handleInputChange('reg_secuencia', Number(e.target.value))}
-                                                    error={!!errors.reg_secuencia}
-                                                    helperText={errors.reg_secuencia}
+                                                    indeterminate={selectedReglas?.length > 0 && selectedReglas?.length < reglas?.length}
+                                                    checked={reglas?.length > 0 && selectedReglas?.length === reglas?.length}
+                                                    onChange={handleSelectAllRegla}
                                                 />
                                             </TableCell>
                                             <TableCell>
-                                                <TextField
-                                                    placeholder="Columna"
-                                                    value={newRegla.reg_tit_columna || ''}
-                                                    onChange={(e) => handleInputChange('reg_tit_columna', Number(e.target.value))}
-                                                    error={!!errors.reg_tit_columna}
-                                                    helperText={errors.reg_tit_columna}
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <TextField
-                                                    select
-                                                    placeholder="Operador"
-                                                    value={newRegla.reg_operador || ''}
-                                                    onChange={(e) => handleInputChange('reg_operador', e.target.value)}
-                                                    error={!!errors.reg_operador}
-                                                    helperText={errors.reg_operador}
+                                                <TableSortLabel
+                                                    active={orderBy === 'reg_secuencia'}
+                                                    direction={orderBy === 'reg_secuencia' ? order : 'asc'}
+                                                    onClick={() => handleRequestSort('reg_secuencia')}
                                                 >
-                                                    {
-                                                        operators?.map(op => <MenuItem
-                                                            value={op}>{op}</MenuItem>)
-                                                    }
-                                                </TextField>
+                                                    Secuencia
+                                                </TableSortLabel>
                                             </TableCell>
-                                            <TableCell>
-                                                <TextField
-                                                    placeholder="Valor"
-                                                    value={newRegla.reg_valor || ''}
-                                                    onChange={(e) => handleInputChange('reg_valor', e.target.value)}
-                                                    error={!!errors.reg_valor}
-                                                    helperText={errors.reg_valor}
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <IconButton onClick={handleAddClick} aria-label="add">
-                                                    <AddIcon/>
-                                                </IconButton>
-                                            </TableCell>
+                                            <TableCell>Columna</TableCell>
+                                            <TableCell>Operador</TableCell>
+                                            <TableCell>Valor</TableCell>
+                                            <TableCell>Acciones</TableCell>
                                         </TableRow>
-                                    }
-
-                                    {reglas?.map((regla) => (
-                                        <TableRow key={regla.id}>
-                                            <TableCell>
-                                                {!(isEditing && editingRegla?.id !== regla.id) && (
-                                                    <Checkbox
-                                                        checked={selectedReglas.includes(regla.id)}
-                                                        onChange={(e) => handleSelectRegla(e, regla.id)}
-                                                        inputProps={{'aria-label': 'controlled'}}
-                                                    />
-                                                )
-                                                }
-                                            </TableCell>
-                                            <TableCell>
-                                                {isEditing && editingRegla?.id === regla.id ? (
+                                    </TableHead>
+                                    <TableBody>
+                                        {
+                                            !isEditing && <TableRow>
+                                                <TableCell/>
+                                                <TableCell>
                                                     <TextField
-                                                        value={editingRegla.reg_secuencia}
+                                                        placeholder="Secuencia"
+                                                        value={newRegla.reg_secuencia || ''}
                                                         onChange={(e) => handleInputChange('reg_secuencia', Number(e.target.value))}
                                                         error={!!errors.reg_secuencia}
                                                         helperText={errors.reg_secuencia}
                                                     />
-                                                ) : (
-                                                    regla.reg_secuencia
-                                                )}
-                                            </TableCell>
-                                            <TableCell>
-                                                {isEditing && editingRegla?.id === regla.id ? (
+                                                </TableCell>
+                                                <TableCell>
                                                     <TextField
-                                                        value={editingRegla.reg_tit_columna}
+                                                        placeholder="Columna"
+                                                        value={newRegla.reg_tit_columna || ''}
                                                         onChange={(e) => handleInputChange('reg_tit_columna', Number(e.target.value))}
                                                         error={!!errors.reg_tit_columna}
                                                         helperText={errors.reg_tit_columna}
                                                     />
-                                                ) : (
-                                                    regla.reg_tit_columna
-                                                )}
-                                            </TableCell>
-                                            <TableCell>
-                                                {isEditing && editingRegla?.id === regla.id ? (
+                                                </TableCell>
+                                                <TableCell>
                                                     <TextField
                                                         select
-                                                        value={editingRegla.reg_operador}
+                                                        placeholder="Operador"
+                                                        value={newRegla.reg_operador || ''}
                                                         onChange={(e) => handleInputChange('reg_operador', e.target.value)}
                                                         error={!!errors.reg_operador}
                                                         helperText={errors.reg_operador}
@@ -451,42 +446,128 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                                                 value={op}>{op}</MenuItem>)
                                                         }
                                                     </TextField>
-                                                ) : (
-                                                    regla.reg_operador
-                                                )}
-                                            </TableCell>
-                                            <TableCell>
-                                                {isEditing && editingRegla?.id === regla.id ? (
+                                                </TableCell>
+                                                <TableCell>
                                                     <TextField
-                                                        value={editingRegla.reg_valor}
+                                                        placeholder="Valor"
+                                                        value={newRegla.reg_valor || ''}
                                                         onChange={(e) => handleInputChange('reg_valor', e.target.value)}
                                                         error={!!errors.reg_valor}
                                                         helperText={errors.reg_valor}
                                                     />
-                                                ) : (
-                                                    regla.reg_valor
-                                                )}
-                                            </TableCell>
-                                            <TableCell>
-                                                {
-                                                    !isEditing &&
-                                                    <IconButton onClick={() => handleEditClick(regla)}
-                                                                aria-label="edit">
-                                                        <EditIcon/>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <IconButton onClick={handleAddClick} aria-label="add">
+                                                        <AddIcon/>
                                                     </IconButton>
-                                                }
-                                                {
-                                                    !isEditing &&
-                                                    <IconButton onClick={() => handleDeleteClick(regla.id)}
-                                                                aria-label="delete">
-                                                        <DeleteIcon/>
-                                                    </IconButton>
-                                                }
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                                                </TableCell>
+                                            </TableRow>
+                                        }
+                                        {paginatedDataReglas?.map((regla) => {
+                                            return (
+                                                <TableRow
+                                                    hover
+                                                    role="checkbox"
+                                                    aria-checked={selectedReglas.includes(regla.id)}
+                                                    tabIndex={-1}
+                                                    key={regla.id}
+                                                    selected={selectedReglas.includes(regla.id)}
+                                                >
+                                                    <TableCell padding="checkbox">
+                                                        {!(isEditing && editingRegla?.id !== regla.id) && (
+                                                            <Checkbox
+                                                                checked={selectedReglas.includes(regla.id)}
+                                                                onChange={(e) => handleSelectRegla(e, regla.id)}
+                                                                inputProps={{'aria-label': 'controlled'}}
+                                                            />
+                                                        )
+                                                        }
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {isEditing && editingRegla?.id === regla.id ? (
+                                                            <TextField
+                                                                value={editingRegla.reg_secuencia}
+                                                                onChange={(e) => handleInputChange('reg_secuencia', Number(e.target.value))}
+                                                                error={!!errors.reg_secuencia}
+                                                                helperText={errors.reg_secuencia}
+                                                            />
+                                                        ) : (
+                                                            regla.reg_secuencia
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {isEditing && editingRegla?.id === regla.id ? (
+                                                            <TextField
+                                                                value={editingRegla.reg_tit_columna}
+                                                                onChange={(e) => handleInputChange('reg_tit_columna', Number(e.target.value))}
+                                                                error={!!errors.reg_tit_columna}
+                                                                helperText={errors.reg_tit_columna}
+                                                            />
+                                                        ) : (
+                                                            regla.reg_tit_columna
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {isEditing && editingRegla?.id === regla.id ? (
+                                                            <TextField
+                                                                select
+                                                                value={editingRegla.reg_operador}
+                                                                onChange={(e) => handleInputChange('reg_operador', e.target.value)}
+                                                                error={!!errors.reg_operador}
+                                                                helperText={errors.reg_operador}
+                                                            >
+                                                                {
+                                                                    operators?.map(op => <MenuItem
+                                                                        value={op}>{op}</MenuItem>)
+                                                                }
+                                                            </TextField>
+                                                        ) : (
+                                                            regla.reg_operador
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {isEditing && editingRegla?.id === regla.id ? (
+                                                            <TextField
+                                                                value={editingRegla.reg_valor}
+                                                                onChange={(e) => handleInputChange('reg_valor', e.target.value)}
+                                                                error={!!errors.reg_valor}
+                                                                helperText={errors.reg_valor}
+                                                            />
+                                                        ) : (
+                                                            regla.reg_valor
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {
+                                                            !isEditing &&
+                                                            <IconButton onClick={() => handleEditClick(regla)}
+                                                                        aria-label="edit">
+                                                                <EditIcon/>
+                                                            </IconButton>
+                                                        }
+                                                        {
+                                                            !isEditing &&
+                                                            <IconButton onClick={() => handleDeleteClick(regla.id)}
+                                                                        aria-label="delete">
+                                                                <DeleteIcon/>
+                                                            </IconButton>
+                                                        }
+                                                    </TableCell>
+                                                </TableRow>
+                                            );
+                                        })}
+                                    </TableBody>
+                                </Table>
+                                <TablePagination
+                                    rowsPerPageOptions={[5, 10, 20]}
+                                    component="div"
+                                    count={sortedDataReglas?.length}
+                                    rowsPerPage={rowsPerPage}
+                                    page={page}
+                                    onPageChange={handleChangePage}
+                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                />
+                            </TableContainer>
                         </CustomTabPanel>
                         <CustomTabPanel value={value} index={1}>
                             {selectedFormula.length > 0 &&
@@ -501,109 +582,60 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                     Eliminar seleccionados
                                 </Button>
                             }
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>
-                                            {
-                                                !isEditingFormula && <Checkbox
-                                                    checked={checkedFormula}
-                                                    onChange={(e) => handleSelectAllFormula(e)}
-                                                    inputProps={{'aria-label': 'controlled'}}
-                                                />
-                                            }
-                                            Secuencia
-                                        </TableCell>
-                                        <TableCell>Columna</TableCell>
-                                        <TableCell>Operador</TableCell>
-                                        <TableCell>Acciones</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                {
-                                    !isEditingFormula &&
-                                    <TableRow>
-                                        <TableCell>
-                                            <TextField
-                                                placeholder="Secuencia"
-                                                value={newFormula.for_secuencia || ''}
-                                                onChange={(e) => handleInputFormulaChange('for_secuencia', Number(e.target.value))}
-                                                error={!!errors.for_secuencia}
-                                                helperText={errors.for_secuencia}
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <TextField
-                                                placeholder="Columna"
-                                                value={newFormula.for_tit_columna || ''}
-                                                onChange={(e) => handleInputFormulaChange('for_tit_columna', Number(e.target.value))}
-                                                error={!!errors.for_tit_columna}
-                                                helperText={errors.for_tit_columna}
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <TextField
-                                                select
-                                                placeholder="Operador"
-                                                value={newFormula.for_operador || ''}
-                                                onChange={(e) => handleInputFormulaChange('for_operador', e.target.value)}
-                                                error={!!errors.for_operador}
-                                                helperText={errors.for_operador}
-                                            >
-                                                {
-                                                    operators?.map(op => <MenuItem
-                                                        value={op}>{op}</MenuItem>)
-                                                }
-                                            </TextField>
-                                        </TableCell>
-                                        <TableCell>
-                                            <IconButton onClick={handleAddFormulaClick} aria-label="add">
-                                                <AddIcon/>
-                                            </IconButton>
-                                        </TableCell>
-                                    </TableRow>
-                                }
-                                <TableBody>
-                                    {formulas?.map((formula) => (
-                                        <TableRow key={formula.for_secuencia}>
 
+                            <TableContainer component={Paper} >
+                                <Table stickyHeader>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell padding="checkbox">
+                                                <Checkbox
+                                                    indeterminate={selectedFormula?.length > 0 && selectedFormula?.length < formulas?.length}
+                                                    checked={formulas?.length > 0 && selectedFormula?.length === formulas?.length}
+                                                    onChange={handleSelectAllFormula}
+                                                />
+                                            </TableCell>
                                             <TableCell>
-                                                {
-                                                    !(isEditingFormula && editingFormula?.id === formula.id) && (
-                                                        <Checkbox
-                                                            checked={selectedFormula.includes(formula.id)}
-                                                            onChange={(e) => handleSelectFormula(e, formula?.id)}
-                                                            inputProps={{'aria-label': 'controlled'}}
-                                                        />
-                                                    )
-                                                }
-                                                {isCurrentFormula(formula) ? (
+                                                <TableSortLabel
+                                                    active={orderByFor === 'for_secuencia'}
+                                                    direction={orderByFor === 'for_secuencia' ? order : 'asc'}
+                                                    onClick={() => handleRequestSortFor('for_secuencia')}
+                                                >
+                                                    Secuencia
+                                                </TableSortLabel>
+                                            </TableCell>
+                                            <TableCell>Columna</TableCell>
+                                            <TableCell>Operador</TableCell>
+                                            <TableCell>Acciones</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {
+                                            !isEditingFormula &&
+                                            <TableRow>
+                                                <TableCell/>
+                                                <TableCell>
                                                     <TextField
-                                                        value={editingFormula?.for_secuencia}
+                                                        placeholder="Secuencia"
+                                                        value={newFormula.for_secuencia || ''}
                                                         onChange={(e) => handleInputFormulaChange('for_secuencia', Number(e.target.value))}
                                                         error={!!errors.for_secuencia}
                                                         helperText={errors.for_secuencia}
                                                     />
-                                                ) : (
-                                                    formula.for_secuencia
-                                                )}
-                                            </TableCell>
-                                            <TableCell>
-                                                {isCurrentFormula(formula) ? (
+                                                </TableCell>
+                                                <TableCell>
                                                     <TextField
-                                                        value={editingFormula?.for_tit_columna}
+                                                        placeholder="Columna"
+                                                        value={newFormula.for_tit_columna || ''}
                                                         onChange={(e) => handleInputFormulaChange('for_tit_columna', Number(e.target.value))}
                                                         error={!!errors.for_tit_columna}
                                                         helperText={errors.for_tit_columna}
                                                     />
-                                                ) : (
-                                                    formula.for_tit_columna
-                                                )}
-                                            </TableCell>
-                                            <TableCell>
-                                                {isCurrentFormula(formula) ? (
+                                                </TableCell>
+                                                <TableCell>
                                                     <TextField
                                                         select
-                                                        value={editingFormula?.for_operador}
+                                                        placeholder="Operador"
+                                                        value={newFormula.for_operador || ''}
                                                         onChange={(e) => handleInputFormulaChange('for_operador', e.target.value)}
                                                         error={!!errors.for_operador}
                                                         helperText={errors.for_operador}
@@ -613,30 +645,108 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                                                 value={op}>{op}</MenuItem>)
                                                         }
                                                     </TextField>
-                                                ) : (
-                                                    formula.for_operador
-                                                )}
-                                            </TableCell>
-                                            <TableCell>
-                                                {
-                                                    !isEditingFormula &&
-                                                    <IconButton onClick={() => handleEditFormulaClick(formula)}
-                                                                aria-label="edit">
-                                                        <EditIcon/>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <IconButton onClick={handleAddFormulaClick} aria-label="add">
+                                                        <AddIcon/>
                                                     </IconButton>
-                                                }
-                                                {
-                                                    !isEditingFormula &&
-                                                    <IconButton onClick={() => handleDeleteFormulaClick(formula?.id)}
-                                                                aria-label="delete">
-                                                        <DeleteIcon/>
-                                                    </IconButton>
-                                                }
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                                                </TableCell>
+                                            </TableRow>
+                                        }
+                                        {paginatedDataFormulas?.map((formula) => {
+                                            return (
+                                                <TableRow
+                                                    hover
+                                                    role="checkbox"
+                                                    aria-checked={selectedFormula.includes(formula.id)}
+                                                    tabIndex={-1}
+                                                    key={formula.id}
+                                                    selected={selectedFormula.includes(formula.id)}
+                                                >
+                                                    <TableCell padding="checkbox">
+                                                        {
+                                                            !(isEditingFormula && editingFormula?.id === formula.id) && (
+                                                                <Checkbox
+                                                                    checked={selectedFormula.includes(formula.id)}
+                                                                    onChange={(e) => handleSelectFormula(e, formula?.id)}
+                                                                    inputProps={{'aria-label': 'controlled'}}
+                                                                />
+                                                            )
+                                                        }
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {isCurrentFormula(formula) ? (
+                                                            <TextField
+                                                                value={editingFormula?.for_secuencia}
+                                                                onChange={(e) => handleInputFormulaChange('for_secuencia', Number(e.target.value))}
+                                                                error={!!errors.for_secuencia}
+                                                                helperText={errors.for_secuencia}
+                                                            />
+                                                        ) : (
+                                                            formula.for_secuencia
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {isCurrentFormula(formula) ? (
+                                                            <TextField
+                                                                value={editingFormula?.for_tit_columna}
+                                                                onChange={(e) => handleInputFormulaChange('for_tit_columna', Number(e.target.value))}
+                                                                error={!!errors.for_tit_columna}
+                                                                helperText={errors.for_tit_columna}
+                                                            />
+                                                        ) : (
+                                                            formula.for_tit_columna
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {isCurrentFormula(formula) ? (
+                                                            <TextField
+                                                                select
+                                                                value={editingFormula?.for_operador}
+                                                                onChange={(e) => handleInputFormulaChange('for_operador', e.target.value)}
+                                                                error={!!errors.for_operador}
+                                                                helperText={errors.for_operador}
+                                                            >
+                                                                {
+                                                                    operators?.map(op => <MenuItem
+                                                                        value={op}>{op}</MenuItem>)
+                                                                }
+                                                            </TextField>
+                                                        ) : (
+                                                            formula.for_operador
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {
+                                                            !isEditingFormula &&
+                                                            <IconButton onClick={() => handleEditFormulaClick(formula)}
+                                                                        aria-label="edit">
+                                                                <EditIcon/>
+                                                            </IconButton>
+                                                        }
+                                                        {
+                                                            !isEditingFormula &&
+                                                            <IconButton onClick={() => handleDeleteFormulaClick(formula?.id)}
+                                                                        aria-label="delete">
+                                                                <DeleteIcon/>
+                                                            </IconButton>
+                                                        }
+                                                    </TableCell>
+                                                </TableRow>
+                                            );
+                                        })}
+                                    </TableBody>
+                                </Table>
+                                <TablePagination
+                                    rowsPerPageOptions={[5, 10, 20]}
+                                    component="div"
+                                    count={sortedDataFormulas?.length}
+                                    rowsPerPage={rowsPerPageFor}
+                                    page={pageFor}
+                                    onPageChange={handleChangePageFor}
+                                    onRowsPerPageChange={handleChangeRowsPerPageFor}
+                                />
+                            </TableContainer>
                         </CustomTabPanel>
                     </Grid>
                 </Grid>

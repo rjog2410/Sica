@@ -37,7 +37,7 @@ const CuentasTable = forwardRef(({
 }: CuentasTableProps, ref) => {
   const [selected, setSelected] = useState<number[]>([]);
   const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<keyof Cuenta>('cuenta');
+  const [orderBy, setOrderBy] = useState<keyof Cuenta>('cuc_clave');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -153,9 +153,9 @@ const CuentasTable = forwardRef(({
             </TableCell>
             <TableCell>
               <TableSortLabel
-                active={orderBy === 'cuenta'}
-                direction={orderBy === 'cuenta' ? order : 'asc'}
-                onClick={() => handleRequestSort('cuenta')}
+                active={orderBy === 'cuc_clave'}
+                direction={orderBy === 'cuc_clave' ? order : 'asc'}
+                onClick={() => handleRequestSort('cuc_clave')}
               >
                 Cuenta
               </TableSortLabel>
