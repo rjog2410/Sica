@@ -124,14 +124,9 @@ const ReporteConciliacionSaldosPage: React.FC = () => {
 
         setIsLoading(true);
         try {
-            const data = await service.fetchReporteConciliacionSaldos(filtros);
+            await service.fetchReporteConciliacionSaldos(filtros);
 
-            if (data.length === 0) {
-                notify('No se encontraron datos para los filtros seleccionados.', 'warning');
-            } else {
-                setReporteData(data);
                 notify('Reporte generado con éxito', 'success');
-            }
 
         } catch (error: unknown) {
             if (error instanceof Error && 'response' in error && (error as any).response?.status === 404) {
