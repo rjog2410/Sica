@@ -94,7 +94,15 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
     const [selectedReglas, setSelectedReglas] = useState<Partial<number[]>>([]);
     const [selectedFormula, setSelectedFormula] = useState<Partial<number[]>>([]);
 
+    const [currentFormulas, setCurrentFormulas] = useState<Formula[]>([]); // Estado para las reglas asociadas a una cuenta
+    const [currentReglas, setCurrentReglas] = useState<Regla[]>([]); // Estado para las reglas asociadas a una cuenta
+
     const operators: string[] = ["+", "-", "*", "/"];
+
+    useEffect(() => {
+        setCurrentFormulas(formulas)
+        setCurrentReglas(reglas)
+    }, [reglas,formulas]);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
