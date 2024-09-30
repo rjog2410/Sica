@@ -140,7 +140,7 @@ const CuentasTable = forwardRef(({
   };
 
   return (
-    <TableContainer component={Paper} style={{ height: '450px', width: '100%' }}>
+    <TableContainer component={Paper} >
       <Table stickyHeader>
         <TableHead>
           <TableRow>

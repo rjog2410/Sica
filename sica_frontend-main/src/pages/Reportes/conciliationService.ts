@@ -1,5 +1,6 @@
 import axios from "axios";
 import {ReporteConciliacion, ReporteConciliacionFiltros} from "./interfaces";
+import {ConciliacionCuenta} from "@/types.ts";
 
 const BASE_URL = 'http://localhost:8080';
 
@@ -30,4 +31,20 @@ export const fetchModulosBySistema = async (sistemaClave: string): Promise<{ mod
     const response = await axios.post(`${BASE_URL}/catalogos/cuentas_regla/get_modules_filter`, {cuc_mod_sis_clave: sistemaClave});
     return response.data.data;
 };
-  
+
+// Obtener el listado de monedas
+export const fetchMonedas = async (): Promise<{ clave: string }[]> => {
+    const response = await axios.post(`${BASE_URL}/consultas/catalogos/monedas`);
+    return response.data.data;
+};
+
+// Obtener el listado de oficinas
+export const fetchOficinas = async (): Promise<{ clave: string }[]> => {
+    const response = await axios.post(`${BASE_URL}/consultas/catalogos/oficinas`);
+    return response.data.data;
+};
+
+export const fetchModulosBySistema = async (consiliacion:ConciliacionCuenta): Promise<{ mod_clave: string }[]> => {
+    const response = await axios.post(`${BASE_URL}/catalogos/cuentas_regla/get_modules_filter`, {cuc_mod_sis_clave: sistemaClave});
+    return response.data.data;
+};

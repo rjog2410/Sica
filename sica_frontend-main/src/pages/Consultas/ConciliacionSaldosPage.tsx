@@ -1,10 +1,19 @@
 import React, {useState, useMemo, useEffect} from 'react';
-import {Autocomplete, Box, Button, Grid, TextField} from '@mui/material';
+import {
+    Autocomplete,
+    Box,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Grid,
+    TextField
+} from '@mui/material';
 import BodyHeader from '../../components/base/BodyHeader';
-import {conciliacionesMock} from '../../mock/conciliacionesMock';
 import ConciliacionTable from '../../components/base/tabla/ConciliacionTable';
 import {
-    fetchModulosBySistema,
+    fetchModulosBySistema, fetchMonedas, fetchOficinas,
     fetchReporteConciliacionSaldos,
     fetchSistemas
 } from "@/pages/Reportes/conciliationService.ts";
@@ -21,12 +30,18 @@ const ConciliacionSaldosPage: React.FC = () => {
     const {notify} = useNotification();
     const [data, setData] = useState({
         sistemas: [],
-        modulos: []
+        modulos: [],
+        info:[]
     })
 
     useEffect(() => {
         fetchSistemas().then(resp => {
-            setData({...data, sistemas: resp})
+            fetchMonedas().then( respCurr => {
+                fetchOficinas().then( offices => {
+                    setData({...data, sistemas: resp, monedas: respCurr, oficinas: offices})
+                    setFiltros({...filtros, oficina: offices?.find(office => office?.clave_particular === 90)||0 , moneda: respCurr?.find(coin => coin?.mon_clave === 1) || 0})
+                })
+            })
         })
     }, []);
 
@@ -44,29 +59,17 @@ const ConciliacionSaldosPage: React.FC = () => {
         setFiltros(prev => ({...prev, [name]: value}));
     };
 
-    // Memorizar la conciliación filtrada para evitar recalcular en cada render
-    const conciliacionesFiltradas = useMemo(() => {
-        console.log("Filtros: ",filtros)
-        if (!!filtros?.sistema && !!filtros?.modulo && !!filtros?.fecha_informacion && !!filtros?.oficina && !!filtros?.moneda) {
-            fetchReporteConciliacionSaldos(filtros).then(resp => {
-                console.log("Response: ", resp)
-            })
-        }
-        return conciliacionesMock?.filter((item) => {
-            return (
-                (filtros.sistema === '' || item.sistema === filtros.sistema) &&
-                (filtros.modulo === '' || item.modulo === filtros.modulo) &&
-                (filtros.fecha_informacion === '' || item.fecha === filtros.fecha_informacion) &&
-                (filtros.oficina === -1 || item.oficina === filtros.oficina) &&
-                (filtros.moneda === -1 || item.moneda === filtros.moneda)
-            );
-        });
-    }, [filtros]);
 
     const searchSaldos = ()=>{
-        if (!!filtros?.sistema && !!filtros?.modulo && !!filtros?.fecha_informacion && !!filtros?.oficina && !!filtros?.moneda) {
-            fetchReporteConciliacionSaldos(filtros).then(resp => {
-                console.log("Response: ", resp)
+        if (!!filtros?.oficina && !!filtros?.moneda) {
+            console.log("Filtros: ",filtros)
+            fetchReporteConciliacionSaldos({...filtros,oficina:filtros.oficina.clave_particular,moneda:filtros.moneda.mon_clave}).then(resp => {
+                if(resp?.status !== 200){
+                    notify(resp?.message,"error")
+                }
+                if(resp?.status === 200){
+                   setData({...data, info: resp?.data})
+                }
             })
         }else{
             if(!filtros?.oficina || !filtros?.moneda){
@@ -105,42 +108,52 @@ const ConciliacionSaldosPage: React.FC = () => {
                         options={Array.from(new Set(data?.sistemas?.map(sistema => sistema?.sis_clave)))}
                         onChange={(_event, value) => handleFiltroChange('sistema', value || '')}
                         value={filtros?.sistema}
-                        renderInput={(params) => <TextField {...params} label={filtros?.sistema}
-                                                            variant="outlined"/>} // Aplicamos la propiedad sx a TextField
+                        renderInput={(params) => <TextField {...params} label={"Sistema"} variant="outlined"/>} // Aplicamos la propiedad sx a TextField
                     />
                 </Grid>
                 <Grid item xs={6}>
                     <Autocomplete
                         aria-placeholder={"Modulo"}
-                        options={Array.from(new Set(data?.modulos?.map(modulo => modulo?.mod_clave)))}
+                        options={data?.modulos?.length > 0 ? ["TODOS",...Array.from(new Set(data?.modulos?.map(modulo => modulo?.mod_clave)))] : []}
                         onChange={(_event, value) => handleFiltroChange('modulo', value || '')}
                         value={filtros?.modulo}
-                        renderInput={(params) => <TextField {...params} label={filtros?.modulo}
-                                                            variant="outlined"/>} // Aplicamos la propiedad sx a TextField
+                        disabled={data?.modulos?.length <= 0}
+                        renderInput={(params) => <TextField {...params} label={"Modulos"} variant="outlined"/>} // Aplicamos la propiedad sx a TextField
                     />
                 </Grid>
                 <Grid item xs={3}>
                     <TextField
-                        placeholder={"Fecha"}
                         type={"date"}
                         value={filtros?.fecha_informacion}
                         onChange={(e) => handleFiltroChange('fecha_informacion', e?.target?.value || '')}
+                        variant="outlined"
+                        label={"Fecha"}
                     />
                 </Grid>
                 <Grid item xs={3}>
-                    <TextField
-                        placeholder={"Oficina"}
-                        type={"text"}
+                    <Autocomplete
+                        aria-placeholder={"Oficina"}
+                        options={data?.oficinas?.length > 0 ? ["TODOS",...Array.from(new Set(data?.oficinas?.map(oficina => oficina)))] : []}
+                        onChange={(_event, value) => handleFiltroChange('oficina', value || '')}
                         value={filtros?.oficina}
-                        onChange={(e) => handleFiltroChange('oficina', e?.target?.value || '')}
+                        disabled={data?.oficinas?.length <= 0}
+                        getOptionLabel={(option) => option?.nombre}
+                        renderInput={(params) => {
+                            return <TextField {...params} label={"Oficina"} variant="outlined"/>
+                        }} // Aplicamos la propiedad sx a TextField
                     />
                 </Grid>
                 <Grid item xs={3}>
-                    <TextField
-                        placeholder={"Moneda"}
-                        type={"number"}
+                    <Autocomplete
+                        aria-placeholder={"Monedas"}
+                        options={data?.monedas?.length > 0 ? ["TODOS",...Array.from(new Set(data?.monedas?.map(moneda => moneda)))] : []}
+                        onChange={(_event, value) => handleFiltroChange('moneda', value || '')}
                         value={filtros?.moneda}
-                        onChange={(e) => handleFiltroChange('moneda', e?.target?.value || '')}
+                        disabled={data?.monedas?.length <= 0}
+                        getOptionLabel={(option) => option?.mon_nombre}
+                        renderInput={(params) => {
+                            return <TextField {...params} label={"Moneda"} variant="outlined"/>
+                        }} // Aplicamos la propiedad sx a TextField
                     />
                 </Grid>
                 <Grid item xs={3}>
@@ -149,13 +162,13 @@ const ConciliacionSaldosPage: React.FC = () => {
                     </Button>
                 </Grid>
             </Grid>
-            <ConciliacionTable data={conciliacionesFiltradas}/>
+            <ConciliacionTable data={data?.info} filtros={filtros}/>
             <Box mt={2}>
                 <Button
                     variant="contained"
                     color="primary"
                     onClick={handleExportModule}
-                    disabled={!conciliacionesFiltradas.length} // Deshabilitar si no hay datos filtrados
+                    disabled={!data?.info.length} // Deshabilitar si no hay datos filtrados
                 >
                     Generar Módulo
                 </Button>
@@ -163,7 +176,7 @@ const ConciliacionSaldosPage: React.FC = () => {
                     variant="contained"
                     color="secondary"
                     onClick={handleExportFile}
-                    disabled={!conciliacionesFiltradas.length} // Deshabilitar si no hay datos filtrados
+                    disabled={!data?.info.length} // Deshabilitar si no hay datos filtrados
                     sx={{ml: 2}}
                 >
                     Generar Archivo
