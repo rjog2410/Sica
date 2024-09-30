@@ -130,7 +130,7 @@ export const updateRegla = async (regla: Regla): Promise<void> => {
 
 // Eliminar una regla
 export const deleteRegla = async (regla: Regla): Promise<any> => {
-    const response = await axios.post(`${BASE_URL}/reglas/delete`, {regla});
+    const response = await axios.post(`${BASE_URL}/reglas/delete`, regla);
     return response;
 };
 

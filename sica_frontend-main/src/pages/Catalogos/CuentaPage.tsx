@@ -18,7 +18,7 @@ import {
 import {
     createFormula,
     deleteFormula,
-    deleteMultipleFormula,
+    deleteMultipleFormula, fetchReglas,
     updateCuenta
 } from "@/pages/Catalogos/servicios/cuentasReglaService.ts"; // Asumiendo que tienes este modal para manejar las reglas
 
@@ -87,7 +87,7 @@ const CuentaPage: React.FC = () => {
                 setSistemas(resp);
             }
         }).catch(error => {
-            console.error('Error al cargar los datos de sistemas:', error);
+            console.error(error);
             notify('Error al cargar los datos de sistema', 'error');
         })
     }, []);
@@ -255,17 +255,25 @@ const CuentaPage: React.FC = () => {
         if (!cuentaSeleccionada) {
             notify('Cuenta no encontrada', 'error');
             return;
+        }else {
+            fetchReglas(cuentaSeleccionada?.cuc_clave).then(resp => {
+
+                getFormulas(cuentaSeleccionada?.cuc_clave).then(respF => {
+                    setCurrentFormulas(respF?.map((form, index) => ({
+                        ...form,
+                        id: index
+                    })))
+
+                    setCurrentReglas(resp?.map((reg, i) => ({
+                        ...reg,
+                        id: i
+                    })))
+                })
+            }).finally( () =>{
+                setCuentaInfo(cuentaSeleccionada)
+                setIsSubpantallaOpen(true);
+            })
         }
-        getReglas(cuentaSeleccionada?.cuc_clave).then(resp => setCurrentReglas(resp?.map((reg, i) => ({
-            ...reg,
-            id: i
-        }))))
-        getFormulas(cuentaSeleccionada?.cuc_clave).then(resp => setCurrentFormulas(resp?.map((form, index) => ({
-            ...form,
-            id: index
-        }))))
-        setCuentaInfo(cuentaSeleccionada)
-        setIsSubpantallaOpen(true);
     };
 
     const handleDeleteRegla = (id: number) => {
@@ -282,7 +290,7 @@ const CuentaPage: React.FC = () => {
                     console.log("DeleteReg: ", resp)
                     if(resp?.status === 200){
                         setCurrentReglas(currentReglas.filter(regla => reglaToDelete?.id !== regla.id))
-                        notify(resp?.message, 'success');
+                        notify(resp?.data?.message, 'success');
                     }else {
                         notify(resp?.message, 'error');
                     }
