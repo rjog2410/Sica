@@ -173,19 +173,7 @@ const ConsultaCargaAOPage: React.FC = () => {
         typographyPropsTitle={{ variant: "h3" }}
       />
       <Grid container spacing={2} mb={2}>
-        <Grid item xs={12} sm={4}> 
-          <TextField
-            label="Fecha de Carga"
-            type="date"
-            name="fecha_carga"
-            value={filtros.fecha_carga}
-            onChange={handleInputChange}
-            InputLabelProps={{ shrink: true }}
-            fullWidth
-           
-          />                  
-        </Grid>
-        <Grid item xs={12} sm={4}>
+      <Grid item xs={12} sm={4}>
         <Autocomplete
                     options={[...Array.from(new Set(sistemas.map(sistema => sistema.sis_clave)))]}
                     onChange={(_event, value) => handleSistemaSelect(value)}
@@ -202,6 +190,18 @@ const ConsultaCargaAOPage: React.FC = () => {
                     renderInput={(params) => <TextField {...params} label="Módulo" value={selectedModulo} variant="outlined" />} // Aplicamos la propiedad sx a TextField
                 />
         </Grid>
+        <Grid item xs={12} sm={4}> 
+          <TextField
+            label="Fecha de Carga"
+            type="date"
+            name="fecha_carga"
+            value={filtros.fecha_carga}
+            onChange={handleInputChange}
+            InputLabelProps={{ shrink: true }}
+            fullWidth
+           
+          />                  
+        </Grid>        
         <Grid item xs={12} sm={4}>
         <TextField
             label="Fecha Operativa"
