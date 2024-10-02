@@ -93,7 +93,6 @@ const TraductorPage: React.FC = () => {
       notify('La fecha final debe ser mayor o igual a la fecha de inicio', 'error');
       return false;
     }
-setIsLoading(true);
     return true;
   };
 
@@ -102,13 +101,9 @@ setIsLoading(true);
 
       return;
     } 
-    console.log("cambiado",isLoading);
     setIsLoading(true);
-
-    console.log("camio?",isLoading);
-
-    
-    service.executeTraductor(params).then(resp =>{
+    try {
+    await service.executeTraductor(params).then(resp =>{
       if(resp.status === 200){
 
           notify('Traductor ejecutado correctamente', 'success');
@@ -123,7 +118,17 @@ setIsLoading(true);
       notify(error.response.data.message, 'error');
       console.log("ocurrio un error",error.response.data.message);
     }) 
+  } catch (error: unknown) {
+    if (error instanceof Error && 'response' in error && (error as any).response?.status === 404) {
+        notify('Datos no encontrados.', 'error');
+    } else if (error instanceof Error) {
+        notify(`Error: ${error.message}`, 'error');
+    } else {
+        notify('Error desconocido al generar el reporte', 'error');
+    }
+} finally {
     setIsLoading(false);
+}
 
   };
 
