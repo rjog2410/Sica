@@ -33,7 +33,7 @@ export const useModulosHandlers = (
   }, [data, notify, setData]);
 
   const handleSelect = (selected: Modulo | null) => {
-    if (selected && selected.mod_clave === 'ALL') {
+    if (selected && selected.mod_clave === 'TODOS') {
       setFilteredData(data);
     } else if (selected) {
       setFilteredData(data.filter(d => d.mod_clave === selected.mod_clave));

@@ -22,9 +22,9 @@ const ModulosPage: React.FC = () => {
     agrupacion_reportes: null
   }
   const [modulos, setModulos] = useState<Modulo[]>([]);
-  const [selectedSistema, setSelectedSistema] = useState<string | null>('ALL');
+  const [selectedSistema, setSelectedSistema] = useState<string | null>('TODOS');
   const [secondFilterOptions, setSecondFilterOptions] = useState<string[]>([]);
-  const [selectedModulo, setSelectedModulo] = useState<string>('ALL');
+  const [selectedModulo, setSelectedModulo] = useState<string>('TODOS');
   const [loading, setLoading] = useState<boolean>(true);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const tableRef = useRef<any>(null);
@@ -34,7 +34,7 @@ const ModulosPage: React.FC = () => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [editando, setEditando] = useState<boolean>(false);
   var [eliminados,setEliminados]= useState<number>(0);
-  const [filterValue, setFilterValue] = useState<string>('ALL');
+  const [filterValue, setFilterValue] = useState<string>('TODOS');
 
 
   const { notify } = useNotification();
@@ -57,26 +57,26 @@ const ModulosPage: React.FC = () => {
 
   const handleSistemaSelect = (sistema: string | null) => {
     setSelectedSistema(sistema);
-    if (sistema && sistema !== 'ALL') {
+    if (sistema && sistema !== 'TODOS') {
       const filteredModules = modulos.filter(m => m.clave_sistema === sistema);
-      const newOptions = ['ALL', ...new Set(filteredModules.map(m => m.clave_modulo))];
+      const newOptions = ['TODOS', ...new Set(filteredModules.map(m => m.clave_modulo))];
       setSecondFilterOptions(newOptions);
-      setSelectedModulo('ALL');
+      setSelectedModulo('TODOS');
     } else {
       setSecondFilterOptions([]);
-      setSelectedModulo('ALL');
+      setSelectedModulo('TODOS');
     }
   };
 
   const handleModuloSelect = (modulo: string | null) => {
-    setSelectedModulo(modulo || 'ALL');
-    setFilterValue(modulo ? modulo : 'ALL');
+    setSelectedModulo(modulo || 'TODOS');
+    setFilterValue(modulo ? modulo : 'TODOS');
 
   };
 
   const filteredModulos = modulos.filter(modulo => {
-    const matchSistema = selectedSistema === 'ALL' || modulo.clave_sistema === selectedSistema;
-    const matchModulo = selectedModulo === 'ALL' || modulo.clave_modulo === selectedModulo;
+    const matchSistema = selectedSistema === 'TODOS' || modulo.clave_sistema === selectedSistema;
+    const matchModulo = selectedModulo === 'TODOS' || modulo.clave_modulo === selectedModulo;
     return matchSistema && matchModulo;
   });
 
@@ -228,7 +228,7 @@ console.log(selectedIds);
         <>
           <Box mb={2}>
             <ComboBox
-              options={['ALL', ...Array.from(new Set(modulos.map(modulo => modulo.clave_sistema)))]}
+              options={['TODOS', ...Array.from(new Set(modulos.map(modulo => modulo.clave_sistema)))]}
               onSelect={handleSistemaSelect}
               label="Seleccione un Sistema"
               getOptionLabel={(option: string) => option}
@@ -240,7 +240,7 @@ console.log(selectedIds);
               onSelect={handleModuloSelect}
               label="Filtrar por Clave de Módulo"
               getOptionLabel={(option: string) => option}
-              disabled={selectedSistema === 'ALL' || secondFilterOptions.length === 0}
+              disabled={selectedSistema === 'TODOS' || secondFilterOptions.length === 0}
             />
           </Box>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>

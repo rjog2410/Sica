@@ -61,8 +61,8 @@ const CuentaPage: React.FC = () => {
     const [cuentas, setCuentas] = useState<Cuenta[]>([]);
     const [sistemas, setSistemas] = useState<Sistema[]>([]);
     const [reglas, setReglas] = useState<Regla[]>([]);
-    const [selectedSistema, setSelectedSistema] = useState<string | null>('ALL');
-    const [selectedModulo, setSelectedModulo] = useState<string | null>('ALL');
+    const [selectedSistema, setSelectedSistema] = useState<string | null>('TODOS');
+    const [selectedModulo, setSelectedModulo] = useState<string | null>('TODOS');
     const [filteredCuentas, setFilteredCuentas] = useState<Cuenta[]>([]);
     const [modulos, setModulos] = useState<string[]>([]);
     const [isCuentaModalOpen, setIsCuentaModalOpen] = useState<boolean>(false); // Estado para el modal de cuentas
@@ -107,30 +107,30 @@ const CuentaPage: React.FC = () => {
     }, [notify]);
 
     useEffect(() => {
-        if (!!selectedSistema && selectedSistema !== 'ALL') {
+        if (!!selectedSistema && selectedSistema !== 'TODOS') {
             fetchModuloByClave(selectedSistema).then(resp => {
-                setModulos(['ALL', ...Array.from(new Set(resp?.map(modulo => modulo?.mod_clave)))]);
+                setModulos(['TODOS', ...Array.from(new Set(resp?.map(modulo => modulo?.mod_clave)))]);
             });
             getCuentasBySistema(selectedSistema).then(resp => {
                 setFilteredCuentas(resp);
             })
         } else {
             fetchModulos().then(resp => {
-                setModulos(['ALL', ...Array.from(new Set(resp?.map(modulo => modulo?.clave_modulo)))]);
+                setModulos(['TODOS', ...Array.from(new Set(resp?.map(modulo => modulo?.clave_modulo)))]);
             });
             getAllCuentas().then(resp => {
                 setFilteredCuentas(resp);
             })
         }
-        setSelectedModulo('ALL');
+        setSelectedModulo('TODOS');
     }, [selectedSistema]);
 
     useEffect(() => {
-        if (!!selectedModulo && selectedModulo !== 'ALL' && !!selectedSistema && selectedSistema !== 'ALL') {
+        if (!!selectedModulo && selectedModulo !== 'TODOS' && !!selectedSistema && selectedSistema !== 'TODOS') {
             getCuentasBySistemaAndModulo(selectedSistema, selectedModulo).then(resp => {
                 setFilteredCuentas(resp);
             })
-        } else if (!!selectedSistema && selectedSistema !== 'ALL') {
+        } else if (!!selectedSistema && selectedSistema !== 'TODOS') {
             getCuentasBySistema(selectedSistema).then(resp => {
                 setFilteredCuentas(resp);
             })
@@ -144,7 +144,7 @@ const CuentaPage: React.FC = () => {
 
     const handleSistemaSelect = (sistema: string | null) => {
         setSelectedSistema(sistema);
-        setSelectedModulo('ALL');
+        setSelectedModulo('TODOS');
     };
 
     const handleModuloSelect = (modulo: string | null) => {
@@ -461,7 +461,7 @@ const CuentaPage: React.FC = () => {
             />
             <Box mb={2}>
                 <Autocomplete
-                    options={['ALL', ...Array.from(new Set(sistemas.map(cuenta => cuenta.sis_clave)))]}
+                    options={['TODOS', ...Array.from(new Set(sistemas.map(cuenta => cuenta.sis_clave)))]}
                     onChange={(_event, value) => handleSistemaSelect(value)}
                     value = {selectedSistema}
                     renderInput={(params) => <TextField {...params} label={selectedSistema} variant="outlined" />} // Aplicamos la propiedad sx a TextField
@@ -471,7 +471,7 @@ const CuentaPage: React.FC = () => {
                 <Autocomplete
                     options={modulos}
                     onChange={(_event, value) => handleModuloSelect(value)}
-                    disabled={selectedSistema === 'ALL'}
+                    disabled={selectedSistema === 'TODOS'}
                     value = {selectedModulo}
                     renderInput={(params) => <TextField {...params} label={selectedModulo} variant="outlined" />} // Aplicamos la propiedad sx a TextField
                 />

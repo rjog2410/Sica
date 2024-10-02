@@ -26,12 +26,13 @@ const ExtraccionSIFPage: React.FC = () => {
     borrar_info: '',
   });
 
+  const [isLoading, setIsLoading] = useState(false);
   const [modulos, setModulos] = useState<Modulo[]>([]);
-  const [selectedSistema, setSelectedSistema] = useState<string | null>('ALL');
+  const [selectedSistema, setSelectedSistema] = useState<string | null>('TODOS');
   const [secondFilterOptions, setSecondFilterOptions] = useState<string[]>([]);
-  const [selectedModulo, setSelectedModulo] = useState<string>('ALL');
+  const [selectedModulo, setSelectedModulo] = useState<string>('TODOS');
   
-  const [filterValue, setFilterValue] = useState<string>('ALL');
+  const [filterValue, setFilterValue] = useState<string>('TODOS');
 
 
   const { notify } = useNotification();
@@ -51,29 +52,29 @@ const ExtraccionSIFPage: React.FC = () => {
 
   const handleSistemaSelect = (sistema: string | null) => {
     setSelectedSistema(sistema);
-    if (sistema && sistema !== 'ALL') {
+    if (sistema && sistema !== 'TODOS') {
       const filteredModules = modulos.filter(m => m.clave_sistema === sistema);
-      const newOptions = ['ALL', ...new Set(filteredModules.map(m => m.clave_modulo))];
+      const newOptions = ['TODOS', ...new Set(filteredModules.map(m => m.clave_modulo))];
       params.sistema=sistema;
       setSecondFilterOptions(newOptions);
-      setSelectedModulo('ALL');
+      setSelectedModulo('TODOS');
     } else {
       setSecondFilterOptions([]);
-      setSelectedModulo('ALL');
+      setSelectedModulo('TODOS');
     }
   };
 
   const handleModuloSelect = (modulo: string | null) => {
     
     params.modulo=modulo;
-    setSelectedModulo(modulo || 'ALL');
-    setFilterValue(modulo ? modulo : 'ALL');
+    setSelectedModulo(modulo || 'TODOS');
+    setFilterValue(modulo ? modulo : 'TODOS');
 
   };
 
   const filteredModulos = modulos.filter(modulo => {
-    const matchSistema = selectedSistema === 'ALL' || modulo.clave_sistema === selectedSistema;
-    const matchModulo = selectedModulo === 'ALL' || modulo.clave_modulo === selectedModulo;
+    const matchSistema = selectedSistema === 'TODOS' || modulo.clave_sistema === selectedSistema;
+    const matchModulo = selectedModulo === 'TODOS' || modulo.clave_modulo === selectedModulo;
     return matchSistema && matchModulo;
   });
 
@@ -107,7 +108,7 @@ const ExtraccionSIFPage: React.FC = () => {
 
   const handleExecute = async () => {
     if (!validateParams()) return;
-
+    setIsLoading(true);
       await service.executeExtraccionSIF(params).then(resp =>{
         console.log("",resp)
         if(resp.status === 200){
@@ -124,9 +125,11 @@ const ExtraccionSIFPage: React.FC = () => {
         console.log("ocurrio un error",error.response.data.message);
       }) 
      setParams(originalObject);
-     setSelectedSistema('ALL');
+     setSelectedSistema('TODOS');
      setSecondFilterOptions([]);
-     setSelectedModulo('ALL');
+     setSelectedModulo('TODOS');
+     setIsLoading(false);
+
   };
 
   const handleSelectChange = (event: SelectChangeEvent<string>) => {
@@ -150,7 +153,7 @@ const ExtraccionSIFPage: React.FC = () => {
       />
  <Box mb={2}>
             <ComboBox
-              options={['ALL', ...Array.from(new Set(modulos.map(modulo => modulo.clave_sistema)))]}
+              options={['TODOS', ...Array.from(new Set(modulos.map(modulo => modulo.clave_sistema)))]}
               onSelect={handleSistemaSelect}
               label="Seleccione un Sistema"
               value={selectedSistema}
@@ -163,7 +166,7 @@ const ExtraccionSIFPage: React.FC = () => {
               onSelect={handleModuloSelect}
               label="Filtrar por Clave de Módulo"
               getOptionLabel={(option: string) => option}
-              disabled={selectedSistema === 'ALL' || secondFilterOptions.length === 0}
+              disabled={selectedSistema === 'TODOS' || secondFilterOptions.length === 0}
             />
           </Box>
           <Box mb={2}>
@@ -225,8 +228,13 @@ const ExtraccionSIFPage: React.FC = () => {
         </Box>
       
       <Box sx={{ mt: 3 }}>
-        <Button variant="contained" color="primary" onClick={handleExecute}>
-          Ejecutar
+        <Button 
+        variant="contained" 
+        color="primary" 
+        onClick={handleExecute}
+        disabled={isLoading}
+>
+{isLoading ? 'Ejecutando...' : 'Ejecutar'}
         </Button>
       </Box>
     </Box>

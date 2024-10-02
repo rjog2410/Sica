@@ -25,8 +25,8 @@ const CuentaReglaPage: React.FC = () => {
     }
 
     const [reglas, setReglas] = useState<Regla[]>([]);
-    const [selectedSistema, setSelectedSistema] = useState<string | null>('ALL');
-    const [selectedModulo, setSelectedModulo] = useState<string | null>('ALL');
+    const [selectedSistema, setSelectedSistema] = useState<string | null>('TODOS');
+    const [selectedModulo, setSelectedModulo] = useState<string | null>('TODOS');
     const [modulos, setModulos] = useState<string[]>([]);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [isSubpantallaOpen, setIsSubpantallaOpen] = useState<boolean>(false); // Estado para la subpantalla de reglas
@@ -52,18 +52,18 @@ const CuentaReglaPage: React.FC = () => {
     }, [notify]);
 
     useEffect(() => {
-        if (selectedSistema && selectedSistema !== 'ALL') {
+        if (selectedSistema && selectedSistema !== 'TODOS') {
             //filtros
         } else {
-            setModulos(['ALL']);
+            setModulos(['TODOS']);
         }
     }, [selectedSistema]);
 
     useEffect(() => {
         // setFilteredCuentas(
         //   cuentas.filter(cuenta => {
-        //     const matchSistema = selectedSistema === 'ALL' || cuenta.clave_sistema === selectedSistema;
-        //     const matchModulo = selectedModulo === 'ALL' || cuenta.clave_modulo === selectedModulo;
+        //     const matchSistema = selectedSistema === 'TODOS' || cuenta.clave_sistema === selectedSistema;
+        //     const matchModulo = selectedModulo === 'TODOS' || cuenta.clave_modulo === selectedModulo;
         //     return matchSistema && matchModulo;
         //   })
         // );
@@ -71,7 +71,7 @@ const CuentaReglaPage: React.FC = () => {
 
     const handleSistemaSelect = (sistema: string | null) => {
         setSelectedSistema(sistema);
-        setSelectedModulo('ALL');
+        setSelectedModulo('TODOS');
     };
 
     const handleModuloSelect = (modulo: string | null) => {
@@ -185,8 +185,8 @@ const CuentaReglaPage: React.FC = () => {
             />
             <Box mb={2}>
                 <ComboBox
-                    // options={['ALL', ...Array.from(new Set(cuentas.map(cuenta => cuenta.clave_sistema)))]}
-                    options={['ALL']}
+                    // options={['TODOS', ...Array.from(new Set(cuentas.map(cuenta => cuenta.clave_sistema)))]}
+                    options={['TODOS']}
                     onSelect={handleSistemaSelect}
                     label="Seleccione un Sistema"
                     getOptionLabel={(option: string) => option}
@@ -198,7 +198,7 @@ const CuentaReglaPage: React.FC = () => {
                     onSelect={handleModuloSelect}
                     label="Seleccione un Módulo"
                     getOptionLabel={(option: string) => option}
-                    disabled={selectedSistema === 'ALL'}
+                    disabled={selectedSistema === 'TODOS'}
                 />
             </Box>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>

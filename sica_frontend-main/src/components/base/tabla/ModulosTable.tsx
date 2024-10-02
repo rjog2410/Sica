@@ -81,7 +81,7 @@ const ModulosTable = forwardRef(({
   const filteredData = useMemo(() => {
     
     console.log(filterValue)
-    return filterValue === 'ALL'
+    return filterValue === 'TODOS'
       ? data
       : data.filter((modulo) => modulo.clave_modulo.includes(filterValue));
   }, [data, filterValue]);

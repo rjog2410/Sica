@@ -43,8 +43,3 @@ export const fetchOficinas = async (): Promise<{ clave: string }[]> => {
     const response = await axios.post(`${BASE_URL}/consultas/catalogos/oficinas`);
     return response.data.data;
 };
-
-export const fetchModulosBySistema = async (consiliacion:ConciliacionCuenta): Promise<{ mod_clave: string }[]> => {
-    const response = await axios.post(`${BASE_URL}/catalogos/cuentas_regla/get_modules_filter`, {cuc_mod_sis_clave: sistemaClave});
-    return response.data.data;
-};

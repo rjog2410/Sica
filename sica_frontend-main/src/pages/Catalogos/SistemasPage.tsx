@@ -13,7 +13,7 @@ const SistemasPage: React.FC = () => {
   const originalObject = { sis_clave: '', sis_nombre: '' }
   const [sistemas, setSistemas] = useState<Sistema[]>([]);
   const [, setSelectedSistema] = useState<Sistema | null>(null);
-  const [filterValue, setFilterValue] = useState<string>('ALL');
+  const [filterValue, setFilterValue] = useState<string>('TODOS');
   const [loading, setLoading] = useState<boolean>(true);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const tableRef = useRef<any>(null);
@@ -43,7 +43,7 @@ const SistemasPage: React.FC = () => {
 
   const handleSistemaSelect = (sistema: Sistema | null) => {
     setSelectedSistema(sistema);
-    setFilterValue(sistema ? sistema.sis_clave : 'ALL');
+    setFilterValue(sistema ? sistema.sis_clave : 'TODOS');
   };
 
   const handleOpenModal = () => {

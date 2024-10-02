@@ -99,48 +99,18 @@ const API_URL = 'http://localhost:8080/reportes/reporte';
 
 export const fetchReporteConciliacionSaldos = async (
   filtros: ReporteConciliacionFiltros
-): Promise<ReporteConciliacion[]> => {
-
-  
-  var fecha =filtros.fecha?.split("-");
-  filtros.fecha=fecha[2]+"/"+fecha[1]+"/"+fecha[0];
-
-
-console.log(filtros)
+): Promise<String> => {
   try {
+    var fecha =filtros.fecha?.split("-");
+  filtros.fecha=fecha[2]+"/"+fecha[1]+"/"+fecha[0];
     /*const response = await axios.post(API_URL, params);*/
-   await axios.post(`${API_URL}`,filtros,{responseType:"arraybuffer"}).then((res)=>{
-  console.log(res.data);
-  const blob =new Blob([res.data]);
-    const filename = `Reporte_Conciliacion.pdf`;
-const link = document.createElement('a');
-    const  url = URL.createObjectURL(blob);
-    link.setAttribute('href',url);
-    link.setAttribute('download',filename);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-   })
-   .catch((err)=>{
-console.log(err)
-   });
-    
+   return await axios.post(`${API_URL}`,filtros,{responseType:"arraybuffer"});
     
   } catch (error) {
     console.error('Error ejecutando la extracción SIF:', error);
     throw error; // Esto permite capturar el error en la UI y manejarlo apropiadamente
   }
   
-  return mockData.filter(
-    (item) =>
-      (filtros.sistema === 'TODOS' || item.sistema === filtros.sistema) &&
-      (filtros.modulo === 'TODOS' || item.modulo === filtros.modulo) &&
-      (filtros.fecha === '' || item.fecha === filtros.fecha) &&
-      item.nivel_agrupacion === filtros.agrupacion
-  );
-
-
 };
 
 export const getDistinctValues = async (key: keyof ReporteConciliacion): Promise<string[]> => {

@@ -28,7 +28,7 @@ const ReporteConciliacionSaldosPage: React.FC = () => {
         sistema: '',
         modulo: '',
         fecha: '',
-        agrupacion: 'Cuenta',
+        agrupacion: '',
     });
     const [reporteData, setReporteData] = useState<ReporteConciliacion[]>([]);
     const fetchData = async () => {
@@ -124,9 +124,26 @@ const ReporteConciliacionSaldosPage: React.FC = () => {
 
         setIsLoading(true);
         try {
-            await service.fetchReporteConciliacionSaldos(filtros);
+            await service.fetchReporteConciliacionSaldos(filtros).then((res)=>{
+                console.log(res.data);
+                const blob =new Blob([res.data]);
+                  const filename = `Reporte_Conciliacion.pdf`;
+              const link = document.createElement('a');
+                  const  url = URL.createObjectURL(blob);
+                  link.setAttribute('href',url);
+                  link.setAttribute('download',filename);
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  notify('Reporte generado con éxito', 'success');
+                  setSelectedSistema('');
+                 })
+                 .catch((err)=>{
+                    notify(err, 'error');
+                                 });
+                  
 
-                notify('Reporte generado con éxito', 'success');
+              
 
         } catch (error: unknown) {
             if (error instanceof Error && 'response' in error && (error as any).response?.status === 404) {

@@ -15,8 +15,8 @@ const ColumnasPage: React.FC = () => {
   const [sistemas, setSistemas] = useState<Sistema[]>([]); 
   const [modulos, setModulos] = useState<String[]>([]);
   const [columnas, setColumnas] = useState<Columna[]>([]);
-  const [selectedSistema, setSelectedSistema] = useState<string>('ALL');
-  const [selectedModulo, setSelectedModulo] = useState<string>('ALL');
+  const [selectedSistema, setSelectedSistema] = useState<string>('TODOS');
+  const [selectedModulo, setSelectedModulo] = useState<string>('TODOS');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [editingColumna, setEditingColumna] = useState<Columna | null>(null);
   const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
@@ -38,7 +38,7 @@ const ColumnasPage: React.FC = () => {
         serviceColumna.fetchColumnas().then(resp => {
           console.log(resp);
           setColumnas(resp); 
-          setSelectedModulo('ALL');
+          setSelectedModulo('TODOS');
           notify("consultando todas las columnas", 'success');              
         }).catch(resp =>{
           console.error('Error al cargar los datos de columnas para todos los sistemas', error);
@@ -57,7 +57,7 @@ const ColumnasPage: React.FC = () => {
     try {
       setColumnas([]);
       let dataMod= null;
-      if(!!selectedSistema && selectedSistema !== 'ALL'){
+      if(!!selectedSistema && selectedSistema !== 'TODOS'){
         dataMod=  await serviceModulo.fetchModuloByClave(selectedSistema);
       }else{
         dataMod=  await serviceModulo.fetchModulos();
@@ -65,8 +65,8 @@ const ColumnasPage: React.FC = () => {
       
       if(!!dataMod && dataMod.length>0){
         console.log("respuesta modulos para sistema {}: {}",selectedSistema,dataMod);
-        setModulos(['ALL', ...Array.from(new Set(dataMod.map(obj => obj?.mod_clave)))]);
-        setSelectedModulo('ALL');
+        setModulos(['TODOS', ...Array.from(new Set(dataMod.map(obj => obj?.mod_clave)))]);
+        setSelectedModulo('TODOS');
         
         serviceColumna.fetchColumnaByCveSistema(selectedSistema).then(resp =>{
           console.log(resp);
@@ -78,8 +78,8 @@ const ColumnasPage: React.FC = () => {
         });
         
       }else{
-        setModulos(['ALL']);
-        setSelectedModulo('ALL');
+        setModulos(['TODOS']);
+        setSelectedModulo('TODOS');
       }
     
       
@@ -94,14 +94,14 @@ const ColumnasPage: React.FC = () => {
   useEffect(() => {
     setColumnas([]);
     setModulos([]);
-    if (!!selectedSistema && selectedSistema !== 'ALL') {
+    if (!!selectedSistema && selectedSistema !== 'TODOS') {
       fetchDataMOduloByClaveSis();
       
     } else {
       console.log("consultando all columnas");
           serviceColumna.fetchColumnas().then(resp => {
             setColumnas(resp);    
-            setSelectedModulo('ALL');
+            setSelectedModulo('TODOS');
             notify("consultando todas las columnas", 'success');             
           }).catch(resp =>{
             console.error('Error al cargar los datos de columnas todos los sistemas', error);
@@ -113,7 +113,7 @@ const ColumnasPage: React.FC = () => {
 
   const consultaCols = () => {
     setColumnas([]);
-      if(!!selectedSistema && selectedSistema !=='ALL'){
+      if(!!selectedSistema && selectedSistema !=='TODOS'){
         console.log("consultando columnas por sistema: "+selectedSistema);
         
           console.log("consultando columnas por sistema: "+selectedSistema +' y modulo: '+selectedModulo);
@@ -139,7 +139,7 @@ const ColumnasPage: React.FC = () => {
 
   const handleSistemaSelect = (sistema: string | null) => {
     setSelectedSistema(sistema);
-    setSelectedModulo('ALL');
+    setSelectedModulo('TODOS');
     
   };
 
@@ -285,7 +285,7 @@ const ColumnasPage: React.FC = () => {
       />
       <Box mb={2}>
       <Autocomplete
-                    options={['ALL', ...Array.from(new Set(sistemas.map(sistema => sistema.sis_clave)))]}
+                    options={['TODOS', ...Array.from(new Set(sistemas.map(sistema => sistema.sis_clave)))]}
                     onChange={(_event, value) => handleSistemaSelect(value)}
                     value = {selectedSistema}
                     renderInput={(params) => <TextField {...params} label={selectedSistema} variant="outlined" />} // Aplicamos la propiedad sx a TextField
@@ -295,7 +295,7 @@ const ColumnasPage: React.FC = () => {
       <Autocomplete
                     options={modulos}
                     onChange={(_event, value) => handleModuloSelect(value)}
-                    disabled={selectedSistema === 'ALL'}
+                    disabled={selectedSistema === 'TODOS'}
                     value = {selectedModulo}
                     renderInput={(params) => <TextField {...params} label={selectedModulo} variant="outlined" />} // Aplicamos la propiedad sx a TextField
                 />

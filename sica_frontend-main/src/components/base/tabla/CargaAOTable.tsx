@@ -116,7 +116,7 @@ const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => 
         </TableBody>
         </Table>    
             <TablePagination
-              rowsPerPageOptions={[5, 10, 50, { value: -1, label: 'All' }]}
+              rowsPerPageOptions={[5, 10, 50, { value: -1, label: 'TODOS' }]}
               component="div"
               count={sortedData?.length}
               rowsPerPage={rowsPerPage}

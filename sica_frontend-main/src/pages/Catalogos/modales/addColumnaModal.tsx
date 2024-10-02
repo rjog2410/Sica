@@ -71,7 +71,7 @@ const AddColumnaModal: React.FC<AddColumnaModalProps> = ({ open, onClose, onSave
 
 
   useEffect(() => {
-    if (claveSistema && claveSistema !== 'ALL') {
+    if (claveSistema && claveSistema !== 'TODOS') {
       fetchDataMOduloByClaveSistema();     
     } else {      
       setModulos([]);
