@@ -127,6 +127,8 @@ const ConciliacionSaldosPage: React.FC = () => {
                         value={filtros?.fecha_informacion}
                         onChange={(e) => handleFiltroChange('fecha_informacion', e?.target?.value || '')}
                         variant="outlined"
+                        InputLabelProps={{ shrink: true }}
+
                         label={"Fecha"}
                     />
                 </Grid>
