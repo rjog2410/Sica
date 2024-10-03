@@ -93,7 +93,6 @@ public class ColumnasController {
         return response;
     }
 
-    @SuppressWarnings("unused")
     @Transactional
     @PostMapping("/catalogos/columnas/create")
     public Map<String, Object> create_titulos(@RequestBody @Valid ColumnasValidateEntity columnasEntity) {
@@ -120,7 +119,6 @@ public class ColumnasController {
         return response;
     }
 
-    @SuppressWarnings("unused")
     @Transactional
     @PostMapping("/catalogos/columnas/update")
     public Map<String, Object> update_titulos(@RequestBody @Valid ColumnasValidateEntity columnasEntity) {

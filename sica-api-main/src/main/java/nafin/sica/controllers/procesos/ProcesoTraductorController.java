@@ -54,8 +54,8 @@ public class ProcesoTraductorController {
             sp.registerStoredProcedureParameter("fecha_final", String.class, ParameterMode.IN);
             sp.registerStoredProcedureParameter("saldos", String.class, ParameterMode.IN);
             sp.registerStoredProcedureParameter("movimientos", String.class, ParameterMode.IN);
-            sp.setParameter("sistema", (String) data.get("sistema"));
-            sp.setParameter("modulo", (String) data.get("modulo"));
+            sp.setParameter("sistema", data.get("sistema").equals("Todos") ? "%" : (String) data.get("sistema"));
+            sp.setParameter("modulo", data.get("modulo").equals("Todos") ? "%" : (String) data.get("modulo"));
             sp.setParameter("fecha_inicial", formatter.format(date_inicial));
             sp.setParameter("fecha_final", formatter.format(date_final));
             sp.setParameter("saldos", tipo_info.equals("S") ? "S" : "N");

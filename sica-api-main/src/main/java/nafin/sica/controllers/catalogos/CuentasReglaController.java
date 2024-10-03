@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import nafin.sica.persistence.dto.CuentasReglaDto;
 import nafin.sica.persistence.dto.ModulesFilterDto;
 import nafin.sica.persistence.dto.SistemFilterDto;
 import nafin.sica.persistence.entity.CuentasConciliaEntity;
@@ -76,7 +75,7 @@ public class CuentasReglaController {
     public Map<String, Object> get_all() {
         Map<String, Object> response = new HashMap<>();
         try {
-            //List<CuentasReglaDto> CuentasRegla = cuentasConciliaRepository.findAllDto();
+            // List<CuentasReglaDto> CuentasRegla = cuentasConciliaRepository.findAllDto();
             List<CuentasConciliaEntity> CuentasRegla = cuentasConciliaRepository.findAllCuentas();
             response = responseService.buildJsonResponseObject(CuentasRegla);
         } catch (Exception e) {
@@ -93,6 +92,7 @@ public class CuentasReglaController {
             if (utils.isNullOrEmpty(cuc_mod_sis_clave)) {
                 return response = responseService.buildJsonErrorValidateString();
             }
+            // List<CuentasReglaDto> cuentasRegla = cuentasConciliaRepository.get_by_cuc_sis_clave(cuc_mod_sis_clave);
             List<CuentasConciliaEntity> cuentasRegla = cuentasConciliaRepository.get_by_cuc_sis_clave(cuc_mod_sis_clave);
             response = responseService.buildJsonResponseObject(cuentasRegla);
         } catch (Exception e) {
@@ -110,6 +110,8 @@ public class CuentasReglaController {
             if (utils.isNullOrEmpty(cuc_mod_clave) || utils.isNullOrEmpty(cuc_mod_sis_clave)) {
                 return response = responseService.buildJsonErrorValidateString();
             }
+            // List<CuentasReglaDto> cuentasRegla = cuentasConciliaRepository.get_by_cuc_mod_clave(cuc_mod_sis_clave,
+            //         cuc_mod_clave);
             List<CuentasConciliaEntity> cuentasRegla = cuentasConciliaRepository.get_by_cuc_mod_clave(cuc_mod_sis_clave,
                     cuc_mod_clave);
             response = responseService.buildJsonResponseObject(cuentasRegla);

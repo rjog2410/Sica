@@ -10,51 +10,15 @@
 	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
-	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
-		<box>
-			<pen lineWidth="0.5" lineColor="#000000"/>
-			<topPen lineWidth="0.5" lineColor="#000000"/>
-			<leftPen lineWidth="0.5" lineColor="#000000"/>
-			<bottomPen lineWidth="0.5" lineColor="#000000"/>
-			<rightPen lineWidth="0.5" lineColor="#000000"/>
-		</box>
-	</style>
-	<style name="Table_CH" mode="Opaque" backcolor="#BFE1FF">
-		<box>
-			<pen lineWidth="0.5" lineColor="#000000"/>
-			<topPen lineWidth="0.5" lineColor="#000000"/>
-			<leftPen lineWidth="0.5" lineColor="#000000"/>
-			<bottomPen lineWidth="0.5" lineColor="#000000"/>
-			<rightPen lineWidth="0.5" lineColor="#000000"/>
-		</box>
-	</style>
-	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
-		<box>
-			<pen lineWidth="0.5" lineColor="#000000"/>
-			<topPen lineWidth="0.5" lineColor="#000000"/>
-			<leftPen lineWidth="0.5" lineColor="#000000"/>
-			<bottomPen lineWidth="0.5" lineColor="#000000"/>
-			<rightPen lineWidth="0.5" lineColor="#000000"/>
-		</box>
-	</style>
-	<dataset name="Detallesds" uuid="9d7e1b5f-ebb5-46bb-9e12-a434053402da">
-		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<dataset name="Dataset1" uuid="8e733a02-70d3-4e54-bbdd-8bf271061410">
 		<query language="sql"><![CDATA[]]></query>
-		<field name="ENTE" class="java.lang.String"/>
-		<field name="ENTE_NOMBRE" class="java.lang.String"/>
-		<field name="IMPORTE_SIF" class="java.lang.String"/>
-		<field name="IMPORTE_AO" class="java.lang.String"/>
-		<field name="DIFERENCIA" class="java.lang.String"/>
-		<field name="CUENTA" class="java.lang.String"/>
-		<field name="SCTA1" class="java.lang.String"/>
-		<field name="SCTA2" class="java.lang.String"/>
-		<field name="SCTA3" class="java.lang.String"/>
-		<field name="SCTA4" class="java.lang.String"/>
 	</dataset>
 	<parameter name="fecha_principal" class="java.lang.String"/>
 	<parameter name="fecha_proceso" class="java.lang.String"/>
 	<parameter name="hora_proceso" class="java.lang.String"/>
 	<parameter name="imgLogo" class="java.io.InputStream"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String"/>
+	<parameter name="Parameter1" class=""/>
 	<query language="sql"><![CDATA[]]></query>
 	<field name="SISTEMA" class="java.lang.String"/>
 	<field name="MODULO" class="java.lang.String"/>
@@ -62,17 +26,13 @@
 	<field name="MONEDA" class="java.math.BigDecimal"/>
 	<field name="NOMBRE_OFICINA" class="java.lang.String"/>
 	<field name="NOMBRE_MONEDA" class="java.lang.String"/>
-	<field name="detalles" class="java.util.List"/>
-	<field name="TOTAL_SIF" class="java.lang.String"/>
-	<field name="TOTAL_AO" class="java.lang.String"/>
-	<field name="TOTAL_DIF" class="java.lang.String"/>
-	<field name="CUENTA" class="java.lang.String"/>
-	<field name="SCTA1" class="java.lang.String"/>
-	<field name="SCTA2" class="java.lang.String"/>
-	<field name="SCTA3" class="java.lang.String"/>
-	<field name="SCTA4" class="java.lang.String"/>
-	<group name="Group1" startNewPage="true">
-		<expression><![CDATA[$F{SISTEMA} + $F{MODULO} + $F{OFICINA} + $F{MONEDA}+$F{CUENTA}+$F{SCTA1}+$F{SCTA2}+$F{SCTA3}+$F{SCTA4}]]></expression>
+	<field name="CUENTA_BASE" class="java.lang.String"/>
+	<field name="subcuentas" class="java.util.List"/>
+	<field name="TOTAL_AO_CUENTA" class="java.lang.String"/>
+	<field name="TOTAL_DIF_CUENTA" class="java.lang.String"/>
+	<field name="TOTAL_SIF_CUENTA" class="java.lang.String"/>
+	<group name="Grupo Encabezado" startNewPage="true">
+		<expression><![CDATA[$F{SISTEMA} + $F{MODULO} + $F{OFICINA} + $F{MONEDA}]]></expression>
 		<groupHeader>
 			<band height="80">
 				<element kind="rectangle" uuid="1eb6a34b-9a8b-477f-8319-d15aa503755c" x="0" y="0" width="572" height="69"/>
@@ -109,18 +69,31 @@
 			</band>
 		</groupHeader>
 		<groupFooter>
-			<band height="45">
-				<element kind="textField" uuid="3dee8ad2-193c-48c8-8e68-887948e9905d" x="438" y="0" width="100" height="30" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[$F{TOTAL_SIF}]]></expression>
+			<band height="45"/>
+		</groupFooter>
+	</group>
+	<group name="GrupoCuentas" startNewPage="true">
+		<expression><![CDATA[$F{SISTEMA} + $F{MODULO} + $F{OFICINA} + $F{MONEDA}+$F{CUENTA_BASE}]]></expression>
+		<groupHeader>
+			<band height="30">
+				<element kind="textField" uuid="0556d62c-9b29-4d51-a516-10f35e2d027c" x="0" y="0" width="244" height="30" fontSize="11.0" bold="true" hTextAlign="Left" vTextAlign="Middle">
+					<expression><![CDATA["CUENTA : "+$F{CUENTA_BASE}]]></expression>
 				</element>
-				<element kind="textField" uuid="bc6d8057-5b5e-42e5-9d26-bf603998b85b" x="538" y="0" width="112" height="30" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[$F{TOTAL_AO}]]></expression>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="58">
+				<element kind="textField" uuid="aed9cc9a-7e7f-43d1-ac89-b508b4723930" x="244" y="0" width="147" height="30" fontSize="12.0" bold="true" hTextAlign="Left" vTextAlign="Middle">
+					<expression><![CDATA["TOTAL CUENTA : "+$F{CUENTA_BASE}]]></expression>
 				</element>
-				<element kind="textField" uuid="189cb7f9-3e36-44a4-9569-742e51f1fdd6" x="650" y="0" width="100" height="30" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[$F{TOTAL_DIF}]]></expression>
+				<element kind="textField" uuid="adbec313-df91-4433-a215-0883428318cb" x="420" y="0" width="130" height="30" bold="true" hTextAlign="Right" vTextAlign="Middle">
+					<expression><![CDATA[$F{TOTAL_SIF_CUENTA}]]></expression>
 				</element>
-				<element kind="textField" uuid="182f44ac-a5f2-4757-8502-a1341ccb3d0e" x="258" y="0" width="180" height="30" bold="true" hTextAlign="Center" vTextAlign="Middle">
-					<expression><![CDATA["TOTAL CUENTA: "+$F{CUENTA}+"-"+$F{SCTA1}+"-"+$F{SCTA2}+"-"+$F{SCTA3}+"-"+$F{SCTA4}]]></expression>
+				<element kind="textField" uuid="bed26b46-392f-4dda-91f2-8276428cd180" x="660" y="0" width="90" height="30" bold="true" hTextAlign="Right" vTextAlign="Middle">
+					<expression><![CDATA[$F{TOTAL_DIF_CUENTA}]]></expression>
+				</element>
+				<element kind="textField" uuid="e3934a42-efb3-4a2f-bd53-7d655af5842f" x="550" y="0" width="110" height="30" bold="true" hTextAlign="Right" vTextAlign="Middle">
+					<expression><![CDATA[$F{TOTAL_AO_CUENTA}]]></expression>
 				</element>
 			</band>
 		</groupFooter>
@@ -159,100 +132,12 @@
 		</element>
 	</pageHeader>
 	<detail>
-		<band height="66" splitType="Stretch">
-			<element kind="component" uuid="ca856ff9-1d93-4569-ba72-43166f9f2c7f" x="0" y="0" width="749" height="60">
-				<component kind="table">
-					<datasetRun uuid="348443bd-d5be-4bfc-bc9e-6a46f17155e1" subDataset="Detallesds">
-						<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{detalles})
-]]></dataSourceExpression>
-					</datasetRun>
-					<column kind="single" uuid="a7558a96-d5fe-4889-92e0-e4b256ca6dbf" width="140">
-						<columnHeader height="30" rowSpan="1" style="Table_CH">
-							<element kind="staticText" uuid="bf28872f-9f94-4b18-af8b-00fe76abdaea" x="0" y="0" width="140" height="30" bold="true" hTextAlign="Center" vTextAlign="Middle">
-								<text><![CDATA[CUENTA]]></text>
-							</element>
-						</columnHeader>
-						<detailCell height="30" style="Table_TD">
-							<element kind="textField" uuid="4348baf6-e5f0-422e-85c0-65cb88c7055f" x="0" y="0" width="140" height="30">
-								<expression><![CDATA[$F{CUENTA} + "-" + $F{SCTA1} + "-" + $F{SCTA2} + "-" + $F{SCTA3} + "-" + $F{SCTA4}]]></expression>
-							</element>
-						</detailCell>
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
-					</column>
-					<column kind="single" uuid="78cc19fc-1446-452a-b2a4-3247351db7d7" width="80">
-						<columnHeader height="30" rowSpan="1" style="Table_CH">
-							<element kind="staticText" uuid="a9d750f1-2f5b-4e0f-a4f7-5bebac856409" x="0" y="0" width="80" height="30" bold="true" hTextAlign="Center" vTextAlign="Middle">
-								<text><![CDATA[ENTE]]></text>
-							</element>
-						</columnHeader>
-						<detailCell height="30" style="Table_TD">
-							<element kind="textField" uuid="85411165-2863-48f6-aa01-08b6cef329cb" x="0" y="0" width="80" height="30" hTextAlign="Center" vTextAlign="Middle">
-								<expression><![CDATA[$F{ENTE}]]></expression>
-							</element>
-						</detailCell>
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
-					</column>
-					<column kind="single" uuid="b96307c6-e3dc-4e35-8d49-f50fc3b66bf5" width="220">
-						<columnHeader height="30" rowSpan="1" style="Table_CH">
-							<element kind="staticText" uuid="594ddb74-0642-42a2-a60c-7867210e7b55" x="0" y="0" width="220" height="30" bold="true" hTextAlign="Center" vTextAlign="Middle">
-								<text><![CDATA[NOMBRE ENTE]]></text>
-							</element>
-						</columnHeader>
-						<detailCell height="30" style="Table_TD">
-							<element kind="textField" uuid="3af47e36-4bee-4dda-b6bc-a8433e75c379" x="0" y="0" width="220" height="30" hTextAlign="Center" vTextAlign="Middle">
-								<expression><![CDATA[$F{ENTE_NOMBRE}]]></expression>
-							</element>
-						</detailCell>
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
-					</column>
-					<column kind="single" uuid="42fc2873-4c64-41dc-9a77-768d4487fc03" width="100">
-						<columnHeader height="30" rowSpan="1" style="Table_CH">
-							<element kind="staticText" uuid="c99d6429-d8b4-44f6-bdf3-8acafde1218e" x="0" y="0" width="100" height="30" bold="true" hTextAlign="Center" vTextAlign="Middle">
-								<text><![CDATA[CONTABILIDAD]]></text>
-							</element>
-						</columnHeader>
-						<detailCell height="30" style="Table_TD">
-							<element kind="textField" uuid="5dfdfe52-7965-47d7-9bc2-f5e59ef86fdc" x="0" y="0" width="100" height="30" hTextAlign="Right" vTextAlign="Middle">
-								<expression><![CDATA[$F{IMPORTE_SIF}]]></expression>
-							</element>
-						</detailCell>
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
-					</column>
-					<column kind="single" uuid="4699ee53-0150-48f7-b66d-6ae85369b508" width="110">
-						<columnHeader height="30" rowSpan="1" style="Table_CH">
-							<element kind="staticText" uuid="da1d8f85-d799-4d4b-9ffe-bee3d86ca364" x="0" y="0" width="110" height="30" bold="true" hTextAlign="Center" vTextAlign="Middle">
-								<text><![CDATA[AREA OPERATIVA]]></text>
-							</element>
-						</columnHeader>
-						<detailCell height="30" style="Table_TD">
-							<element kind="textField" uuid="8314386e-a658-49e2-9b5e-ae4a1a97f035" x="0" y="0" width="110" height="30" hTextAlign="Right" vTextAlign="Middle">
-								<expression><![CDATA[$F{IMPORTE_AO}]]></expression>
-							</element>
-						</detailCell>
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column5"/>
-					</column>
-					<column kind="single" uuid="718b8e5e-49b6-4c11-b81f-63b4f185c815" width="100">
-						<columnHeader height="30" rowSpan="1" style="Table_CH">
-							<element kind="staticText" uuid="4a9d8794-a604-4c0a-9023-dab9b4d70ea1" x="0" y="0" width="100" height="30" bold="true" hTextAlign="Center" vTextAlign="Middle">
-								<text><![CDATA[DIFERENCIA]]></text>
-							</element>
-						</columnHeader>
-						<detailCell height="30" style="Table_TD">
-							<element kind="textField" uuid="8a66ad7f-e992-4a9b-b210-0d02e1a1a48b" x="0" y="0" width="100" height="30" hTextAlign="Right" vTextAlign="Middle">
-								<expression><![CDATA[$F{DIFERENCIA}]]></expression>
-							</element>
-						</detailCell>
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column6"/>
-					</column>
-				</component>
-				<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
-				<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
-				<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
-				<property name="com.jaspersoft.studio.table.style.detail" value="Table_TD"/>
+		<band height="151" splitType="Stretch">
+			<element kind="subreport" uuid="0db50687-ad6c-4a04-95f9-af59ecb5d55f" x="0" y="0" width="750" height="140">
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{subcuentas})]]></dataSourceExpression>
+				<expression><![CDATA[$P{SUBREPORT_DIR} + "ReporteEntesV2.jasper"
+]]></expression>
 			</element>
 		</band>
 	</detail>
-	<columnFooter height="45" splitType="Stretch"/>
-	<pageFooter height="54" splitType="Stretch"/>
-	<summary height="42" splitType="Stretch"/>
 </jasperReport>

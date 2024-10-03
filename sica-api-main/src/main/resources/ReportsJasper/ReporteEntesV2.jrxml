@@ -1,5 +1,5 @@
 <!-- Created with Jaspersoft Studio version 7.0.0.final using JasperReports Library version 7.0.0-b478feaa9aab4375eba71de77b4ca138ad2f62aa  -->
-<jasperReport name="Blank_Letter_Landscape" language="java" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a40b78d1-1c3e-4747-a4e2-11a6edb4cae0">
+<jasperReport name="Blank_Letter_Landscape" language="java" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="792" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="a40b78d1-1c3e-4747-a4e2-11a6edb4cae0">
 	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
 		<box>
 			<pen lineWidth="0.5" lineColor="#000000"/>
@@ -46,13 +46,13 @@
 		<expression><![CDATA[$F{SUBCUENTA_BASE}]]></expression>
 		<groupHeader>
 			<band height="32">
-				<element kind="textField" uuid="4216ae66-3521-45a1-b267-d81385557b95" x="0" y="0" width="230" height="30" fontSize="11.0" bold="true" hTextAlign="Left" vTextAlign="Middle">
-					<expression><![CDATA[$F{SUBCUENTA_BASE}]]></expression>
+				<element kind="textField" uuid="4216ae66-3521-45a1-b267-d81385557b95" x="0" y="0" width="250" height="30" fontSize="11.0" bold="true" hTextAlign="Left" vTextAlign="Middle">
+					<expression><![CDATA[ "SUBCUENTA: "+$F{SUBCUENTA_BASE}]]></expression>
 				</element>
 			</band>
 		</groupHeader>
 		<groupFooter>
-			<band height="50">
+			<band height="32">
 				<element kind="textField" uuid="d9e4f0f5-7877-415d-9ad2-daf7bd1e42f6" x="620" y="0" width="130" height="30" hTextAlign="Right" vTextAlign="Middle">
 					<expression><![CDATA[$F{TOTAL_DIF_TABLA}]]></expression>
 				</element>

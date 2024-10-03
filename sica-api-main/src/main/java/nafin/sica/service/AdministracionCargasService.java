@@ -36,7 +36,6 @@ public class AdministracionCargasService {
     String msg = null;
     boolean validate = false;
 
-    @SuppressWarnings("null")
     public Map<String, Object> get_carga_operativa(Map<String, Object> data, String origin) {
         Map<String, Object> response = new HashMap<>();
         try {

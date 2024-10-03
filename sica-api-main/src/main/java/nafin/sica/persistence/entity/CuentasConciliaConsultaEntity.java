@@ -1,13 +1,16 @@
 package nafin.sica.persistence.entity;
 
+import java.time.LocalDate;
+
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,11 +23,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "sica_cuentas_concilia")
-public class CuentasConciliaEntity {
+public class CuentasConciliaConsultaEntity {
     @Id
-    @GeneratedValue
-    private Integer cuc_clave;
-    @NotBlank
     private String cuc_mod_sis_clave;
     @NotBlank
     private String cuc_mod_clave;
@@ -38,20 +38,15 @@ public class CuentasConciliaEntity {
     private String cuc_scta3;
     @NotBlank
     private String cuc_scta4;
-    private String cuc_scta5;
-    private String cuc_scta6;
-    private String cuc_scta7;
     @NotNull
     private Integer cuc_tipo_ente;
     @NotNull
     private Integer cuc_ente;
-    @Size(max = 1)
-    @Pattern(regexp = "^[SN]$")
-    private String cuc_consolida_ente;
-    @Size(max = 1)
-    @Pattern(regexp = "^[SN]$")
-    private String cuc_inc_saldo;
-    @Size(max = 1)
-    @Pattern(regexp = "^[SN]$")
-    private String cuc_inc_movs;
+    @NotNull
+    private Integer oficina;
+    @NotNull
+    private Integer moneda;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    private LocalDate con_fecha;
 }

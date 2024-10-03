@@ -54,6 +54,7 @@ public class Utils {
 
     }
 
+
     public boolean isNullOrEmpty(String value) {
         try {
             if (value == null || value.equals("")) {
@@ -79,7 +80,7 @@ public class Utils {
     }
 
     public String format_moneda(Double value) {
-        DecimalFormat formato = new DecimalFormat("#,###,###,###,###.00");
+        DecimalFormat formato = new DecimalFormat("#,###,###,###,##0.00");
         return formato.format(value);
     }
 

@@ -52,15 +52,22 @@ public class ReporteController {
     @PostMapping("/reportes/reporte")
     ResponseEntity<Resource> get_report(@RequestBody Map<String, Object> data) {
         try {
+            Map<String, Object> validate = reportService.validate_data(data);
+            if (validate.get("status").equals("Error")) {
+                return ResponseEntity.badRequest().build();
+            }
             List<Map<String, Object>> listData = reportService.get_list_report(data);
+            if (listData.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
             String url_file = "";
             String file_name = "";
-            if (data.get("agrupacion").equals("cuenta")) {
+            if (data.get("agrupacion").equals("Cuenta")) {
                 url_file = "classpath:ReportsJasper/ReporteSaldos.jasper";
                 file_name = "ReporteCuentas.pdf";
             } else {
-                url_file = "classpath:ReportsJasper/ReporteSaldosEnteV3.jasper";
-                file_name = "ReporteEntesV3.pdf";
+                url_file = "classpath:ReportsJasper/ReporteSaldosEnte.jasper";
+                file_name = "ReporteEntes.pdf";
             }
             final File file = ResourceUtils.getFile(url_file);
             final File imgLogo = ResourceUtils.getFile("classpath:images/LogoNafin.png");
@@ -71,7 +78,9 @@ public class ReporteController {
             parameters.put("fecha_proceso", utils.fecha_actual());
             parameters.put("hora_proceso", utils.hora_actual());
             parameters.put("imgLogo", new FileInputStream(imgLogo)); // Añadir el logotipo como parámetro
-            parameters.put("SUBREPORT_DIR", getClass().getResource("/ReportsJasper/").toString()); // Ruta al directorio de subreportes
+            parameters.put("SUBREPORT_DIR", getClass().getResource("/ReportsJasper/").toString()); // Ruta al directorio
+                                                                                                   // de subreportes
+
             JRDataSource dataSource = new JRBeanCollectionDataSource(listData);
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, dataSource);
@@ -87,8 +96,6 @@ public class ReporteController {
                     .headers(headers).body(new ByteArrayResource(reporte));
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
 
