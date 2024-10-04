@@ -332,7 +332,7 @@ public class ConsultasService {
             query.setParameter("fecha", cuenta.getCon_fecha().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
             return query.getResultList();
         } catch (Exception e) {
-            // System.out.println(e.getMessage());
+            System.out.println(e.getMessage());
             msg = e.getMessage();
             status = "Error";
             List<Object[]> error = new ArrayList<>();

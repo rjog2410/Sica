@@ -1,4 +1,4 @@
-import React, {useState, useMemo, useEffect} from 'react';
+import React, {useState, useMemo, useEffect, useRef} from 'react';
 import {
     Autocomplete,
     Box,
@@ -31,15 +31,21 @@ const ConciliacionSaldosPage: React.FC = () => {
     const [data, setData] = useState({
         sistemas: [],
         modulos: [],
-        info:[]
+        info: []
     })
+
+    const tableRef = useRef<any>(null);
 
     useEffect(() => {
         fetchSistemas().then(resp => {
-            fetchMonedas().then( respCurr => {
-                fetchOficinas().then( offices => {
+            fetchMonedas().then(respCurr => {
+                fetchOficinas().then(offices => {
                     setData({...data, sistemas: resp, monedas: respCurr, oficinas: offices})
-                    setFiltros({...filtros, oficina: offices?.find(office => office?.clave_particular === 90)||0 , moneda: respCurr?.find(coin => coin?.mon_clave === 1) || 0})
+                    setFiltros({
+                        ...filtros,
+                        oficina: offices?.find(office => office?.clave_particular === 90) || 0,
+                        moneda: respCurr?.find(coin => coin?.mon_clave === 1) || 0
+                    })
                 })
             })
         })
@@ -60,22 +66,26 @@ const ConciliacionSaldosPage: React.FC = () => {
     };
 
 
-    const searchSaldos = ()=>{
+    const searchSaldos = () => {
         if (!!filtros?.oficina && !!filtros?.moneda) {
-            console.log("Filtros: ",filtros)
-            fetchReporteConciliacionSaldos({...filtros,oficina:filtros.oficina.clave_particular,moneda:filtros.moneda.mon_clave}).then(resp => {
-                if(resp?.status !== 200){
-                    notify(resp?.message,"error")
+            console.log("Filtros: ", filtros)
+            fetchReporteConciliacionSaldos({
+                ...filtros,
+                oficina: filtros.oficina.clave_particular,
+                moneda: filtros.moneda.mon_clave
+            }).then(resp => {
+                if (resp?.status !== 200) {
+                    notify(resp?.message, "error")
                 }
-                if(resp?.status === 200){
-                   setData({...data, info: resp?.data})
+                if (resp?.status === 200) {
+                    setData({...data, info: resp?.data})
                 }
             })
-        }else{
-            if(!filtros?.oficina || !filtros?.moneda){
+        } else {
+            if (!filtros?.oficina || !filtros?.moneda) {
                 notify("Los campos de oficina y moneda son requeridos", "error")
                 notify("Buscando con valores por defecto", "warning")
-                fetchReporteConciliacionSaldos({...filtros,oficina:90,moneda:1}).then(resp => {
+                fetchReporteConciliacionSaldos({...filtros, oficina: 90, moneda: 1}).then(resp => {
                     console.log("Response: ", resp)
                 })
             }
@@ -88,8 +98,18 @@ const ConciliacionSaldosPage: React.FC = () => {
     };
 
     const handleExportFile = () => {
-        // Implementar la lógica para exportar por sistema
-        console.log('Generando archivo por sistema con filtros:', filtros);
+        if (tableRef.current) {
+            try {
+                const exportResult = tableRef.current.exportToExcel();
+                if (exportResult instanceof Promise) {
+                    exportResult.catch((error) => {
+                        console.error('Error al exportar a Excel:', error);
+                    });
+                }
+            } catch (error) {
+                console.error('Error al exportar a Excel:', error);
+            }
+        }
     };
 
     return (
@@ -108,17 +128,19 @@ const ConciliacionSaldosPage: React.FC = () => {
                         options={Array.from(new Set(data?.sistemas?.map(sistema => sistema?.sis_clave)))}
                         onChange={(_event, value) => handleFiltroChange('sistema', value || '')}
                         value={filtros?.sistema}
-                        renderInput={(params) => <TextField {...params} label={"Sistema"} variant="outlined"/>} // Aplicamos la propiedad sx a TextField
+                        renderInput={(params) => <TextField {...params} label={"Sistema"}
+                                                            variant="outlined"/>} // Aplicamos la propiedad sx a TextField
                     />
                 </Grid>
                 <Grid item xs={6}>
                     <Autocomplete
                         aria-placeholder={"Modulo"}
-                        options={data?.modulos?.length > 0 ? ["TODOS",...Array.from(new Set(data?.modulos?.map(modulo => modulo?.mod_clave)))] : []}
+                        options={data?.modulos?.length > 0 ? ["TODOS", ...Array.from(new Set(data?.modulos?.map(modulo => modulo?.mod_clave)))] : []}
                         onChange={(_event, value) => handleFiltroChange('modulo', value || '')}
                         value={filtros?.modulo}
                         disabled={data?.modulos?.length <= 0}
-                        renderInput={(params) => <TextField {...params} label={"Modulos"} variant="outlined"/>} // Aplicamos la propiedad sx a TextField
+                        renderInput={(params) => <TextField {...params} label={"Modulos"}
+                                                            variant="outlined"/>} // Aplicamos la propiedad sx a TextField
                     />
                 </Grid>
                 <Grid item xs={3}>
@@ -127,7 +149,7 @@ const ConciliacionSaldosPage: React.FC = () => {
                         value={filtros?.fecha_informacion}
                         onChange={(e) => handleFiltroChange('fecha_informacion', e?.target?.value || '')}
                         variant="outlined"
-                        InputLabelProps={{ shrink: true }}
+                        InputLabelProps={{shrink: true}}
 
                         label={"Fecha"}
                     />
@@ -135,7 +157,7 @@ const ConciliacionSaldosPage: React.FC = () => {
                 <Grid item xs={3}>
                     <Autocomplete
                         aria-placeholder={"Oficina"}
-                        options={data?.oficinas?.length > 0 ? ["TODOS",...Array.from(new Set(data?.oficinas?.map(oficina => oficina)))] : []}
+                        options={data?.oficinas?.length > 0 ? ["TODOS", ...Array.from(new Set(data?.oficinas?.map(oficina => oficina)))] : []}
                         onChange={(_event, value) => handleFiltroChange('oficina', value || '')}
                         value={filtros?.oficina}
                         disabled={data?.oficinas?.length <= 0}
@@ -148,7 +170,7 @@ const ConciliacionSaldosPage: React.FC = () => {
                 <Grid item xs={3}>
                     <Autocomplete
                         aria-placeholder={"Monedas"}
-                        options={data?.monedas?.length > 0 ? ["TODOS",...Array.from(new Set(data?.monedas?.map(moneda => moneda)))] : []}
+                        options={data?.monedas?.length > 0 ? ["TODOS", ...Array.from(new Set(data?.monedas?.map(moneda => moneda)))] : []}
                         onChange={(_event, value) => handleFiltroChange('moneda', value || '')}
                         value={filtros?.moneda}
                         disabled={data?.monedas?.length <= 0}
@@ -162,27 +184,31 @@ const ConciliacionSaldosPage: React.FC = () => {
                     <Button variant="contained" color="primary" onClick={searchSaldos} sx={{mr: 1}}>
                         Buscar
                     </Button>
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={handleExportFile}
+                        disabled={!data?.info.length} // Deshabilitar si no hay datos filtrados
+                        sx={{ml: 2}}
+                    >
+                        Exportar excel
+                    </Button>
                 </Grid>
             </Grid>
-            <ConciliacionTable data={data?.info} filtros={filtros}/>
+            <ConciliacionTable
+                ref={tableRef}
+                data={data?.info}
+                />
             <Box mt={2}>
-                <Button
+                {/*<Button
                     variant="contained"
                     color="primary"
                     onClick={handleExportModule}
                     disabled={!data?.info.length} // Deshabilitar si no hay datos filtrados
                 >
                     Generar Módulo
-                </Button>
-                <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={handleExportFile}
-                    disabled={!data?.info.length} // Deshabilitar si no hay datos filtrados
-                    sx={{ml: 2}}
-                >
-                    Generar Archivo
-                </Button>
+                </Button>*/}
+
             </Box>
         </Box>
     );

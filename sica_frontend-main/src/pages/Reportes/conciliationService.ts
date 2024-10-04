@@ -1,6 +1,6 @@
 import axios from "axios";
 import {ReporteConciliacion, ReporteConciliacionFiltros} from "./interfaces";
-import {ConciliacionCuenta} from "@/types.ts";
+import {ConciliacionCuenta, ConciliacionCuentaDetalle} from "@/types.ts";
 
 const BASE_URL = 'http://localhost:8080';
 
@@ -41,5 +41,11 @@ export const fetchMonedas = async (): Promise<{ clave: string }[]> => {
 // Obtener el listado de oficinas
 export const fetchOficinas = async (): Promise<{ clave: string }[]> => {
     const response = await axios.post(`${BASE_URL}/consultas/catalogos/oficinas`);
+    return response.data.data;
+};
+
+// Obtener el listado de oficinas
+export const fetchDetailConcilia = async (searchParams :ConciliacionCuentaDetalle): Promise<{ clave: string }[]> => {
+    const response = await axios.post(`${BASE_URL}/consultas/conciliacion_saldos/get_detail`, searchParams);
     return response.data.data;
 };

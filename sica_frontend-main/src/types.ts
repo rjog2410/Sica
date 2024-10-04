@@ -255,7 +255,6 @@ export interface  ConciliacionCuentaDetalle {
   cuc_scta2: number,
   cuc_scta3: number,
   cuc_scta4: number,
-  con_fecha_carga: string,
   cuc_tipo_ente: number,
   cuc_ente: number,
 }
