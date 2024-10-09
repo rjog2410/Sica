@@ -92,11 +92,12 @@ public class ResponseDtoService {
     // return response;
     // }
 
-    // // 400 error en la recepcion de datos
-    // public ResponseDto buildJsonErrorValidateObject(Map<String, Object> data) {
-    // ResponseDto response = new ResponseDto();
-    // response.setStatus(400);
-    // response.setMessage("Datos incompletos ó incorrectos, favor de validar.");
-    // return response;
-    // }
+    // 400 error en la recepcion de datos
+    public ResponseDto buildJsonErrorValidateObject(Object object) {
+    ResponseDto response = new ResponseDto();
+    response.setData(object);
+    response.setStatus(400);
+    response.setMessage("Datos incompletos ó incorrectos, favor de validar.");
+    return response;
+    }
 }

@@ -39,7 +39,7 @@ public class Login extends HttpServlet {
         String user = null;
         try {
             // configuración para local
-            // ssoUserInfo = "JCARIAS";
+            //ssoUserInfo = "JCARIAS";
             // Configuración producción
             ssoUserInfo = sso.getSSOUserInfo(request, response);
 
@@ -58,7 +58,7 @@ public class Login extends HttpServlet {
                 //String urlEnvio = "https://" + request.getServerName() + ":" + request.getServerPort()
                        // + "/sicader/login?xzc=" + convertT + "&user=" + user;
                 // Configuración para local
-                String urlEnvio="http://localhost:3000/sicader/login?xzc="+convertT;
+                String urlEnvio="http://localhost:3000/sica/login?xzc="+convertT;
                 response.sendRedirect(urlEnvio);
             }
             System.out.println("Termino login===");

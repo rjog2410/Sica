@@ -10,17 +10,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import nafin.sica.jwt.JwtUtils;
-import nafin.sica.persistence.entity.SesionEntity;
 import nafin.sica.persistence.entity.UserEntity;
 import nafin.sica.persistence.repositories.SesionRepository;
 import nafin.sica.persistence.repositories.UserRepository;
 import nafin.sica.service.JwtService;
-import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.util.JRLoader;
+import nafin.sica.service.SesionService;
 
 @RestController
+@AllArgsConstructor
 @RequiredArgsConstructor
 public class TestController {
     // @Value("${jwt.time.expiration}")
@@ -31,33 +31,29 @@ public class TestController {
     @Autowired
     private JwtUtils jwtUtils;
 
-    private final JwtService jwtService;
+    // private final JwtService jwtService;
+
+
+    @Autowired
+    private SesionService sesionService;
+
+
+    @Autowired
+    JwtService jwtService;
 
     @GetMapping("/test/index")
     public String index() {
-        String username = "EOLMOSPE";
-        UserEntity sicaUser = null;
-        // Optional<SicaUser> userOptional = userRepository.getClaveUser(username);
-        Optional<UserEntity> userOptional2 = userRepository.findUserEntityByUsername(username);
-        // if(userOptional.isPresent()){
-        // sicaUser = userOptional.get();
-        // }else{
-        // return "no se encuentra el usuario";
-        // }
-        if (userOptional2.isPresent()) {
-            sicaUser = userOptional2.get();
-        } else {
-            return "no se encuentra el usuario";
-        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String token = (String) authentication.getCredentials();
 
-        System.out.println(sicaUser);
+        String id = jwtService.getIdFromToken(token);
 
-        return sicaUser.getUsername();
+        return id;
     }
 
     @GetMapping("/test/create_test")
     public String index_two() {
-        String username = "JCARIAS";
+        String username = "MGARCIA";
         // String token = create_user(username);
         // return token;
 
@@ -81,7 +77,7 @@ public class TestController {
 
     @GetMapping("/test/create_test2")
     public String index_three() {
-        String username = "JCARIAS";
+        String username = "MGARCIA";
         // String token = create_user(username);
         // return token;
         String token = "";
@@ -95,10 +91,7 @@ public class TestController {
             // .id_rol(1)
             // .build();
             // userRepository.save(sicaUser);
-            SesionEntity sesionEntity = SesionEntity.builder().username(username).build();
-            sesionRepository.save(sesionEntity);
-            System.out.println(sesionEntity.getId());
-            token = jwtService.getToken(sesionEntity.getId());
+            token = sesionService.createTokenSesion(username);
         } catch (Exception e) {
             return "Ocurrio un error:";
         }

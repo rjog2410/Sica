@@ -72,14 +72,25 @@ public class AdministracionBatchService {
 
     private void validate_data() {
         try {
-            batchRepository.delete_batch(proceso);
+            LocalDate now = LocalDate.now();
+            batchRepository.delete_batch(now);
             String val_movs = null;
             String val_saldos = null;
+
+            if (proceso.equals("SICAP001")) {
+                borrar = null;
+            }
+            if (utils.isNullOrEmpty(sistema) || sistema.equals("TODOS"))
+                sistema = "%";
+            if (utils.isNullOrEmpty(modulo) || modulo.equals("TODOS"))
+                modulo = "%";
             if (!proceso.equals("SICAP004")) {
                 val_movs = "M".equals(tipo_info) ? "S" : "N";
                 val_saldos = "S".equals(val_movs) ? "N" : "S";
+            } else {
+                sistema = null;
+                modulo = null;
             }
-            LocalDate now = LocalDate.now();
             BatchID batchId = BatchID.builder().nom_proceso(proceso).fecha(now).build();
             BatchEntity batchEntity = BatchEntity.builder().id(batchId).par_modulo(modulo).par_sistema(sistema)
                     .par_borrar(borrar).par_fecha_fin(utils.get_date(fecha_fin)).par_movtos(val_movs)
@@ -128,42 +139,32 @@ public class AdministracionBatchService {
                         break;
                     }
                 }
-
-                if (utils.isNullOrEmpty(sistema)) {
+                if (utils.isNullOrEmpty(borrar)) {
                     status = "Error";
-                    msg = "El sistema no puede ser nulo.";
-                    return;
-                } else if (utils.isNullOrEmpty(modulo)) {
-                    status = "Error";
-                    msg = "El modulo no puede ser nulo.";
+                    msg = "La opción borrado no puede ser nulo.";
                     return;
                 } else {
-                    if (utils.isNullOrEmpty(borrar)) {
+                    String regex1 = "^[SN]$";
+                    if (!Pattern.matches(regex1, borrar)) {
                         status = "Error";
-                        msg = "La opción borrado no puede ser nulo.";
+                        msg = "Borrar información sólo debe contener un carácter entre 'S' o 'N'.";
                         return;
-                    } else {
-                        String regex1 = "^[SN]$";
-                        if (!Pattern.matches(regex1, borrar)) {
-                            status = "Error";
-                            msg = "Borrar información sólo debe contener un carácter entre 'S' o 'N'.";
-                            return;
-                        }
-                    }
-
-                    if (utils.isNullOrEmpty(tipo_info)) {
-                        status = "Error";
-                        msg = "El tipo de información no puede ser nulo.";
-                        return;
-                    } else {
-                        String regex = "^[SM]$";
-                        if (!Pattern.matches(regex, tipo_info)) {
-                            status = "Error";
-                            msg = "El tipo de información debe contener sólo 1 carácter entre 'S' o 'M'.";
-                            return;
-                        }
                     }
                 }
+
+                if (utils.isNullOrEmpty(tipo_info)) {
+                    status = "Error";
+                    msg = "El tipo de información no puede ser nulo.";
+                    return;
+                } else {
+                    String regex = "^[SM]$";
+                    if (!Pattern.matches(regex, tipo_info)) {
+                        status = "Error";
+                        msg = "El tipo de información debe contener sólo 1 carácter entre 'S' o 'M'.";
+                        return;
+                    }
+                }
+
             }
             if (utils.isNullOrEmpty(fecha_ini) || utils.isNullOrEmpty(fecha_fin)) {
                 status = "Error";

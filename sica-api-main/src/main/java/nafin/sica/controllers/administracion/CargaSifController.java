@@ -34,6 +34,7 @@ public class CargaSifController {
     public Map<String, Object> get_carga_sif(@RequestBody Map<String, Object> data) {
         Map<String, Object> response = new HashMap<>();
         try {
+            // Thread.sleep(5000);
             response = administracionService.get_carga_operativa(data, "sif");
             if (response.get("status").equals("OK")) {
                 response = responseService.buildJsonResponseObject(response.get("data"));

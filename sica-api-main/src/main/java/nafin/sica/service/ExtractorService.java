@@ -28,7 +28,7 @@ public class ExtractorService {
             if (utils.isNullOrEmpty(sistema)) {
                 status = "Error";
                 msg = "El campo sistema no puede ir vacio";
-            } else if (utils.isNullOrEmpty(modulo)) {
+            } else if (!sistema.equals("TODOS") && utils.isNullOrEmpty(modulo)) {
                 status = "Error";
                 msg = "El campo modulo no puede ir vacio";
             } else if (utils.isNullOrEmpty(fecha_inicial)) {

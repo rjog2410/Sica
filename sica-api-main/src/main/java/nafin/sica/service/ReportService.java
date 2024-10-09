@@ -140,20 +140,29 @@ public class ReportService {
                                                                                         .replace(",", ""))
                                                                         + (importeSif - importeAo)));
 
+                                        if (object.get("TOTAL_AO").equals("-0.00"))
+                                                object.put("TOTAL_AO", "0.00");
+                                        if (object.get("TOTAL_DIF").equals("-0.00"))
+                                                object.put("TOTAL_DIF", "0.00");
+                                        if (object.get("TOTAL_SIF").equals("-0.00"))
+                                                object.put("TOTAL_SIF", "0.00");
+
                                         detail.put("CUENTA", resultado[6]);
                                         detail.put("NOMBRE_CUENTA", resultado[7]);
-                                        detail.put("IMPORTE_SIF", detail.get("IMPORTE_SIF") == null ? importeSif
+                                        detail.put("IMPORTE_SIF", detail.get("IMPORTE_SIF") == null
+                                                        ? utils.format_moneda(importeSif)
                                                         : utils.format_moneda(Double
                                                                         .parseDouble(detail.get("IMPORTE_SIF")
                                                                                         .toString().replace(",", ""))
                                                                         + importeSif));
-                                        detail.put("IMPORTE_AO", detail.get("IMPORTE_AO") == null ? importeAo
+                                        detail.put("IMPORTE_AO", detail.get("IMPORTE_AO") == null
+                                                        ? utils.format_moneda(importeAo)
                                                         : utils.format_moneda(Double
                                                                         .parseDouble(detail.get("IMPORTE_AO").toString()
                                                                                         .replace(",", ""))
                                                                         + importeAo));
                                         detail.put("DIFERENCIA", detail.get("DIFERENCIA") == null
-                                                        ? (importeSif - importeAo)
+                                                        ? utils.format_moneda((importeSif - importeAo))
                                                         : utils.format_moneda(Double
                                                                         .parseDouble(detail.get("DIFERENCIA").toString()
                                                                                         .replace(",", ""))
@@ -340,6 +349,13 @@ public class ReportService {
                                                                                                         .replace(",", ""))
                                                                                         + (importeSif - importeAo)));
 
+                                        if (map_subcuenta.get("TOTAL_SIF_TABLA").equals("-0.00"))
+                                                map_subcuenta.put("TOTAL_SIF_TABLA", "0.00");
+                                        if (map_subcuenta.get("TOTAL_AO_TABLA").equals("-0.00"))
+                                                map_subcuenta.put("TOTAL_AO_TABLA", "0.00");
+                                        if (map_subcuenta.get("TOTAL_DIF_TABLA").equals("-0.00"))
+                                                map_subcuenta.put("TOTAL_DIF_TABLA", "0.00");
+
                                         // contenedor de las cuentas
                                         object.put("CUENTA_BASE", resultado[6].toString());
                                         object.put("TOTAL_SIF_CUENTA", object.get("TOTAL_SIF_CUENTA") == null
@@ -360,7 +376,13 @@ public class ReportService {
                                                                         .parseDouble(object.get("TOTAL_DIF_CUENTA")
                                                                                         .toString().replace(",", ""))
                                                                         + (importeSif - importeAo)));
-
+                                        if (object.get("TOTAL_SIF_CUENTA").equals("-0.00"))
+                                                object.put("TOTAL_SIF_CUENTA", "0.00");
+                                        if (object.get("TOTAL_AO_CUENTA").equals("-0.00"))
+                                                object.put("TOTAL_AO_CUENTA", "0.00");
+                                        if (object.get("TOTAL_DIF_CUENTA").equals("-0.00"))
+                                                object.put("TOTAL_DIF_CUENTA", "0.00");
+                                        // if()
                                         if (!ente_before.equals(ente_current)) {
                                                 entes_list.add(new HashMap<>(entes));
                                                 entes.clear();
@@ -399,13 +421,11 @@ public class ReportService {
                 modulo = (String) data.get("modulo");
                 fecha = (String) data.get("fecha");
                 if (utils.isNullOrEmpty(sistema)) {
-                        status = "Error";
-                        msg = "El sistema no puede ser nulo.";
+                        sistema = "TODOS";
 
                 }
-                if (utils.isNullOrEmpty(modulo)) {
-                        status = "Error";
-                        msg = "El Módulo no puede ser nulo.";
+                if (utils.isNullOrEmpty(modulo) || sistema.equals("TODOS")) {
+                        modulo = "TODOS";
                 }
                 if (utils.isNullOrEmpty(fecha)) {
                         status = "Error";

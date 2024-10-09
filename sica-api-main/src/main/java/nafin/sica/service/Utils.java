@@ -5,6 +5,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties.Jwt;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
@@ -80,7 +83,7 @@ public class Utils {
     }
 
     public String format_moneda(Double value) {
-        DecimalFormat formato = new DecimalFormat("#,###,###,###,##0.00");
+        DecimalFormat formato = new DecimalFormat("###,###,###,###,###,###,##0.00");
         return formato.format(value);
     }
 
@@ -95,5 +98,17 @@ public class Utils {
         DateTimeFormatter formatter_time = DateTimeFormatter.ofPattern("hh:mm:ss");
         return hora_proceso_time.format(formatter_time);
     }
+
+    // public Long sessionJwt(){
+    //     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+    //     Long id = null;
+
+    //     if(authentication.getPrincipal() instanceof Jwt){
+    //         Jwt jwt = (Jwt) authentication.getPrincipal();
+    //          id = jwt.getClaim("id");
+    //     }   
+
+    // }
 
 }

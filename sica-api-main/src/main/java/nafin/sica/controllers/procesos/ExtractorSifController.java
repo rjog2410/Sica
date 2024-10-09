@@ -44,6 +44,7 @@ public class ExtractorSifController {
     public Map<String, Object> get_extractor(@RequestBody Map<String, Object> data) {
         Map<String, Object> response = new HashMap<>();
         try {
+            // Thread.sleep(5000);
             response = extractorService.validate_data(data, "extractor");
             if (!response.get("status").equals("OK")) {
                 return response = responseService.buildJsonErrorValidateResponse((String) response.get("message"));

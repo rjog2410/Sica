@@ -24,7 +24,7 @@ public interface BatchRepository extends CrudRepository<BatchEntity, BatchID>{
 
     @Modifying
     @Transactional
-    @Query("delete from BatchEntity b where b.procesado = 'S' and b.id.nom_proceso = ?1")
-    void delete_batch(String proceso);
+    @Query("delete from BatchEntity b where b.id.fecha <> ?1")
+    void delete_batch(LocalDate now);
     
 }

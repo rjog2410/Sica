@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.chermansolutions.oracle.sso.partnerapp.beans.SSOEnablerJspBean;
-@WebServlet(urlPatterns = "/logout")
+@WebServlet(urlPatterns = "/logoff")
 public class Logout extends HttpServlet{
 
      SSOEnablerJspBean sso = new SSOEnablerJspBean();
@@ -30,7 +30,7 @@ public class Logout extends HttpServlet{
             //response.sendRedirect("https://"+ request.getServerName()+":"+request.getServerPort()+"/sicader-api/init");
             response.sendRedirect(logoutURL+"?p_done_url="+urlinit+"/init");
         } catch(Exception e) {
-            // e.printStackTrace();
+            e.printStackTrace();
             System.out.println("**error:"+e);
         }
     }

@@ -10,6 +10,7 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,10 +21,14 @@ import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import nafin.sica.persistence.dto.ModuloReporteDto;
 import nafin.sica.persistence.dto.ModulosCatalogosDto;
+import nafin.sica.persistence.dto.ResponseDto;
+import nafin.sica.persistence.dto.SistemDto;
+import nafin.sica.persistence.dto.SistemFilterDto;
 import nafin.sica.persistence.entity.ModulosEntity;
 import nafin.sica.persistence.repositories.ColumnasRepository;
 import nafin.sica.persistence.repositories.ModuloRepository;
 import nafin.sica.persistence.repositories.SistemasRepository;
+import nafin.sica.service.ResponseDtoService;
 import nafin.sica.service.ResponseService;
 import nafin.sica.service.Utils;
 
@@ -43,6 +48,9 @@ public class ModulosController {
 
     @Autowired
     Utils utils;
+
+    @Autowired
+    ResponseDtoService responseDtoService;
 
     String mod_sis_clave = null;
     String mod_clave = null;
@@ -159,4 +167,27 @@ public class ModulosController {
         }
         return response;
     }
+
+    @PostMapping("/catalogos/modulos/get_sistems_create")
+    public ResponseEntity<ResponseDto> get_sistems_create() {
+        try {
+            List<SistemDto> sistemOptional = sistemasRepository.findAllBySisClaveOnlyName();
+            return ResponseEntity.ok().body(responseDtoService.buildJsonResponseObject(sistemOptional));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(responseDtoService.buildJsonErrorResponse(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/catalogos/modulos/get_sistems")
+    public ResponseEntity<ResponseDto> get_sistems() {
+        try {
+            List<SistemFilterDto> ListSistem = moduloRepository.getSistemFilter();
+            return ResponseEntity.ok().body(responseDtoService.buildJsonResponseObject(ListSistem));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(responseDtoService.buildJsonErrorResponse(e.getMessage()));
+        }
+    }
+
+
+
 }

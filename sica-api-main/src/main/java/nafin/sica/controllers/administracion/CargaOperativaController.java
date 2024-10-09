@@ -34,6 +34,7 @@ public class CargaOperativaController {
     public Map<String, Object> get_carga_operativa(@RequestBody Map<String, Object> data) {
         Map<String, Object> response = new HashMap<>();
         try {
+            // Thread.sleep(5000);
             response = administracionService.get_carga_operativa(data,"Operativa");
             if (response.get("status").equals("OK")) {
                 response = responseService.buildJsonResponseObject(response.get("data"));

@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import nafin.sica.persistence.dto.ColumnasDto;
+import nafin.sica.persistence.dto.ModulesFilterDto;
+import nafin.sica.persistence.dto.SistemFilterDto;
 import nafin.sica.persistence.entity.ColumnasEntity;
 import nafin.sica.persistence.entity.ColumnasId;
 import nafin.sica.persistence.entity.ColumnasValidateEntity;
@@ -184,4 +186,31 @@ public class ColumnasController {
         return response;
     }
 
+    @PostMapping("/catalogos/columnas/get_sistems_filter")
+    public Map<String, Object> get_sistem_filter() {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            List<SistemFilterDto> sistemFilter = columnasRepository.getSistemFilter();
+            response = responseService.buildJsonResponseObject(sistemFilter);
+        } catch (Exception e) {
+            response = responseService.buildJsonErrorResponse(e.getMessage());
+        }
+        return response;
+    }
+
+    @PostMapping("/catalogos/columnas/get_modules_filter")
+    public Map<String, Object> get_modules_filter(@RequestBody Map<String, Object> data) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            tit_mod_sis_clave = (String) data.get("sis_clave");
+            if (utils.isNullOrEmpty(tit_mod_sis_clave)) {
+                return response = responseService.buildJsonErrorValidateString();
+            }
+            List<ModulesFilterDto> modulosFilter = columnasRepository.getModulesFilter(tit_mod_sis_clave);
+            response = responseService.buildJsonResponseObject(modulosFilter);
+        } catch (Exception e) {
+            response = responseService.buildJsonErrorResponse(e.getMessage());
+        }
+        return response;
+    }
 }

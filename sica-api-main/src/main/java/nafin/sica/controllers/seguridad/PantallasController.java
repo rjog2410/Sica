@@ -1,9 +1,5 @@
 package nafin.sica.controllers.seguridad;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
@@ -17,8 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
 import nafin.sica.persistence.dto.ResponseDto;
-import nafin.sica.persistence.entity.PantallasEntity;
+import nafin.sica.persistence.dto.ValidationsDto.DeleteAllDto;
+import nafin.sica.persistence.dto.ValidationsDto.DeleteIdDto;
+import nafin.sica.persistence.dto.ValidationsDto.PantallaRequestDto;
 import nafin.sica.persistence.repositories.PantallaRepository;
+import nafin.sica.service.PantallaService;
 import nafin.sica.service.ResponseDtoService;
 import nafin.sica.service.Utils;
 
@@ -35,86 +34,34 @@ public class PantallasController {
     @Autowired
     Utils utils;
 
+    @Autowired
+    PantallaService pantallaService;
+
     @PostMapping("/seguridad/pantallas/create")
-    public ResponseEntity<ResponseDto> create(@RequestBody @Valid PantallasEntity pantalla) {
-        ResponseDto response = new ResponseDto();
-        try {
-            pantallaRepository.save(pantalla);
-            response = responseDtoService.buildJsonResponse();
-        } catch (Exception e) {
-            response = responseDtoService.buildJsonErrorResponse(e.getMessage());
-        }
-        return ResponseEntity.ok().body(response);
+    public ResponseEntity<ResponseDto> create(@RequestBody @Valid PantallaRequestDto pantalla) {
+        return ResponseEntity.ok().body(pantallaService.create(pantalla));
     }
 
     @PostMapping("/seguridad/pantallas/update")
-    public ResponseEntity<ResponseDto> update(@RequestBody @Valid PantallasEntity pantalla) {
-        ResponseDto response = new ResponseDto();
-        response.setStatus(200);
-        try {
-            if (utils.isNullOrZero(pantalla.getId())) {
-                response = responseDtoService.buildJsonErrorValidateResponse("El Id no debe ser nulo.");
-            } else {
-                Optional<PantallasEntity> pantallaUpdate = pantallaRepository.findById(pantalla.getId());
-                if (pantallaUpdate.isPresent()) {
-                    pantallaRepository.save(pantalla);
-                    response = responseDtoService.buildJsonResponse();
-                } else {
-                    response = responseDtoService.buildJsonErrorValidateResponse("No existe Menu con el Id enviado.");
-                }
-            }
-        } catch (Exception e) {
-            response = responseDtoService.buildJsonErrorResponse(e.getMessage());
-        }
-        return ResponseEntity.ok().body(response);
+    public ResponseEntity<ResponseDto> update(@RequestBody @Valid PantallaRequestDto pantalla) {
+        return ResponseEntity.ok().body(pantallaService.update(pantalla));
     }
 
     @Transactional
     @PostMapping("/seguridad/pantallas/delete")
-    public ResponseEntity<ResponseDto> delete(@RequestBody Map<String, Integer> data) {
-        ResponseDto response = new ResponseDto();
-        response.setStatus(200);
-        try {
-            if (utils.isNullOrZero(data.get("id"))) {
-                response = responseDtoService.buildJsonErrorValidateResponse("El Id no debe ser nulo.");
-            } else {
-                Optional<PantallasEntity> pantOptional = pantallaRepository.findById(data.get("id"));
-                if (pantOptional.isPresent()) {
-                    pantallaRepository.deleteById(data.get("id"));
-                    response = responseDtoService.buildJsonResponse();
-                } else {
-                    response = responseDtoService
-                            .buildJsonErrorValidateResponse("No existe Pantalla con el Id enviado.");
-                }
-            }
-        } catch (Exception e) {
-            response = responseDtoService.buildJsonErrorResponse(e.getMessage());
-        }
-        return ResponseEntity.ok().body(response);
+    public ResponseEntity<ResponseDto> delete(@RequestBody @Valid DeleteIdDto id) {
+        return ResponseEntity.ok().body(pantallaService.delete(id));
     }
 
     @Transactional
     @PostMapping("/seguridad/pantallas/delete_all")
-    public ResponseEntity<ResponseDto> delete_all(@RequestBody Map<String, List<Integer>> data) {
-        ResponseDto response = new ResponseDto();
-        response.setStatus(200);
-        try {
-            if (data.get("ids") == null) {
-                response = responseDtoService.buildJsonErrorValidateResponse("El Id no debe ser nulo.");
-            } else {
-                List<PantallasEntity> pantallas = (List<PantallasEntity>) pantallaRepository
-                        .findAllById(data.get("ids"));
-                if (pantallas.size() != data.get("ids").size()) {
-                    response = responseDtoService.buildJsonErrorValidateResponse("Uno o más Ids no son válidos");
-                } else {
-                    pantallaRepository.deleteAllById(data.get("ids"));
-                    response = responseDtoService.buildJsonResponse();
-                }
-            }
-        } catch (Exception e) {
-            response = responseDtoService.buildJsonErrorResponse(e.getMessage());
-        }
-        return ResponseEntity.ok().body(response);
+    public ResponseEntity<ResponseDto> delete_all(@RequestBody @Valid DeleteAllDto ids) {
+        return ResponseEntity.ok().body(pantallaService.delete_all(ids));
+    }
+
+    @PostMapping("/seguridad/pantallas/get")
+    public ResponseEntity<ResponseDto> getPantallas(){
+        return ResponseEntity.ok().body(pantallaService.get_pantallas_with_menu());
     }
 
 }

@@ -39,6 +39,7 @@ public class CanastaEntity {
     private String can_c6;
     private String can_c7;
     private String can_c8;
+    private String can_c9;
     private String can_c10;
     private String can_c11;
     private String can_c12;

@@ -6,8 +6,11 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -16,6 +19,7 @@ import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nafin.sica.persistence.entity.SesionEntity;
+import nafin.sica.persistence.entity.UserEntity;
 import nafin.sica.persistence.repositories.SesionRepository;
 
 @Service
@@ -29,23 +33,16 @@ public class JwtService {
     private final SesionRepository sesionRepository;
 
     public String getToken(Long Id) {
-        return Jwts.builder()
-                .setId(Long.toString(Id))
-                .setIssuedAt(new Date(System.currentTimeMillis()))
+        return Jwts.builder().setId(Long.toString(Id)).setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + Long.parseLong(TimeExpiration)))
-                .signWith(Secret_Key)
-                .compact();
+                .signWith(Secret_Key).compact();
     }
 
     // Validar Token de Acceso
     public boolean isTokenValid(String Token) {
 
         try {
-            Jwts.parserBuilder()
-                    .setSigningKey(Secret_Key)
-                    .build()
-                    .parseClaimsJws(Token)
-                    .getBody();
+            Jwts.parserBuilder().setSigningKey(Secret_Key).build().parseClaimsJws(Token).getBody();
 
             return true;
         } catch (Exception e) {
@@ -54,13 +51,10 @@ public class JwtService {
         }
     }
 
+    @Transactional(readOnly = true)
     public boolean isTokenValidFull(String Token, UserDetails userDetails) {
         try {
-            Jwts.parserBuilder()
-                    .setSigningKey(Secret_Key)
-                    .build()
-                    .parseClaimsJws(Token)
-                    .getBody();
+            Jwts.parserBuilder().setSigningKey(Secret_Key).build().parseClaimsJws(Token).getBody();
             SesionEntity sesionEntity = null;
             final String id_user = getIdFromToken(Token);
             Optional<SesionEntity> userSesion = sesionRepository.findById(Long.parseLong(id_user));
@@ -69,7 +63,8 @@ public class JwtService {
             } else {
                 return false;
             }
-            String username = sesionEntity.getUsername();
+            UserEntity user = sesionEntity.getUser();
+            String username = user.getUsername();
             return (username.equals(userDetails.getUsername()) && !isTokenExpired(Token));
         } catch (Exception e) {
             log.error("Token Inválido , error: ".concat(e.getMessage()));
@@ -79,14 +74,8 @@ public class JwtService {
 
     // Obtener Claims
     public Claims getAllClaims(String Token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(Secret_Key)
-                .build()
-                .parseClaimsJws(Token)
-                .getBody();
+        return Jwts.parserBuilder().setSigningKey(Secret_Key).build().parseClaimsJws(Token).getBody();
     }
-
-
 
     public String getIdFromToken(String token) {
         return getClaim(token, Claims::getId);
@@ -104,6 +93,17 @@ public class JwtService {
 
     private boolean isTokenExpired(String token) {
         return getExpiration(token).before(new Date());
+    }
+
+    @SuppressWarnings("unused")
+    public String getIdSession() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String token = (String) authentication.getCredentials();
+
+        String id = getIdFromToken(token);
+
+        return id;
+
     }
 
 }

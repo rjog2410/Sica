@@ -14,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -21,8 +22,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nafin.sica.persistence.entity.SesionEntity;
 import nafin.sica.persistence.repositories.SesionRepository;
+import nafin.sica.persistence.repositories.UserRepository;
 import nafin.sica.service.JwtService;
-import nafin.sica.service.SesionService;
 import nafin.sica.service.UserDetailServiceImpl;
 
 @Component
@@ -34,34 +35,37 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailServiceImpl userDetailServiceImpl;
     // @Autowired
     private final JwtService jwtService;
-    private final SesionService sesionService;
     private final SesionRepository sesionRepository;
+
+    @Autowired
+    UserRepository userRepository;
 
     @SuppressWarnings("null")
     @Override
+    @Transactional(readOnly = true)
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
         final String token = getTokenFromRequest(request);
 
-        /*if (token == null || !jwtService.isTokenValid(token)) {
+        if (token == null || !jwtService.isTokenValid(token)) {
             filterChain.doFilter(request, response);
-            Integer udpate = sesionService.closeSesion();
-            log.info("Se han cerrado - " + Integer.toString(udpate) + " sesiones.");
+            // Integer udpate = sesionService.closeSesion();
+            // log.info("Se han cerrado - " + Integer.toString(udpate) + " sesiones.");
             return;
         }
 
         final String id_user = jwtService.getIdFromToken(token);
         Optional<SesionEntity> sesionOptional = sesionRepository.findById(Long.parseLong(id_user));
         SesionEntity sesionEntity = null;
+        String username = "";
         if (sesionOptional.isPresent()) {
             sesionEntity = sesionOptional.get();
+            username = sesionEntity.getUser().getUsername();
         } else {
             filterChain.doFilter(request, response);
             return;
         }
-        String username = sesionEntity.getUsername();
-
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             try {
                 UserDetails userDetail = userDetailServiceImpl.loadUserByUsername(username);
@@ -75,13 +79,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-        }*/
+        }
 
         filterChain.doFilter(request, response);
 
     }
 
-    private String getTokenFromRequest(HttpServletRequest request) {
+    public String getTokenFromRequest(HttpServletRequest request) {
 
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 

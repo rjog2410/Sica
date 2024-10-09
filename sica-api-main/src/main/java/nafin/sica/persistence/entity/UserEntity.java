@@ -1,14 +1,15 @@
 package nafin.sica.persistence.entity;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -16,6 +17,8 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,18 +30,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "sica_usuarios", uniqueConstraints = { @UniqueConstraint(columnNames = { "usu_clave" }) })
+@Table(name = "sica_users", uniqueConstraints = { @UniqueConstraint(columnNames = { "usu_clave" }) })
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_usuario")
+    @Column(name = "id_user")
     Integer id;
     @NotBlank
     @Column(name = "usu_clave")
-    @NotBlank
     @Size(max = 20)
     String username;
-    @NotBlank
     @Column(name = "usu_nombre")
     @Size(max = 40)
     String nombre;
@@ -51,7 +52,7 @@ public class UserEntity {
     @Column(name = "usu_transferencia")
     @Size(max = 1)
     String transferencia;
-    
+
     @PrePersist
     @PreUpdate
     public void onSave() {
@@ -59,9 +60,26 @@ public class UserEntity {
         username = username.toUpperCase();
     }
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_usuario")
-    private List<RolesUsuariosEntity> rolesUsuarios;
+    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference // Agregar esta anotación para evitar referencias circulares en la serialización JSON
+    @Builder.Default // Agregar esta línea
+    private Set<RolesUsersEntity> rolUsers = new HashSet<>();
 
+    @OneToMany(mappedBy = "userPantalla", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference // Agregar esta anotación para evitar referencias circulares en la serialización JSON
+    @Builder.Default // Agregar esta línea
+    private Set<UserPantallaEntity> UserPantalla = new HashSet<>();
+
+    // Relación con SesionEntity
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference // Para evitar referencia circular
+    @Builder.Default
+    private Set<SesionEntity> sesiones = new HashSet<>();
+
+
+    // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    // @JsonManagedReference // Agregar esta anotación para evitar referencias circulares en la serialización JSON
+    // @Builder.Default
+    // private Set<SesionEntity> sesiones = new HashSet<>();
 
 }

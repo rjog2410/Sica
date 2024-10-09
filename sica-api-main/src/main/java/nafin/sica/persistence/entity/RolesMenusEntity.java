@@ -12,17 +12,16 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
 @AllArgsConstructor
+@Builder
 @Entity
-@Table(name = "sica_roles_usuarios")
-public class RolesUsuariosEntity {
-
+@Table(name = "sica_rol_menu")
+public class RolesMenusEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_rol_usuario")
+    @Column(name = "id_rol_menu")
     private Integer id;
+    private Integer id_menu;
     private Integer id_rol;
-    private Integer id_usuario;
 
 }

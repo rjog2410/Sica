@@ -24,6 +24,11 @@ public class BatchEntity {
 
     @EmbeddedId
     BatchID id;
+    // @NotBlank(message = "La fecha no debe ser nulo")
+    // private LocalDate fecha;
+    // @Id
+    // @NotBlank(message = "El proceso no puede ser nulo")
+    // private String nom_proceso;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate par_fecha_ini;

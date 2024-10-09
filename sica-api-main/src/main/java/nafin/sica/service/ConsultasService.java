@@ -78,24 +78,57 @@ public class ConsultasService {
         List<ConciliacionSaldosDto> lista = null;
         try {
             if (moneda != null && oficina != null && fecha_carga != null) {
-                lista = conciliacionesRepository.get_by_all(sistema, modulo, fecha_carga, oficina, moneda);
+                if (modulo.equals("TODOS")) {
+                    lista = conciliacionesRepository.get_by_all_modules(sistema, fecha_carga, oficina, moneda);
+                } else {
+                    lista = conciliacionesRepository.get_by_all(sistema, modulo, fecha_carga, oficina, moneda);
+                }
             } else if (moneda != null && oficina != null && fecha_carga == null) {
-                lista = conciliacionesRepository.get_by_sistema_and_modulo_and_moneda_and_oficina(sistema, modulo,
-                        moneda, oficina);
+                if (modulo.equals("TODOS")) {
+                    lista = conciliacionesRepository.get_by_sistema_and_moneda_and_oficina(sistema, moneda, oficina);
+                } else {
+                    lista = conciliacionesRepository.get_by_sistema_and_modulo_and_moneda_and_oficina(sistema, modulo,
+                            moneda, oficina);
+                }
             } else if (moneda != null && oficina == null && fecha_carga != null) {
-                lista = conciliacionesRepository.get_by_sistema_and_modulo_and_fecha_and_moneda(sistema, modulo,
-                        fecha_carga, moneda);
+                if (modulo.equals("TODOS")) {
+                    lista = conciliacionesRepository.get_by_sistema_and_fecha_and_moneda(sistema, fecha_carga, moneda);
+                } else {
+                    lista = conciliacionesRepository.get_by_sistema_and_modulo_and_fecha_and_moneda(sistema, modulo,
+                            fecha_carga, moneda);
+                }
             } else if (moneda == null && oficina != null && fecha_carga != null) {
-                lista = conciliacionesRepository.get_by_sistema_and_modulo_and_fecha_and_oficina(sistema, modulo,
-                        fecha_carga, oficina);
+                if (modulo.equals("TODOS")) {
+                    lista = conciliacionesRepository.get_by_sistema_and_fecha_and_oficina(sistema, fecha_carga,
+                            oficina);
+                } else {
+                    lista = conciliacionesRepository.get_by_sistema_and_modulo_and_fecha_and_oficina(sistema, modulo,
+                            fecha_carga, oficina);
+                }
             } else if (moneda != null && oficina == null && fecha_carga == null) {
-                lista = conciliacionesRepository.get_by_sistema_and_modulo_and_moneda(sistema, modulo, moneda);
+                if (modulo.equals("TODOS")) {
+                    lista = conciliacionesRepository.get_by_sistema_and_moneda(sistema, moneda);
+                } else {
+                    lista = conciliacionesRepository.get_by_sistema_and_modulo_and_moneda(sistema, modulo, moneda);
+                }
             } else if (moneda == null && oficina != null && fecha_carga == null) {
-                lista = conciliacionesRepository.get_by_sistema_and_modulo_and_oficina(sistema, modulo, oficina);
+                if (modulo.equals("TODOS")) {
+                    lista = conciliacionesRepository.get_by_sistema_and_oficina(sistema, oficina);
+                } else {
+                    lista = conciliacionesRepository.get_by_sistema_and_modulo_and_oficina(sistema, modulo, oficina);
+                }
             } else if (moneda == null && oficina == null && fecha_carga != null) {
-                lista = conciliacionesRepository.get_by_sistema_and_modulo_and_fecha(sistema, modulo, fecha_carga);
+                if (modulo.equals("TODOS")) {
+                    lista = conciliacionesRepository.get_by_sistema_and_fecha(sistema, fecha_carga);
+                } else {
+                    lista = conciliacionesRepository.get_by_sistema_and_modulo_and_fecha(sistema, modulo, fecha_carga);
+                }
             } else {
-                lista = conciliacionesRepository.get_by_sistema_and_modulo(sistema, modulo);
+                if (modulo.equals("TODOS")) {
+                    lista = conciliacionesRepository.get_by_sistema(sistema);
+                } else {
+                    lista = conciliacionesRepository.get_by_sistema_and_modulo(sistema, modulo);
+                }
             }
             response.put("data", lista);
         } catch (Exception e) {
@@ -118,26 +151,25 @@ public class ConsultasService {
             }
             modulo = (String) data.get("modulo");
             if (utils.isNullOrEmpty(modulo)) {
-                status = "Error";
-                msg = "El modulo no puede ser nulo.";
-                return;
+                modulo = "TODOS";
             }
             fecha = (String) data.get("fecha_informacion");
-            if (fecha != null && !fecha.equals("")) {
+            if (!utils.isNullOrEmpty(fecha)) {
                 if (!is_validate_date(fecha)) {
                     status = "Error";
                     msg = "Formato de fecha incorrecto";
                     return;
                 }
+                fecha_carga = utils.get_date(fecha);
             }
             moneda = (Integer) data.get("moneda");
-            if (moneda != null && moneda == 0) {
+            if (moneda != null && moneda.equals(0)) {
                 status = "Error";
                 msg = "La moneda no puede ser cero.";
                 return;
             }
             oficina = (Integer) data.get("oficina");
-            if (oficina != null && oficina == 0) {
+            if (oficina != null && oficina.equals(0)) {
                 status = "Error";
                 msg = "La oficina no puede ser cero.";
                 return;
@@ -170,7 +202,7 @@ public class ConsultasService {
         }
         List<String> cabeceras = new ArrayList<>();
         Columnas.forEach(dto -> {
-            cabeceras.add(dto.getTitulo());
+            cabeceras.add(dto.getTitulo().replace(" ", "_"));
         });
         // System.out.println(Columnas);
         // Obtenemos la clave maxima.
@@ -219,6 +251,7 @@ public class ConsultasService {
                 }
             }
         }
+        System.out.println(condicionesMap);
         List<Object[]> ResultFinal = ObtenerDatosFinales(cuenta, condicionesMap, Columnas.size());
         if (ResultFinal.isEmpty()) {
             return response;
@@ -227,7 +260,7 @@ public class ConsultasService {
         for (Object[] resultado : ResultFinal) {
             Map<String, Object> mapaResultado = new HashMap<>();
             Columnas.forEach(dto -> {
-                mapaResultado.put(dto.getTitulo(), resultado[dto.getNum_columnas() - 1]);
+                mapaResultado.put(dto.getTitulo().replace(" ", "_"), resultado[dto.getNum_columnas() - 1]);
             });
             listaResultados.add(mapaResultado);
 
@@ -242,7 +275,7 @@ public class ConsultasService {
         if (condicion.contains("=")) {
             return 1; // significa igualdad
         } else if (condicion.contains("<>")) {
-            return 2; 
+            return 2;
         } else if (condicion.contains("<=")) {
             return 3;
         } else if (condicion.contains("<")) {
@@ -300,13 +333,13 @@ public class ConsultasService {
                 if (part2.equals("1")) {
                     String buffer = "";
                     for (String elemento : valor) {
-                        buffer = buffer.equals("") ? elemento : buffer + " , " + elemento;
+                        buffer = buffer.equals("") ? "'" + elemento + "'" : buffer + " , " + "'" + elemento + "'";
                     }
                     jpql.append(" AND c.can_c" + part1 + " in ( " + buffer + " )");
                 } else if (part2.equals("2")) {
                     String buffer = "";
                     for (String elemento : valor) {
-                        buffer = buffer.equals("") ? elemento : buffer + " , " + elemento;
+                        buffer = buffer.equals("") ? "'" + elemento + "'" : buffer + " , " + "'" + elemento + "'";
                     }
                     jpql.append(" AND c.can_c" + part1 + " not in ( " + buffer + " )");
                 } else if (part2.equals("8")) {
@@ -332,7 +365,7 @@ public class ConsultasService {
             query.setParameter("fecha", cuenta.getCon_fecha().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
             return query.getResultList();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            // System.out.println(e.getMessage());
             msg = e.getMessage();
             status = "Error";
             List<Object[]> error = new ArrayList<>();
