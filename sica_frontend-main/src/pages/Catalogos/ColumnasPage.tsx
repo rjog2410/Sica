@@ -162,7 +162,6 @@ const ColumnasPage: React.FC = () => {
 
         console.log("editando col: ",newColumna);
         serviceColumna.createOrUpdateColumna(newColumna, true).then(resp =>{
-          console.log("respuesta de editando: ",resp);
           if(resp?.data?.status == 200){
             setColumnas(columnas.map((columna) =>
               (columna.numero_columna === editingColumna.numero_columna && columna.clave_sistema === editingColumna.clave_sistema && columna.clave_modulo === editingColumna.clave_modulo) ? newColumna : columna
@@ -179,13 +178,13 @@ const ColumnasPage: React.FC = () => {
         });
         
       } else {
-        console.log("nueva col: ");
+        // console.log("nueva col: ");
         serviceColumna.createOrUpdateColumna(newColumna).then(resp => {
-          console.log("respuesta agregar columna: ",resp);
+          // console.log("respuesta agregar columna: ",resp);
           
           if(resp?.data?.status == 200){
             setColumnas([...columnas, newColumna]);
-            notify(resp?.data?.message, 'success');
+            notify("Columna creada exitosamente.", 'success');
           }else{
             notify( resp?.data?.message, 'info');
           }
@@ -197,7 +196,7 @@ const ColumnasPage: React.FC = () => {
        
       }
     } catch (error) {
-      notify('Error al guardar la columna', 'error');
+      notify('No es posible guardar el registro.', 'error');
     }
     handleCloseModal();
   };
@@ -214,7 +213,6 @@ const ColumnasPage: React.FC = () => {
       notify('Columna no encontrada', 'error');
       return;
     }
-    console.log("columnas a eliminar: "+columnaToDelete);
   
     setConfirmAction(() => async () => {
       try {
@@ -222,7 +220,7 @@ const ColumnasPage: React.FC = () => {
         setColumnas(columnas.filter(columna => columna.numero_columna !== numero_columna));
         notify('Columna eliminada correctamente', 'success');
       } catch (error) {
-        notify('Error al eliminar la columna', 'error');
+        notify('No es posible eliminar el registro.', 'error');
       }
     });
     setConfirmOpen(true);
@@ -235,25 +233,25 @@ const ColumnasPage: React.FC = () => {
   
     setConfirmAction(() => async () => {
       try {
-        console.log("columnas a eliminar: ",columnasToDelete);
+        // console.log("columnas a eliminar: ",columnasToDelete);
         await serviceColumna.deleteMultipleColumnas(columnasToDelete).then(resp =>{
           if(resp.status === 200){
             consultaCols();
             notify(resp.message, 'success');
-            console.log("columnas eliminadoas correctamente");
+            // console.log("columnas eliminadoas correctamente");
           }else{
             notify(resp.message, 'info');
-            console.log("ocurrio un error al eliminar columnas: ",resp.message);
+            // console.log("ocurrio un error al eliminar columnas: ",resp.message);
           }
          
         }).catch(error =>{
           notify(error.response.data.message, 'error');
-          console.log("ocurrio un error al eliminar columnas: ",error.response.data.message);
+          // console.log("ocurrio un error al eliminar columnas: ",error.response.data.message);
         }) 
        
       } catch (error) {
-        notify('Error al eliminar las columnas', 'error');
-        console.log("columnas eliminadoas correctamente");
+        notify('No es posible eliminar los registros.', 'error');
+        // console.log("columnas eliminadoas correctamente");
       }
     });
     setConfirmOpen(true);

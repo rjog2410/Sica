@@ -100,7 +100,7 @@ const ModulosPage: React.FC = () => {
             setModulos(modulos.map((modulo) =>
               modulo.clave_modulo === editingModulo.clave_modulo ? newModulo : modulo
             ));
-            notify('Módulo '+resp.message+' actualizado correctamente', 'success');
+            notify('Módulo actualizado correctamente', 'success');
           } else {
             setModulos([...modulos, newModulo]);
             notify('Módulo agregado correctamente', 'success');
@@ -108,19 +108,19 @@ const ModulosPage: React.FC = () => {
 
         }else{
           notify(resp.message, 'info');
-          console.log("ocurrio un error: ",resp.message);
           setEliminados(0);    
         }
          }).catch(error =>{
-        notify(error.response.data.message, 'error');
+        // notify(error.response.data.message, 'error');
+        notify("No es posible guardar el registro.", 'error');
         setEliminados(0);    
-        console.log("ocurrio un error",error.response.data.message);
+        // console.log("ocurrio un error",error.response.data.message);
       }) 
 
 
       
     } catch (error) {
-      notify('Error al Eliminar el sistema: '+error, 'error');
+      notify('No es posible eliminar el registro.', 'error');
     }
     handleCloseModal();
   };
@@ -132,7 +132,7 @@ const ModulosPage: React.FC = () => {
   };
 
   const handleDeleteModulo = (clave_modulo: string) => {
-    console.log("handleDeleteModulo")
+    // console.log("handleDeleteModulo")
     setConfirmAction(() => async () => {
       try {
         await service.deleteModulo(clave_modulo).then(resp =>{
@@ -142,29 +142,28 @@ const ModulosPage: React.FC = () => {
             setSelectedIds([]);        
           }else{
             notify(resp.message, 'info');
-            console.log("ocurrio un error al eliminar modulo: ",resp.message);
             setEliminados(0);    
             setSelectedIds([]);        
 
           }
            }).catch(error =>{
-          notify(error.response.data.message, 'error');
+          // notify(error.response.data.message, 'error');
+          notify('No es posible eliminar el registro.', 'error');
           setEliminados(0);    
-          console.log("ocurrio un error al eliminar Modulo: ",error.response.data.message);
         }) 
 
     
       } catch (error) {
-        notify('Error al eliminar el módulo', 'error');
+        notify('No es posible eliminar el registro.', 'error');
       }
     });
     setConfirmOpen(true);
   };
 
-console.log(selectedIds);
+// console.log(selectedIds);
   const handleDeleteMultiple = (clave_modulos: string[]) => {
     for (var i=0; i < eliminados; i++) {
-      console.log("---")
+      // console.log("---")
       clave_modulos.shift();
     }
     setConfirmAction(() => async () => {
@@ -176,23 +175,23 @@ console.log(selectedIds);
           setEliminados(clave_modulos.length+eliminados);    
           setSelectedIds([]);        
 
-          console.log("modulos eliminadoas correctamente");
+          // console.log("modulos eliminadoas correctamente");
         }else{
           notify(resp.message, 'info');
-          console.log("ocurrio un error al eliminar modulos: ",resp.message);
+          // console.log("ocurrio un error al eliminar modulos: ",resp.message);
           setEliminados(0);    
           setSelectedIds([]);
 
         }
          }).catch(error =>{
-        notify(error.response.data.message, 'error');
+        // notify(error.response.data.message, 'error');
+        notify('No es posible eliminar los registros.', 'error');
         setEliminados(0);    
-        console.log("ocurrio un error al eliminar columnas: ",error.response.data.message);
       }) 
       
       } catch (error) {
         setEliminados(0);    
-        notify('Error al eliminar los módulos', 'error');
+        notify('No es posible eliminar los registros.', 'error');
       }
     });
     setConfirmOpen(true);
@@ -204,11 +203,11 @@ console.log(selectedIds);
         const exportResult = tableRef.current.exportToExcel();
         if (exportResult instanceof Promise) {
           exportResult.catch((error) => {
-            console.error('Error al exportar a Excel:', error);
+            // console.error('Error al exportar a Excel:', error);
           });
         }
       } catch (error) {
-        console.error('Error al exportar a Excel:', error);
+        // console.error('Error al exportar a Excel:', error);
       }
     }
   };

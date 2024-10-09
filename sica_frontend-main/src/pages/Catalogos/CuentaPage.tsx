@@ -154,7 +154,6 @@ const CuentaPage: React.FC = () => {
     const handleSaveRegla = async (newRegla: Regla) => {
         try {
             if (newRegla.id <= currentReglas?.length) {
-                console.log("Actualizando regla")
                 await service.createOrUpdateRegla(newRegla, false).then(resp => {
                     if (resp?.data?.status === 400) {
                         notify(resp?.data?.message?.msg, 'error');
@@ -162,23 +161,23 @@ const CuentaPage: React.FC = () => {
                         setReglas(reglas.map((regla) =>
                             regla.id === newRegla.id ? newRegla : regla
                         ));
-                        notify(resp?.data?.message?.msg, 'success');
+                        notify("Regla actualizada exitosamente.", 'success');
                     }
                 });
             } else {
-                console.log("Creando regla")
                 await service.createOrUpdateRegla(newRegla, true).then(resp => {
                     if (resp?.data?.status === 400) {
                         notify(resp?.data?.message?.msg, 'error');
                     } else {
                         setReglas([...reglas, newRegla]);
-                        notify(resp?.data?.message?.msg, 'success');
+                        notify("Regla creada exitosamente.", 'success');
                     }
                 });
 
             }
         } catch (error) {
-            notify(error, 'error');
+            // notify(error, 'error');
+            notify('No es posible guardar el registro.', 'error');
         }
 
         getReglas(cuentaInfo?.cuc_clave).then(resp => setCurrentReglas(resp?.map((reg, i) => ({...reg, id: i}))))
@@ -192,11 +191,11 @@ const CuentaPage: React.FC = () => {
                 if (resp?.data?.status === 400) {
                     notify(resp?.data?.message?.msg, 'error');
                 } else {
-                    notify(resp?.data?.message?.msg, 'success');
+                    notify("Formula creada exitosamente.", 'success');
                 }
             });
         } catch (error) {
-            notify('Error al guardar la formula', 'error');
+            notify('No es posible guardar el registro.', 'error');
         }
 
         getFormulas(cuentaInfo?.cuc_clave).then(resp => setCurrentFormulas(resp?.map((form, index) => ({
@@ -223,20 +222,19 @@ const CuentaPage: React.FC = () => {
                 await service.createOrUpdateCuentaRegla(cuenta).then(resp =>{
                     if(resp?.data?.status ===200){
                         setCuentas([...cuentas, cuenta]);
-                        notify(resp?.data?.message, 'success');
+                        notify("Cuenta creada exitosamente.", 'success');
                     }
                 });
             }else{
-                console.log("Updating new account")
                 await updateCuenta(cuenta).then(resp =>{
                     if(resp?.data?.status ===200){
                         setCuentas(cuentas.map(c => (c.cuc_clave === cuenta.cuc_clave ? cuenta : c)));
-                        notify(resp?.data?.message, 'success');
+                        notify("Cuenta actualizada correctamente.", 'success');
                     }
                 });
             }
         } catch (error) {
-            notify('Error al guardar la cuenta', 'error');
+            notify('No es posible guardar el registro.', 'error');
         }
         setIsCuentaModalOpen(false);
         getAllCuentas().then(resp => {
@@ -290,13 +288,13 @@ const CuentaPage: React.FC = () => {
                     console.log("DeleteReg: ", resp)
                     if(resp?.status === 200){
                         setCurrentReglas(currentReglas.filter(regla => reglaToDelete?.id !== regla.id))
-                        notify(resp?.data?.message, 'success');
+                        notify("Regla eliminada exitosamente.", 'success');
                     }else {
                         notify(resp?.message, 'error');
                     }
                 });
             } catch (error) {
-                notify('Error al eliminar la regla', 'error');
+                notify('No es posible eliminar el registro.', 'error');
             }
         });
         setConfirmOpen(true);
@@ -315,14 +313,14 @@ const CuentaPage: React.FC = () => {
             try {
                 await service.removeCuenta(cuentaToDelete?.cuc_clave).then(resp => {
                     if (resp?.status === 200) {
-                        notify(resp?.message, 'success');
+                        notify("Cuenta eliminada exitosamente.", 'success');
                         setFilteredCuentas(filteredCuentas?.filter(cuenta => cuenta.cuc_clave !== id))
                     } else {
                         notify(resp?.message, 'error');
                     }
                 });
             } catch (error) {
-                notify('Error al eliminar la cuenta', 'error');
+                notify('No es posible eliminar el registro.', 'error');
             }
         });
         setConfirmOpen(true);
@@ -341,13 +339,13 @@ const CuentaPage: React.FC = () => {
                 await service.removeMultipleCuentas(ids).then(res => {
                     if (res?.status === 200) {
                         setFilteredCuentas(filteredCuentas?.filter(cuenta => !ids?.includes(cuenta?.cuc_clave)))
-                        //notify('Cuentas eliminadas correctamente', 'success');
+                        notify('Cuentas eliminadas correctamente', 'success');
                     } else {
-                        //notify('Error al eliminar las cuentas', 'error');
+                        notify('Error al eliminar las cuentas', 'error');
                     }
                 });
             } catch (error) {
-                notify('Error al eliminar las cuentas', 'error');
+                notify('No es posible eliminar los registros.', 'error');
             }
         });
         setSelectedIds([])
@@ -367,14 +365,14 @@ const CuentaPage: React.FC = () => {
                 await service.removeMultipleReglas(reglasToDelete).then(resp => {
                     if(resp?.status === 200){
                         setCurrentReglas(currentReglas.filter(regla => !ids.includes(regla.id)))
-                        notify(resp?.message, 'success');
+                        notify("Reglas eliminadas exitosamente.", 'success');
                     }else {
                         notify(resp?.message, 'error');
                     }
                 });
 
             } catch (error) {
-                notify('Error al eliminar las reglas', 'error');
+                notify('No es posible eliminar los registros.', 'error');
             }
         });
         setConfirmOpen(true);
@@ -397,13 +395,13 @@ const CuentaPage: React.FC = () => {
                             ...form,
                             id: index
                         }))))
-                        notify(resp?.message, 'success');
+                        notify("Formula eliminada exitosamente.", 'success');
                     }else {
                         notify(resp?.message, 'error');
                     }
                 });
             } catch (error) {
-                notify('Error al eliminar la formula', 'error');
+                notify('No es posible eliminar el registro.', 'error');
             }
         });
         setConfirmOpen(true);
@@ -422,14 +420,14 @@ const CuentaPage: React.FC = () => {
                 await deleteMultipleFormula(formulasToDelete).then(resp => {
                     if(resp?.status === 200){
                         setCurrentFormulas(currentFormulas.filter(form => !ids.includes(form?.id)))
-                        notify(resp?.message, 'success');
+                        notify("Formulas eliminadas exitosamente.", 'success');
                     }else {
                         notify(resp?.message, 'error');
                     }
                 });
 
             } catch (error) {
-                notify('Error al eliminar las formulas', 'error');
+                notify('No es posible eliminar los registros.', 'error');
             }
         });
         setConfirmOpen(true);

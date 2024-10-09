@@ -111,7 +111,7 @@ const TraductorPage: React.FC = () => {
           setParams(originalObject);
          
       }else{
-        notify(resp.message, 'info');
+        notify(resp.message, 'warning');
         console.log("ocurrio un error: ",resp.message);
       }
        }).catch(error =>{
@@ -214,7 +214,7 @@ const TraductorPage: React.FC = () => {
         onClick={handleExecute}
         disabled={isLoading}
 >
-{isLoading ? 'Generando...' : 'Generar Reporte'}
+{isLoading ? 'Ejecutando...' : 'Ejecutar'}
         </Button>
       </Box>
     </Box>

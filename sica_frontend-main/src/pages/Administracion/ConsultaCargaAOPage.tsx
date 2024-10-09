@@ -36,16 +36,16 @@ const ConsultaCargaAOPage: React.FC = () => {
     if(!!dataSist && dataSist.length>0){
       //console.log("sistemas recuperados: ",dataSist);
       setSistemas(dataSist);
-      setSelectedSistema(dataSist[0].sis_clave);
-      handleFiltroChange('sistema', dataSist[0].sis_clave || '');
-      handleFiltroChange('modulo', '');
-      setSelectedModulo('');
+      // setSelectedSistema(dataSist[0].sis_clave);
+      // handleFiltroChange('sistema', dataSist[0].sis_clave || '');
+      // handleFiltroChange('modulo', '');
+      // setSelectedModulo('');
       setModulos([]);
     }else{
       setSistemas([]);
       setModulos([]);
-      handleFiltroChange('sistema', '');
-      handleFiltroChange('modulo', '');
+      // handleFiltroChange('sistema', '');
+      // handleFiltroChange('modulo', '');
       setSelectedSistema('');
       setSelectedModulo('');
     }
@@ -63,12 +63,13 @@ const ConsultaCargaAOPage: React.FC = () => {
     if(!dataModXSist || dataModXSist.length == 0 ){
       setModulos([]);
       setSelectedModulo('');
-      handleFiltroChange('modulo', '');
+      // handleFiltroChange('modulo', '');
       notify('No existen módulos para sistema: '+selectedSistema, 'info');
     }else{
       setModulos(Array.from(new Set(dataModXSist.map(obj => obj?.mod_clave))));
-      setSelectedModulo(dataModXSist[0].mod_clave);
-      handleFiltroChange('modulo',dataModXSist[0].mod_clave || '');
+       setSelectedModulo('');
+       handleFiltroChange('modulo', '');
+      // handleFiltroChange('modulo',dataModXSist[0].mod_clave || '');
     }
    
     } catch (error) {
@@ -116,25 +117,42 @@ const ConsultaCargaAOPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      serviceCargaAO.fetchCargaAreaOperativa(filtros).then(resp => {
-        console.log("respuesta: ",resp);
-        if(!!resp && resp.status == 200){
-          setCargaData(resp?.data);
-          if(resp?.data.length>0){
-            notify('Consulta realizada con éxito. '+resp?.data.length +' registros recuperados.' , 'success');
-          }else{
-            notify('No existe información para los criterios de búsqueda seleccionados.', 'info');
-          }         
-        }else{
-          setCargaData([]);
-          notify((!!resp && !!resp.message ? resp.message : 'Error al consultar la carga de área operativa'), 'info');
-        }
+      // setIsLoading(true);
+      // serviceCargaAO.fetchCargaAreaOperativa(filtros).then(resp => {
+      //   console.log("respuesta: ",resp);
+      //   if(!!resp && resp.status == 200){
+      //     setCargaData(resp?.data);
+      //     if(resp?.data.length>0){
+      //       notify('Consulta realizada con éxito. '+resp?.data.length +' registros recuperados.' , 'success');
+      //     }else{
+      //       notify('No existe información para los criterios de búsqueda seleccionados.', 'info');
+      //     }         
+      //   }else{
+      //     setCargaData([]);
+      //     notify((!!resp && !!resp.message ? resp.message : 'Error al consultar la carga de área operativa'), 'info');
+      //   }
         
        
-      }).catch(error=>{
-        console.error('Error al consultar los datos de craga area operativa', error);
-        notify('Error al consultar los datos de craga area operativa' , 'error');
-      });
+      // }).catch(error=>{
+      //   console.error('Error al consultar los datos de craga area operativa', error);
+      //   notify('Error al consultar los datos de craga area operativa' , 'error');
+      // });
+      // Usamos await para esperar la respuesta de la API correctamente
+      const resp = await serviceCargaAO.fetchCargaAreaOperativa(filtros);
+      console.log("respuesta: ", resp);
+
+      if (resp?.status === 200) {
+        setCargaData(resp.data);
+        if (resp.data.length > 0) {
+          notify(`Consulta realizada con éxito. ${resp.data.length} registros recuperados.`, 'success');
+        } else {
+          notify('No existe información para los criterios de búsqueda seleccionados.', 'info');
+        }
+      } else {
+        setCargaData([]);
+        notify(resp?.message || 'Error al consultar la carga de área operativa', 'info');
+      }
+
      
     } catch (error) {
       notify('Error al obtener los datos de carga AO.', 'error');

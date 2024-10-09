@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Autocomplete, Box, Button, Grid , TextField} from '@mui/material';
+import { Autocomplete, Box, Button, Grid, TextField } from '@mui/material';
 import BodyHeader from '../../components/base/BodyHeader';
-import {  saveBatchProcess } from '../../api/batchService';
+import { saveBatchProcess } from '../../api/batchService';
 import { useNotification } from '../../providers/NotificationProvider';
 import ComboBox from '../../components/base/tabla/Combobox';
-import {  Sistema } from '../../types';
+import { Sistema } from '../../types';
 import * as serviceSistema from '../Catalogos/selectores/serviceSelectorSistemas';
 import * as serviceModulo from '../Catalogos/selectores/serviceSelectorModulos';
 import { FiltrosConsultaBatch } from '../../types';
@@ -21,9 +21,9 @@ const ConsultaBatchPage: React.FC = () => {
     fecha_fin: '',
   });
 
-  
+
   const { notify } = useNotification();
-  const [sistemas, setSistemas] = useState<Sistema[]>([]); 
+  const [sistemas, setSistemas] = useState<Sistema[]>([]);
   const [modulos, setModulos] = useState<String[]>([]);
   const [selectedSistema, setSelectedSistema] = useState<string>('');
   const [selectedModulo, setSelectedModulo] = useState<string>('');
@@ -31,23 +31,23 @@ const ConsultaBatchPage: React.FC = () => {
 
   const fetchData = async () => {
     try {
-    const dataSist= await serviceSistema.fetchSistemas();
-    if(!!dataSist && dataSist.length>0){
-      console.log("sistemas recuperados: ",dataSist);
-      setSistemas(dataSist);
-      setSelectedSistema(dataSist[0].sis_clave);
-      handleFiltroChange('sistema', dataSist[0].sis_clave || '');
-      setSelectedModulo('');
-      setModulos([]);
-    }else{
-      handleFiltroChange('sistema', '');
-      setSistemas([]);
-      setModulos([]);
-      setSelectedSistema('');
-      setSelectedModulo('');
-    }
-    
-   
+      const dataSist = await serviceSistema.fetchSistemas();
+      if (!!dataSist && dataSist.length > 0) {
+        console.log("sistemas recuperados: ", dataSist);
+        // setSistemas(dataSist);
+        const sistemasConTodos = [{ sis_clave: 'TODOS', sis_nombre: 'Todos los sistemas' }, ...dataSist];
+        setSistemas(sistemasConTodos);
+        setSelectedModulo('');
+        setModulos([]);
+      } else {
+        handleFiltroChange('sistema', '');
+        setSistemas([]);
+        setModulos([]);
+        setSelectedSistema('');
+        setSelectedModulo('');
+      }
+
+
     } catch (error) {
       console.error('Error al cargar los datos de sistemas:', error);
       notify('Error al cargar los datos de columnas', 'error');
@@ -56,29 +56,30 @@ const ConsultaBatchPage: React.FC = () => {
 
   const fetchDataMOduloByClaveSistema = async () => {
     try {
-    const dataModXSist= await serviceModulo.fetchModuloByClave(selectedSistema);
-    if(!dataModXSist || dataModXSist.length == 0 ){
-      setModulos([]);
-      setSelectedModulo('');
-      handleFiltroChange('modulo', '');
-      notify('No existen módulos para sistema: '+selectedSistema, 'info');
-    }else{
-      setModulos(Array.from(new Set(dataModXSist.map(obj => obj?.mod_clave))));
-      setSelectedModulo(dataModXSist[0].mod_clave);
-      handleFiltroChange('modulo', dataModXSist[0].mod_clave || '');
-    }
-   
+      const dataModXSist = await serviceModulo.fetchModuloByClave(selectedSistema);
+      if (!dataModXSist || dataModXSist.length == 0) {
+        setModulos([]);
+        setSelectedModulo('');
+        handleFiltroChange('modulo', '');
+        notify('No existen módulos para sistema: ' + selectedSistema, 'info');
+      } else {
+        // setModulos(Array.from('TODOS', ...new Set(dataModXSist.map(obj => obj?.mod_clave))));
+        const modulosConTodos = ['TODOS', ...new Set(dataModXSist.map((obj) => obj?.mod_clave))];
+        setModulos(modulosConTodos);
+      }
+
     } catch (error) {
-      console.error('Error al cargar los datos de modulos para sistema: '+selectedSistema, error);
-      notify('Error al cargar los datos de modulos para clave sistema: '+selectedSistema, 'error');
+      console.error('Error al cargar los datos de modulos para sistema: ' + selectedSistema, error);
+      notify('Error al cargar los datos de modulos para clave sistema: ' + selectedSistema, 'error');
     }
   };
 
   useEffect(() => {
-    if (!!selectedSistema && selectedSistema !== '') {
-      fetchDataMOduloByClaveSistema();     
-    } else {      
-      setModulos([]);
+    if (!!selectedSistema && selectedSistema !== '' && selectedSistema != "TODOS") {
+      fetchDataMOduloByClaveSistema();
+    } else{
+      setModulos(['TODOS']);
+      setSelectedModulo('TODOS');
     }
   }, [selectedSistema]);
 
@@ -95,7 +96,7 @@ const ConsultaBatchPage: React.FC = () => {
     setSelectedModulo('');
     handleFiltroChange('modulo', '');
     handleFiltroChange('sistema', sistema || '');
-     
+
   };
 
   const handleModuloSelect = (modulo: string | null) => {
@@ -106,19 +107,19 @@ const ConsultaBatchPage: React.FC = () => {
   const handleGuardar = async () => {
     console.log('filtros: ', filtros);
 
-    if (filtros.proceso === 'SICAP004') {     
+    if (filtros.proceso === 'SICAP004') {
       if (!filtros.proceso || !filtros.fecha_ini || !filtros.fecha_fin) {
         notify('Todos los campos son obligatorios', 'warning');
         return;
       }
-    }else{
-      if (!filtros.proceso || !filtros.sistema || !filtros.modulo || !filtros.borrar || !filtros.tipo_informacion || !filtros.fecha_ini || !filtros.fecha_fin) {
+    } else {
+      if (!filtros.proceso || !filtros.borrar || !filtros.tipo_informacion || !filtros.fecha_ini || !filtros.fecha_fin) {
         notify('Todos los campos son obligatorios', 'warning');
         return;
       }
     }
-    
-    if(!!filtros.fecha_ini && !!filtros.fecha_fin && filtros.fecha_fin!== '' && filtros.fecha_ini !== ''){
+
+    if (!!filtros.fecha_ini && !!filtros.fecha_fin && filtros.fecha_fin !== '' && filtros.fecha_ini !== '') {
       if (new Date(filtros.fecha_fin) < new Date(filtros.fecha_ini)) {
         notify('La fecha de termino debe ser mayor o igual a la fecha de inicio.', 'warning');
         return;
@@ -126,24 +127,24 @@ const ConsultaBatchPage: React.FC = () => {
     };
 
     // Validaciones específicas para cada proceso
-    
-    
-    
+
+
+
     setIsLoading(true);
     try {
       serviceConsultaBatch.saveBatchProcess(filtros).then(resp => {
-        console.log("respuesta: ",resp);
-        if(!!resp && resp.status == 200){
-          notify('Proceso Batch '+ filtros.proceso+' guardado correctamente.' , 'success');
-        }else{
-          notify((!!resp && !!resp.message ? resp.message : 'Error al guardar el proceso batch '+ filtros.proceso +'.'), 'warning');
+        console.log("respuesta: ", resp);
+        if (!!resp && resp.status == 200) {
+          notify('Proceso Batch ' + filtros.proceso + ' guardado correctamente.', 'success');
+        } else {
+          notify((!!resp && !!resp.message ? resp.message : 'Error al guardar el proceso batch ' + filtros.proceso + '.'), 'warning');
         }
-      }).catch(error=>{
-        console.error('Error al guardar el proceso batch '+ filtros.proceso +'.', error);
-        notify('Error al guardar el proceso batch '+ filtros.proceso +'.' , 'error');
+      }).catch(error => {
+        console.error('Error al guardar el proceso batch ' + filtros.proceso + '.', error);
+        notify('Error al guardar el proceso batch ' + filtros.proceso + '.', 'error');
       });
     } catch (error) {
-      notify('Error al guardar el proceso batch '+ filtros.proceso +'.' , 'error');
+      notify('Error al guardar el proceso batch ' + filtros.proceso + '.', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -161,7 +162,7 @@ const ConsultaBatchPage: React.FC = () => {
     <Box>
       <BodyHeader
         headerRoute="Administración / Parametrización de Procesos Batch"
-        TitlePage="Consulta y Parametrización de Procesos Batch"
+        TitlePage="Parametrización de Procesos Batch"
         tooltipProps={{ title: 'Parametriza los procesos Batch diarios' }}
         typographyPropsRoute={{ variant: 'h6' }}
         typographyPropsTitle={{ variant: 'h3' }}
@@ -182,21 +183,21 @@ const ConsultaBatchPage: React.FC = () => {
         {filtros.proceso !== 'SICAP004' && (
           <>
             <Grid item xs={12} sm={6}>
-            <Autocomplete
-                    options={[...Array.from(new Set(sistemas.map(sistema => sistema.sis_clave)))]}
-                    onChange={(_event, value) => handleSistemaSelect(value)}
-                    value = {selectedSistema}
-                    renderInput={(params) => <TextField {...params} value={selectedSistema} label="Sistema" variant="outlined" />} // Aplicamos la propiedad sx a TextField
-                />
+              <Autocomplete
+                options={[...Array.from(new Set(sistemas.map(sistema => sistema.sis_clave)))]}
+                onChange={(_event, value) => handleSistemaSelect(value)}
+                value={selectedSistema}
+                renderInput={(params) => <TextField {...params} value={selectedSistema} label="Sistema" variant="outlined" />} // Aplicamos la propiedad sx a TextField
+              />
             </Grid>
             <Grid item xs={12} sm={6}>
-            <Autocomplete
-                    options={modulos}
-                    onChange={(_event, value) => handleModuloSelect(value)}
-                    disabled={selectedSistema === ''}
-                    value = {selectedModulo}
-                    renderInput={(params) => <TextField {...params} label="Módulo" value={selectedModulo} variant="outlined" />} // Aplicamos la propiedad sx a TextField
-                />
+              <Autocomplete
+                options={modulos}
+                onChange={(_event, value) => handleModuloSelect(value)}
+                disabled={selectedSistema === ''}
+                value={selectedModulo}
+                renderInput={(params) => <TextField {...params} label="Módulo" value={selectedModulo} variant="outlined" />} // Aplicamos la propiedad sx a TextField
+              />
             </Grid>
           </>
         )}
@@ -227,26 +228,26 @@ const ConsultaBatchPage: React.FC = () => {
           </>
         )}
         <Grid item xs={12} sm={6}>
-        <TextField
+          <TextField
             label="Fecha de Inicio"
             type="date"
             name="fecha_ini"
             value={filtros.fecha_ini}
             onChange={handleInputChange}
             InputLabelProps={{ shrink: true }}
-            fullWidth   
-          /> 
+            fullWidth
+          />
         </Grid>
         <Grid item xs={12} sm={6}>
-        <TextField
+          <TextField
             label="Fecha de Termino"
             type="date"
             name="fecha_fin"
             value={filtros.fecha_fin}
             onChange={handleInputChange}
             InputLabelProps={{ shrink: true }}
-            fullWidth   
-          /> 
+            fullWidth
+          />
         </Grid>
       </Grid>
       <Box mt={2}>

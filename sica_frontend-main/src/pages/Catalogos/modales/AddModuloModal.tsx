@@ -86,7 +86,7 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
     setErrors(newErrors);
 
     newModulo.fecha_carga==newModulo.fecha_informacion;
-    console.log(newModulo.num_registros)
+    // console.log(newModulo.num_registros)
     if (Object.keys(newErrors).length === 0) {
       onSave(newModulo);
       onClose();
@@ -146,7 +146,7 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             onChange={(e) => handleInputChange('fecha_carga', e.target.value)}
             fullWidth
             InputLabelProps={{ shrink: true }}
-            disabled={!!initialData}
+            disabled={true}
           />
         </Box>
         <Box mb={2}>
@@ -157,7 +157,7 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             onChange={(e) => handle(e)}
             inputProps={{ maxLength: 2 , type: 'number', min: "0", max: "99", step: "1"}}
             fullWidth
-            disabled={!!initialData}
+            disabled={true}
             error={!!errors.num_registros}
             helperText={errors.num_registros}
           />
@@ -170,7 +170,7 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             onChange={(e) => handleInputChange('fecha_informacion', e.target.value)}
             fullWidth
             InputLabelProps={{ shrink: true }}
-            disabled={!!initialData}
+            disabled={true}
 
           />
         </Box>
@@ -193,7 +193,7 @@ const [numRegistros, setNumRegistros] = useState<number>(minValue);
             value={newModulo.status || ''}
             onChange={(e) => handleInputChange('status', e.target.value as 'S' | 'N' | null)}
             fullWidth
-            disabled={!!initialData}
+            disabled={true}
 
           >
             <MenuItem value="S">Correcta</MenuItem>

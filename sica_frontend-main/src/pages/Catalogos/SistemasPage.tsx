@@ -66,15 +66,15 @@ const SistemasPage: React.FC = () => {
         setSistemas(sistemas.map((sistema) =>
           sistema.sis_clave === editingSistema.sis_clave ? newSistema : sistema
         ));
-        notify( 'Sistema '+responseMessage.message+' actualizado correctamente', 'success');
+        notify( 'Sistema actualizado correctamente', 'success');
       } else if(responseMessage.status=='400'){
         notify(responseMessage.message,'warning');
       }else{
         setSistemas([...sistemas, newSistema]);
-        notify('Sistema '+responseMessage.message+' agregado correctamente', 'success');
+        notify('Sistema agregado correctamente', 'success');
       }
     } catch (error) {
-      notify('Error al guardar el sistema', 'error');
+      notify('Error al guardar el registro.', 'error');
     }
     setEditingSistema(null);
 
@@ -97,12 +97,12 @@ const SistemasPage: React.FC = () => {
       if(responseMessage?.status=='200'){
         setSistemas(sistemas.filter((sistema) => sistema.sis_clave !== sis_clave));
 
-        notify('Sistema '+responseMessage.message+' eliminado correctamente', 'success');
+        notify('Sistema eliminado correctamente', 'success');
       }else{
         notify(responseMessage.message, 'warning');
       }
     } catch (error) {
-      notify('Error al Eliminar el sistema: '+error.response.data.message, 'error');
+      notify('No es posible eliminar el registro.', 'error');
     }
     });
     setConfirmOpen(true);
@@ -123,7 +123,7 @@ const SistemasPage: React.FC = () => {
         notify(responseMessage.message, 'warning');
       }
     } catch (error) {
-      notify('Error al Eliminar el sistema: '+error.response.data.message, 'error');
+      notify('No es posible eliminar los registros.', 'error');
     }
     });
     setConfirmOpen(true);

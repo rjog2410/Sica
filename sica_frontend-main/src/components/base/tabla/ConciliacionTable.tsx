@@ -1,4 +1,4 @@
-import React, {forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState} from 'react';
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import {
     Table,
     TableBody,
@@ -8,12 +8,14 @@ import {
     TableRow,
     Paper,
     TablePagination,
-    DialogTitle, DialogContent, Dialog, Box, IconButton
+    DialogTitle, DialogContent, Dialog, Box, IconButton,
+    TableFooter,
+    Typography
 } from '@mui/material';
-import {Conciliacion, ConciliacionCuenta, ConciliacionCuentaDetalle, Cuenta} from '../../../types';
-import {fetchDetailConcilia} from "@/pages/Reportes/conciliationService.ts";
+import { Conciliacion, ConciliacionCuenta, ConciliacionCuentaDetalle, Cuenta } from '../../../types';
+import { fetchDetailConcilia } from "@/pages/Reportes/conciliationService.ts";
 import ExcelJS from "exceljs";
-import {saveAs} from "file-saver";
+import { saveAs } from "file-saver";
 
 interface Props {
     data: ConciliacionCuenta[];
@@ -21,7 +23,7 @@ interface Props {
 
 type Order = 'asc' | 'desc';
 
-const ConciliacionTable = forwardRef(({data}: Props, ref) => {
+const ConciliacionTable = forwardRef(({ data }: Props, ref) => {
 
     const [order, setOrder] = useState<Order>('asc');
     const [orderBy, setOrderBy] = useState<any>('con_cuenta');
@@ -48,6 +50,16 @@ const ConciliacionTable = forwardRef(({data}: Props, ref) => {
         return sortedData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
     }, [sortedData, page, rowsPerPage]);
 
+
+    const totalSif = data.reduce((acc, row) => acc + (parseFloat(row.con_importe_sif.replace(",", "")) || 0), 0);
+    const totalAo = data.reduce((acc, row) => acc + (parseFloat(row.con_importe_ao.replace(",", "")) || 0), 0);
+    const totalDif = data.reduce((acc, row) => acc + (parseFloat(row.con_dif.replace(",", "")) || 0), 0);
+
+    // Formateo de los totales con comas y 2 decimales
+    const formattedTotalSif = totalSif.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const formattedTotalAo = totalAo.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const formattedTotalDif = totalDif.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
     const handleChangePage = (_event: unknown, newPage: number) => {
         setPage(newPage);
     };
@@ -62,19 +74,19 @@ const ConciliacionTable = forwardRef(({data}: Props, ref) => {
         const worksheet = workbook.addWorksheet('Cuentas');
 
         worksheet.columns = [
-            {header: 'Cuenta Contable', key: 'cuenta', width: 20},
-            {header: 'S1', key: 's1', width: 10},
-            {header: 'S2', key: 's2', width: 10},
-            {header: 'S3', key: 's3', width: 10},
-            {header: 'S4', key: 's4', width: 10},
-            {header: 'S5', key: 's5', width: 10},
-            {header: 'S6', key: 's6', width: 10},
-            {header: 'S7', key: 's7', width: 10},
-            {header: 'Tipo Ente', key: 'tipo_ente', width: 10},
-            {header: 'Ente', key: 'ente', width: 10},
-            {header: 'Importe SIF', key: 'imp_sif', width: 20},
-            {header: 'Importe Área', key: 'imp_area', width: 20},
-            {header: 'Diferencia', key: 'dif', width: 20},
+            { header: 'Cuenta Contable', key: 'cuenta', width: 20 },
+            { header: 'S1', key: 's1', width: 10 },
+            { header: 'S2', key: 's2', width: 10 },
+            { header: 'S3', key: 's3', width: 10 },
+            { header: 'S4', key: 's4', width: 10 },
+            { header: 'S5', key: 's5', width: 10 },
+            { header: 'S6', key: 's6', width: 10 },
+            { header: 'S7', key: 's7', width: 10 },
+            { header: 'Tipo Ente', key: 'tipo_ente', width: 10 },
+            { header: 'Ente', key: 'ente', width: 10 },
+            { header: 'Importe SIF', key: 'imp_sif', width: 20 },
+            { header: 'Importe Área', key: 'imp_area', width: 20 },
+            { header: 'Diferencia', key: 'dif', width: 20 },
         ];
 
         sortedData.forEach((con) => {
@@ -95,12 +107,28 @@ const ConciliacionTable = forwardRef(({data}: Props, ref) => {
             });
         });
 
+        // Agregar una fila con los totales al final del archivo Excel
+        worksheet.addRow({
+            cuenta: 'TOTALES',
+            imp_sif: formattedTotalSif,  // Asegura que el total tenga 2 decimales
+            imp_area: formattedTotalAo,
+            dif: formattedTotalDif,
+        });
+
+        // Estilo para destacar la fila de totales
+        const lastRow = worksheet.lastRow;
+        if (lastRow) {
+            lastRow.eachCell((cell) => {
+                cell.font = { bold: true };
+            });
+        }
+
         const today = new Date();
         const date = `${today.getDate()}${today.getMonth() + 1}${today.getFullYear()}`;
         const fileName = `ConciliacionSaldos${date}.xlsx`;
 
         const buffer = await workbook.xlsx.writeBuffer();
-        const blob = new Blob([buffer], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         saveAs(blob, fileName);
     }, [sortedData]);
 
@@ -180,6 +208,13 @@ const ConciliacionTable = forwardRef(({data}: Props, ref) => {
                             </TableRow>
                         ))}
                     </TableBody>
+                    <TableFooter>
+                        <TableCell>TOTALES</TableCell>
+                        <TableCell colSpan={9}></TableCell>
+                        <TableCell>{formattedTotalSif}</TableCell>
+                        <TableCell>{formattedTotalAo}</TableCell>
+                        <TableCell>{formattedTotalDif}</TableCell>
+                    </TableFooter>
                 </Table>
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 20]}
@@ -191,7 +226,7 @@ const ConciliacionTable = forwardRef(({data}: Props, ref) => {
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </TableContainer>
-            <Dialog
+            {/* <Dialog
                 open={isOpen}
                 onClose={() => {
                     setIsOpen(!isOpen)
@@ -214,7 +249,7 @@ const ConciliacionTable = forwardRef(({data}: Props, ref) => {
                             <TableHead>
                                 <TableRow>
                                     {
-                                        detailData?.cabeceras?.map((row) => <TableCell>{row}</TableCell>)
+                                        detailData?.cabeceras?.map((row) => <TableCell>{row.replace("_", " ")}</TableCell>)
                                     }
                                 </TableRow>
                             </TableHead>
@@ -224,6 +259,56 @@ const ConciliacionTable = forwardRef(({data}: Props, ref) => {
                                         {
                                             detailData?.cabeceras?.map((header) => <TableCell>{row[header]}</TableCell>)
                                         }
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </DialogContent>
+            </Dialog> */}
+            <Dialog
+                open={isOpen}
+                onClose={() => {
+                    setIsOpen(!isOpen);
+                    setCurrentReg(null);
+                }}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+                sx={{
+                    "& .MuiDialog-container": {
+                        "& .MuiPaper-root": {
+                            width: "100%",
+                            maxWidth: "1200px",
+                        },
+                    },
+                }}
+            >
+                <DialogTitle id="alert-dialog-title">Detalles de la Cuenta Conciliada</DialogTitle>
+                <DialogContent>
+                    <Box mb={2}>
+                        <Typography variant="body2">
+                            <strong>Sistema:</strong> {currentReg?.con_mod_sis_clave} | <strong>Módulo:</strong> {currentReg?.con_mod_clave} | <strong>Oficina:</strong> {currentReg?.con_oficina} | <strong>Moneda:</strong> {currentReg?.con_moneda}
+                        </Typography>
+                        <Typography variant="body2">
+                            <strong>Cuenta:</strong> {currentReg?.con_cuenta} | <strong>scta1:</strong> {currentReg?.con_scta1} | <strong>scta2:</strong> {currentReg?.con_scta2} | <strong>scta3:</strong> {currentReg?.con_scta3} | <strong>scta4:</strong> {currentReg?.con_scta4}
+                        </Typography>
+                    </Box>
+
+                    <TableContainer component={Paper}>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    {detailData?.cabeceras?.map((row) => (
+                                        <TableCell key={row}>{row.replace("_", " ")}</TableCell>
+                                    ))}
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {detailData?.datos?.map((row, index) => (
+                                    <TableRow key={index}>
+                                        {detailData?.cabeceras?.map((header) => (
+                                            <TableCell key={header}>{row[header]}</TableCell>
+                                        ))}
                                     </TableRow>
                                 ))}
                             </TableBody>

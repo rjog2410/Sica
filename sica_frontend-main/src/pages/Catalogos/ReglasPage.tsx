@@ -101,7 +101,7 @@ const CuentaReglaPage: React.FC = () => {
                 notify('Regla agregada correctamente', 'success');
             }
         } catch (error) {
-            notify('Error al guardar la regla', 'error');
+            notify('No es posible guardar el registro.', 'error');
         }
         handleCloseModal();
     };
@@ -133,7 +133,7 @@ const CuentaReglaPage: React.FC = () => {
                 setReglas(reglas.filter((regla) => regla.reg_cuc_clave !== id));
                 notify('Regla eliminada correctamente', 'success');
             } catch (error) {
-                notify('Error al eliminar la regla', 'error');
+                notify('No es posible eliminar el registro.', 'error');
             }
         });
         setConfirmOpen(true);
@@ -153,7 +153,7 @@ const CuentaReglaPage: React.FC = () => {
                 setReglas(reglas.filter(regla => !ids.includes(regla.reg_cuc_clave)));
                 notify('Reglas eliminadas correctamente', 'success');
             } catch (error) {
-                notify('Error al eliminar las reglas', 'error');
+                notify('No es posible eliminar los registros.', 'error');
             }
         });
         setConfirmOpen(true);

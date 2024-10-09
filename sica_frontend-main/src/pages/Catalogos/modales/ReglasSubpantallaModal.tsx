@@ -104,7 +104,8 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
     const [orderFor, setOrderFor] = useState<Order>('asc');
     const [orderByFor, setOrderByFor] = useState<keyof Formula>('for_secuencia');
 
-    const operators: string[] = ["+", "-", "*", "/"];
+    const operators: string[] = ["=", ">", "<", ">=", "<=" , "<>", "COMO"];
+    const operators_formulas: string[] = ["+" , "-"];
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
@@ -641,7 +642,7 @@ const ReglasSubpantallaModal: React.FC<ReglasSubpantallaModalProps> = ({
                                                         helperText={errors.for_operador}
                                                     >
                                                         {
-                                                            operators?.map(op => <MenuItem
+                                                            operators_formulas?.map(op => <MenuItem
                                                                 value={op}>{op}</MenuItem>)
                                                         }
                                                     </TextField>

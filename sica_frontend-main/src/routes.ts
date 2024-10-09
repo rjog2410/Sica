@@ -113,7 +113,7 @@ const routes = [
       },
       {
         path: '/administración/consulta-bach',
-        name: 'Consulta Batch',
+        name: 'Procesos Batch',
         component: ConsultaBatchPage 
       }
     ]

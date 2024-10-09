@@ -160,13 +160,14 @@ const CuentasTable = forwardRef(({
                 Cuenta
               </TableSortLabel>
             </TableCell>
-            <TableCell>Tipo Ente</TableCell>
-            <TableCell>Ente</TableCell>
-            <TableCell>Tipo Conciliación</TableCell>
             <TableCell>S1</TableCell>
             <TableCell>S2</TableCell>
             <TableCell>S3</TableCell>
             <TableCell>S4</TableCell>
+            <TableCell>Tipo Ente</TableCell>
+            <TableCell>Ente</TableCell>
+            <TableCell>Tipo Conciliación</TableCell>
+
             <TableCell>Acciones</TableCell>
           </TableRow>
         </TableHead>
@@ -195,14 +196,16 @@ const CuentasTable = forwardRef(({
                   }}
                   />
                 </TableCell>
+
                 <TableCell>{row.cuc_cuenta}</TableCell>
-                <TableCell>{row.cuc_tipo_ente || 'N/A'}</TableCell>
-                <TableCell>{row.cuc_ente || 'N/A'}</TableCell>
-                <TableCell>{row.cuc_consolida_ente === 'S' ? 'E': (row.cuc_inc_saldo === 'S' ? 'S' : (row.cuc_inc_movs === 'S' && 'M'))}</TableCell>
                 <TableCell>{row.cuc_scta1}</TableCell>
                 <TableCell>{row.cuc_scta2}</TableCell>
                 <TableCell>{row.cuc_scta3}</TableCell>
                 <TableCell>{row.cuc_scta4}</TableCell>
+                <TableCell>{row.cuc_tipo_ente || 'N/A'}</TableCell>
+                <TableCell>{row.cuc_ente || 'N/A'}</TableCell>
+                <TableCell>{row.cuc_consolida_ente === 'S' ? 'E': (row.cuc_inc_saldo === 'S' ? 'S' : (row.cuc_inc_movs === 'S' && 'M'))}</TableCell>
+
                 <TableCell>
                   <IconButton onClick={() => {
                     onUpdateCuenta(row);
