@@ -13,6 +13,8 @@ import { fetchSistemas } from "@/pages/Reportes/conciliationService.ts";
 import * as serviceSistema from '../Catalogos/selectores/serviceSelectorSistemas';
 import * as serviceModulo from '../Catalogos/selectores/serviceSelectorModulos';
 import { Sistema } from '@/types';
+import useAuthStore from '../../store/authStore'; //para permisos
+import { useNavigate } from 'react-router-dom'; //para permisos
 
 const ReporteConciliacionSaldosPage: React.FC = () => {
 
@@ -23,6 +25,17 @@ const ReporteConciliacionSaldosPage: React.FC = () => {
   const [modulos, setModulos] = useState<String[]>([]);
   const [selectedSistema, setSelectedSistema] = useState<string>('');
   const [selectedModulo, setSelectedModulo] = useState<string>('');
+
+  const navigate = useNavigate();
+  const { hasPermission } = useAuthStore();
+  console.log(hasPermission);
+  const requiredPermission = '/sica/reportes/conciliacion-saldos';
+  useEffect(() => {
+      if (!hasPermission(requiredPermission)) {
+          notify('No tienes permisos para acceder a esta página', 'error');
+          navigate('/');
+      }
+  }, [hasPermission, navigate, notify]);
 
   const [filtros, setFiltros] = useState<ReporteConciliacionFiltros>({
     sistema: '',

@@ -11,7 +11,6 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ handleDrawerToggle }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { user, logout, setLogoutInitiated } = useAuthStore();
-
   const handleMenu = useCallback((event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   }, []);
@@ -34,16 +33,16 @@ const Header: React.FC<HeaderProps> = ({ handleDrawerToggle }) => {
             <img src="/logo.png" alt="Logotipo" style={{ height: 40, marginLeft: 45 }} />
           </Box>
 
-          {user && (
+          {/* {user && (
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', mr: 2 }}>
               <Typography variant="subtitle1" color="textPrimary" sx={{ color: '#000' }}>
-                {user.name}dsd
+                {user.name}
               </Typography>
               <Typography variant="body2" color="textSecondary" sx={{ color: '#000' }}>
-                {user.role}
+                {user.roles}
               </Typography>
             </Box>
-          )}
+          )} */}
           
           <IconButton
             color="inherit"
@@ -58,10 +57,10 @@ const Header: React.FC<HeaderProps> = ({ handleDrawerToggle }) => {
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', mr: 2 }}>
               <Typography variant="subtitle1" color="textPrimary" sx={{ color: '#000' }}>
-                John Doe
+                {user?.name}
               </Typography>
               <Typography variant="body2" color="textSecondary" sx={{ color: '#000' }}>
-                Administrador
+                {user?.roles[0]}
               </Typography>
             </Box>
             <IconButton onClick={handleMenu} color="inherit" sx={{ color: '#000' }}>

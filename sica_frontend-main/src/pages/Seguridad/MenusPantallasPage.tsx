@@ -4,15 +4,13 @@ import { useNotification } from '../../providers/NotificationProvider';
 import BodyHeader from '../../components/base/BodyHeader';
 import SistemasTable from '../../components/base/tabla/SistemasTable';
 import { Sistema } from '../../types';
-import * as service from './selectores/serviceSelectorSistemas'; // Usamos serviceSelector para mocks y API
-import AddSistemaModal from './modales/AddSistemaModal';
+import * as service from './Selectores/serviceSelectorMenuPantallas'; // Usamos serviceSelector para mocks y API
+import AddMenuModal from './Modales/AddMenuModal';
+import AddPantallaModal from './Modales/AddPantallaModal';
 import ComboBox from '../../components/base/tabla/Combobox';
 import ConfirmDialog from '../../components/base/ConfirmDialog';
-import useAuthStore from '../../store/authStore'; //para permisos
-import { useNavigate } from 'react-router-dom'; //para permisos
 
-
-const SistemasPage: React.FC = () => {
+const MenusPantallasPage: React.FC = () => {
   const originalObject = { sis_clave: '', sis_nombre: '' }
   const [sistemas, setSistemas] = useState<Sistema[]>([]);
   const [, setSelectedSistema] = useState<Sistema | null>(null);
@@ -27,15 +25,6 @@ const SistemasPage: React.FC = () => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const { notify } = useNotification();
-  const navigate = useNavigate();
-  const { hasPermission } = useAuthStore();
-  const requiredPermission = '/sica/catalogos/sistemas';
-  useEffect(() => {
-      if (!hasPermission(requiredPermission)) {
-          notify('No tienes permisos para acceder a esta página', 'error');
-          navigate('/');
-      }
-  }, [hasPermission, navigate, notify]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -75,9 +64,9 @@ const SistemasPage: React.FC = () => {
       const responseMessage = await service.createOrUpdateSistema(newSistema,editando);
       if (editando) {
         // Actualizar el sistema en el estado local
-        setSistemas(sistemas.map((sistema) =>
-          sistema.sis_clave === editingSistema.sis_clave ? newSistema : sistema
-        ));
+       // setSistemas(sistemas.map((sistema) =>
+         // sistema.sis_clave === editingSistema.sis_clave ? newSistema : sistema
+        //));
         notify( 'Sistema actualizado correctamente', 'success');
       } else if(responseMessage.status=='400'){
         notify(responseMessage.message,'warning');
@@ -157,12 +146,30 @@ const SistemasPage: React.FC = () => {
     }
   };
 
+
+  class OrderItemRow extends React.Component {
+    render() {
+      const { item } = this.props
+      return (
+        <tr>
+          <td>
+            <img src={item.image} alt={item.name} width="50"/>
+            {item.name}
+          </td>
+          <td>
+            {item.selectedOption}
+          </td>
+        </tr>
+      )
+    }
+  }
+
   return (
     <Box>
       <BodyHeader
-        headerRoute="Catálogos / Sistemas"
-        TitlePage="Sistemas"
-        tooltipProps={{ title: "Información sobre la Gestión de Sistemas" }}
+        headerRoute="Seguridad / Menus - Pantallas"
+        TitlePage="Menu - Pantallas"
+        tooltipProps={{ title: "Información sobre los menus y pantallas" }}
         typographyPropsRoute={{ variant: "h6" }}
         typographyPropsTitle={{ variant: "h3" }}
       />
@@ -171,14 +178,7 @@ const SistemasPage: React.FC = () => {
       ) : (
         <>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={2} >
-            <Box sx={{width:250}}>
-              <ComboBox
-                options={sistemas}
-                onSelect={handleSistemaSelect}
-                label="Seleccione un Sistema"
-                getOptionLabel={(option: Sistema) => option.sis_clave}
-              />
-            </Box>
+            
             <Box>
               {selectedIds.length > 0 && (
                 <Button
@@ -210,7 +210,7 @@ const SistemasPage: React.FC = () => {
             onDeleteSistema={handleDeleteSistema}
             filterValue={filterValue}
           />
-          <AddSistemaModal
+          <AddMenuModal
             open={isModalOpen}
             onClose={handleCloseModal}
             onSave={handleSaveSistema}
@@ -229,7 +229,9 @@ const SistemasPage: React.FC = () => {
         }}
       />
     </Box>
+    
   );
+  
 };
 
-export default SistemasPage;
+export default MenusPantallasPage;

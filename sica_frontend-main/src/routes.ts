@@ -4,6 +4,7 @@
 import ConsultaBatchPage from './pages/Administracion/ConsultaBatchPage';
 import ConsultaCargaAOPage from './pages/Administracion/ConsultaCargaAOPage';
 import ConsultaCargaSIFPage from './pages/Administracion/ConsultaCargaSIFPage';
+import Auth from './pages/Auth';
 import ColumnasPage from './pages/Catalogos/ColumnasPage';
 import CuentaPage from './pages/Catalogos/CuentaPage.tsx';
 import ModulosPage from './pages/Catalogos/ModulosPage';
@@ -14,68 +15,73 @@ import Home from './pages/Home';
 import ExtraccionSIFPage from './pages/Procesos/ExtraccionSIFPage';
 import TraductorPage from './pages/Procesos/TraductorPage';
 import ReporteConciliacionSaldosPage from './pages/Reportes/ReporteConciliacionSaldosPage';
-import ReglasPage from "@/pages/Catalogos/ReglasPage.tsx";
 
 const routes = [
-  { 
-    path: '/', 
-    name: 'Home', 
-    component: Home 
+  {
+    path: '/',
+    name: 'Home',
+    menuOnly: false,
+    component: Home
   },
-
-  { 
-    path: '/catalogos', 
-    name: 'Catalogos', 
+  {
+    path: '/auth',
+    name: 'Auth',
+    component: Auth,  // Define que el componente Auth se renderice en esta ruta
+    hidden: true
+  },
+  {
+    path: '/sica/catalogos',
+    name: 'Catalogos',
     menuOnly: true, // Añade la propiedad menuOnly para rutas que solo actúan como menú
     subroutes: [
       {
-        path: '/catalogos/sistemas',
+        path: '/sica/catalogos/sistemas',
         name: 'Sistemas',
         component: SistemasPage // Ejemplo de subruta con componente
       },
       {
-        path: '/catalogos/modulos',
+        path: '/sica/catalogos/modulos',
         name: 'Modulos',
         component: ModulosPage // Otro ejemplo de subruta
       },
       {
-        path: '/catalogos/columna',
+        path: '/sica/catalogos/columna',
         name: 'Columnas',
         component: ColumnasPage // Otro ejemplo de subruta
       },
       {
-        path: '/catalogos/cuentas',
+        path: '/sica/catalogos/cuentas',
         name: 'Cuentas',
         component: CuentaPage // Otro ejemplo de subruta
       },
     ]
   },
-  { 
-    path: '/procesos', 
-    name: 'Procesos', 
+  {
+    path: '/sica/procesos',
+    name: 'Procesos',
     menuOnly: true, // Añade la propiedad menuOnly para rutas que solo actúan como menú
     subroutes: [
       {
-        path: '/procesos/extraccionsif',
+        path: '/sica/procesos/extraccionsif',
         name: 'Extraccion SIF',
         component: ExtraccionSIFPage // Ejemplo de subruta con componente
       },
       {
-        path: '/procesos/traductor',
+        path: '/sica/procesos/traductor',
         name: 'Traductor',
         component: TraductorPage // Ejemplo de subruta con componente
       },
     ]
   },
-  { 
-    path: '/consulta', 
-    name: 'Consulta', 
+  {
+    path: '/sica/consulta',
+    name: 'Consulta',
     menuOnly: true, // Añade la propiedad menuOnly para rutas que solo actúan como menú
     subroutes: [
       {
-        path: '/consulta/conciliacion-saldos',
+        path: '/sica/consulta/conciliacion-saldos',
         name: 'Conciliacion de Saldos',
-        component: ConciliacionSaldosPage 
+        component: ConciliacionSaldosPage
       },
       // {
       //   path: '/consulta/consulta-detalle',
@@ -84,37 +90,37 @@ const routes = [
       // },
     ]
   },
-  { 
-    path: '/reportes', 
-    name: 'Reportes', 
+  {
+    path: '/sica/reportes',
+    name: 'Reportes',
     menuOnly: true, // Añade la propiedad menuOnly para rutas que solo actúan como menú
     subroutes: [
       {
-        path: '/reportes/conciliacion-saldos',
+        path: '/sica/reportes/conciliacion-saldos',
         name: 'Conciliacion de Saldos',
-        component: ReporteConciliacionSaldosPage 
+        component: ReporteConciliacionSaldosPage
       },
     ]
   },
-  { 
-    path: '/administración', 
-    name: 'Administración', 
+  {
+    path: '/sica/administracion',
+    name: 'Administración',
     menuOnly: true, // Añade la propiedad menuOnly para rutas que solo actúan como menú
     subroutes: [
       {
-        path: '/administración/consulta-carga-ao',
+        path: '/sica/administración/consulta-carga-ao',
         name: 'Consulta Carga AO',
-        component: ConsultaCargaAOPage 
+        component: ConsultaCargaAOPage
       },
       {
-        path: '/administración/consulta-carga-sif',
+        path: '/sica/administración/consulta-carga-sif',
         name: 'Consulta Carga SIF',
-        component: ConsultaCargaSIFPage 
+        component: ConsultaCargaSIFPage
       },
       {
-        path: '/administración/consulta-bach',
+        path: '/sica/administración/consulta-bach',
         name: 'Procesos Batch',
-        component: ConsultaBatchPage 
+        component: ConsultaBatchPage
       }
     ]
   }
@@ -142,14 +148,14 @@ export default routes;
 // import Contact from './pages/Home';
 
 // const routes = [
-//   { 
-//     path: '/', 
-//     name: 'Home', 
-//     component: Home 
+//   {
+//     path: '/',
+//     name: 'Home',
+//     component: Home
 //   },
-//   { 
-//     path: '/about', 
-//     name: 'About', 
+//   {
+//     path: '/about',
+//     name: 'About',
 //     component: About,
 //     subroutes: [
 //       {
@@ -159,14 +165,14 @@ export default routes;
 //       }
 //     ]
 //   },
-//   { 
-//     path: '/contact', 
-//     name: 'Contact', 
-//     component: Contact 
+//   {
+//     path: '/contact',
+//     name: 'Contact',
+//     component: Contact
 //   },
-//   { 
-//     path: '/menuOnly', 
-//     name: 'Menu Only', 
+//   {
+//     path: '/menuOnly',
+//     name: 'Menu Only',
 //     menuOnly: true, // Añade la propiedad menuOnly para rutas que solo actúan como menú
 //     subroutes: [
 //       {

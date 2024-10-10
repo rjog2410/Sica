@@ -10,6 +10,10 @@ import * as serviceModulo from '../Catalogos/selectores/serviceSelectorModulos';
 import { FiltrosConsultaBatch } from '../../types';
 import * as serviceConsultaBatch from '../Administracion/selectores/selectorConsultaBatch';
 
+import useAuthStore from '../../store/authStore'; //para permisos
+import { useNavigate } from 'react-router-dom'; //para permisos
+
+
 const ConsultaBatchPage: React.FC = () => {
   const [filtros, setFiltros] = useState<FiltrosConsultaBatch>({
     proceso: '',
@@ -28,6 +32,17 @@ const ConsultaBatchPage: React.FC = () => {
   const [selectedSistema, setSelectedSistema] = useState<string>('');
   const [selectedModulo, setSelectedModulo] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const navigate = useNavigate();
+  const { hasPermission } = useAuthStore();
+  console.log(hasPermission);
+  const requiredPermission = '/sica/administración/consulta-bach';
+  useEffect(() => {
+      if (!hasPermission(requiredPermission)) {
+          notify('No tienes permisos para acceder a esta página', 'error');
+          navigate('/');
+      }
+  }, [hasPermission, navigate, notify]);
 
   const fetchData = async () => {
     try {

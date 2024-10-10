@@ -7,6 +7,9 @@ import { useNotification } from '../../providers/NotificationProvider';
 import BodyHeader from '../../components/base/BodyHeader';
 import { Modulo } from '@/utils/types';
 import ComboBox from '@/components/base/tabla/Combobox';
+import useAuthStore from '../../store/authStore'; //para permisos
+import { useNavigate } from 'react-router-dom'; //para permisos
+
 
 const ExtraccionSIFPage: React.FC = () => {
   const originalObject = {
@@ -34,8 +37,19 @@ const ExtraccionSIFPage: React.FC = () => {
   
   const [filterValue, setFilterValue] = useState<string>('TODOS');
 
-
   const { notify } = useNotification();
+
+  const navigate = useNavigate();
+  const { hasPermission } = useAuthStore();
+  console.log(hasPermission);
+  const requiredPermission = '/sica/procesos/extraccionsif';
+  useEffect(() => {
+      if (!hasPermission(requiredPermission)) {
+          notify('No tienes permisos para acceder a esta página', 'error');
+          navigate('/');
+      }
+  }, [hasPermission, navigate, notify]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -46,6 +60,7 @@ const ExtraccionSIFPage: React.FC = () => {
         notify('Error al cargar los datos de Extracción SIF', 'error');
       } 
     };
+
 
     fetchData();
   }, [notify]);

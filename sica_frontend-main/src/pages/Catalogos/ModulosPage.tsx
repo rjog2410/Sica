@@ -8,6 +8,10 @@ import { Modulo } from '../../types';
 import ComboBox from '../../components/base/tabla/Combobox';
 import AddModuloModal from './modales/AddModuloModal';
 import ConfirmDialog from '../../components/base/ConfirmDialog';
+import useAuthStore from '../../store/authStore'; //para permisos
+import { useNavigate } from 'react-router-dom'; //para permisos
+
+
 
 const ModulosPage: React.FC = () => {
   const originalObject = {
@@ -30,14 +34,25 @@ const ModulosPage: React.FC = () => {
   const tableRef = useRef<any>(null);
   const [editingModulo, setEditingModulo] = useState<Modulo | null>(originalObject);
   const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
-  const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
+  const [confirmAction, setConfirmAction] = useState<() => void>(() => { });
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [editando, setEditando] = useState<boolean>(false);
-  var [eliminados,setEliminados]= useState<number>(0);
+  var [eliminados, setEliminados] = useState<number>(0);
   const [filterValue, setFilterValue] = useState<string>('TODOS');
 
 
   const { notify } = useNotification();
+
+  const navigate = useNavigate();
+  const { hasPermission } = useAuthStore();
+  console.log(hasPermission);
+  const requiredPermission = '/sica/catalogos/modulos';
+  useEffect(() => {
+    if (!hasPermission(requiredPermission)) {
+      notify('No tienes permisos para acceder a esta página', 'error');
+      navigate('/');
+    }
+  }, [hasPermission, navigate, notify]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -93,12 +108,12 @@ const ModulosPage: React.FC = () => {
 
   const handleSaveModulo = async (newModulo: Modulo) => {
     try {
-      await service.createOrUpdateModulo(newModulo, editando).then(resp =>{
-        if(resp.status === 200){
+      await service.createOrUpdateModulo(newModulo, editando).then(resp => {
+        if (resp?.status === 200) {
 
           if (editando) {
             setModulos(modulos.map((modulo) =>
-              modulo.clave_modulo === editingModulo.clave_modulo ? newModulo : modulo
+              modulo.clave_modulo === editingModulo?.clave_modulo ? newModulo : modulo
             ));
             notify('Módulo actualizado correctamente', 'success');
           } else {
@@ -106,19 +121,19 @@ const ModulosPage: React.FC = () => {
             notify('Módulo agregado correctamente', 'success');
           }
 
-        }else{
+        } else {
           notify(resp.message, 'info');
-          setEliminados(0);    
+          setEliminados(0);
         }
-         }).catch(error =>{
+      }).catch(error => {
         // notify(error.response.data.message, 'error');
         notify("No es posible guardar el registro.", 'error');
-        setEliminados(0);    
+        setEliminados(0);
         // console.log("ocurrio un error",error.response.data.message);
-      }) 
+      })
 
 
-      
+
     } catch (error) {
       notify('No es posible eliminar el registro.', 'error');
     }
@@ -135,24 +150,24 @@ const ModulosPage: React.FC = () => {
     // console.log("handleDeleteModulo")
     setConfirmAction(() => async () => {
       try {
-        await service.deleteModulo(clave_modulo).then(resp =>{
-          if(resp.status === 200){
+        await service.deleteModulo(clave_modulo).then(resp => {
+          if (resp.status === 200) {
             setModulos(modulos.filter((modulo) => modulo.clave_modulo !== clave_modulo));
             notify('Módulo eliminado correctamente', 'success');
-            setSelectedIds([]);        
-          }else{
+            setSelectedIds([]);
+          } else {
             notify(resp.message, 'info');
-            setEliminados(0);    
-            setSelectedIds([]);        
+            setEliminados(0);
+            setSelectedIds([]);
 
           }
-           }).catch(error =>{
+        }).catch(error => {
           // notify(error.response.data.message, 'error');
           notify('No es posible eliminar el registro.', 'error');
-          setEliminados(0);    
-        }) 
+          setEliminados(0);
+        })
 
-    
+
       } catch (error) {
         notify('No es posible eliminar el registro.', 'error');
       }
@@ -160,37 +175,37 @@ const ModulosPage: React.FC = () => {
     setConfirmOpen(true);
   };
 
-// console.log(selectedIds);
+  // console.log(selectedIds);
   const handleDeleteMultiple = (clave_modulos: string[]) => {
-    for (var i=0; i < eliminados; i++) {
+    for (var i = 0; i < eliminados; i++) {
       // console.log("---")
       clave_modulos.shift();
     }
     setConfirmAction(() => async () => {
       try {
-       await service.deleteMultipleModulos(clave_modulos).then(resp =>{
-        if(resp.status === 200){
-          setModulos(modulos.filter((modulo) => !clave_modulos.includes(modulo.clave_modulo)));
-          notify('Módulo eliminado correctamente', 'success');
-          setEliminados(clave_modulos.length+eliminados);    
-          setSelectedIds([]);        
+        await service.deleteMultipleModulos(clave_modulos).then(resp => {
+          if (resp.status === 200) {
+            setModulos(modulos.filter((modulo) => !clave_modulos.includes(modulo.clave_modulo)));
+            notify('Módulo eliminado correctamente', 'success');
+            setEliminados(clave_modulos.length + eliminados);
+            setSelectedIds([]);
 
-          // console.log("modulos eliminadoas correctamente");
-        }else{
-          notify(resp.message, 'info');
-          // console.log("ocurrio un error al eliminar modulos: ",resp.message);
-          setEliminados(0);    
-          setSelectedIds([]);
+            // console.log("modulos eliminadoas correctamente");
+          } else {
+            notify(resp.message, 'info');
+            // console.log("ocurrio un error al eliminar modulos: ",resp.message);
+            setEliminados(0);
+            setSelectedIds([]);
 
-        }
-         }).catch(error =>{
-        // notify(error.response.data.message, 'error');
-        notify('No es posible eliminar los registros.', 'error');
-        setEliminados(0);    
-      }) 
-      
+          }
+        }).catch(error => {
+          // notify(error.response.data.message, 'error');
+          notify('No es posible eliminar los registros.', 'error');
+          setEliminados(0);
+        })
+
       } catch (error) {
-        setEliminados(0);    
+        setEliminados(0);
         notify('No es posible eliminar los registros.', 'error');
       }
     });

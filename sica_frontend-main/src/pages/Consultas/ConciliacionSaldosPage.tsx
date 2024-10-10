@@ -19,6 +19,11 @@ import {
 } from "@/pages/Reportes/conciliationService.ts";
 import { useNotification } from "@/providers/NotificationProvider.tsx";
 
+import useAuthStore from '../../store/authStore'; //para permisos
+import { useNavigate } from 'react-router-dom'; //para permisos
+
+
+
 
 const ConciliacionSaldosPage: React.FC = () => {
     const [filtros, setFiltros] = useState({
@@ -39,6 +44,17 @@ const ConciliacionSaldosPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const tableRef = useRef<any>(null);
+
+    const navigate = useNavigate();
+    const { hasPermission } = useAuthStore();
+    console.log(hasPermission);
+    const requiredPermission = '/sica/consulta/conciliacion-saldos';
+    useEffect(() => {
+        if (!hasPermission(requiredPermission)) {
+            notify('No tienes permisos para acceder a esta página', 'error');
+            navigate('/');
+        }
+    }, [hasPermission, navigate, notify]);
 
     useEffect(() => {
         fetchSistemas().then(resp => {

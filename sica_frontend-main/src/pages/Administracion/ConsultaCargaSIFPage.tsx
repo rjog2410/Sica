@@ -10,6 +10,9 @@ import * as serviceSistema from '../Catalogos/selectores/serviceSelectorSistemas
 import * as serviceModulo from '../Catalogos/selectores/serviceSelectorModulos';
 import * as serviceCargaSIF from '../Administracion/selectores/selectorCargaSIF';
 
+import useAuthStore from '../../store/authStore'; //para permisos
+import { useNavigate } from 'react-router-dom'; //para permisos
+
 
 const ConsultaCargaSIFPage: React.FC = () => {
   const [filtros, setFiltros] = useState<FiltrosCargaSIF>({
@@ -27,6 +30,17 @@ const ConsultaCargaSIFPage: React.FC = () => {
   const [modulos, setModulos] = useState<String[]>([]);
   const [selectedSistema, setSelectedSistema] = useState<string>('');
   const [selectedModulo, setSelectedModulo] = useState<string>('');
+
+  const navigate = useNavigate();
+  const { hasPermission } = useAuthStore();
+  console.log(hasPermission);
+  const requiredPermission = '/sica/administración/consulta-carga-sif';
+  useEffect(() => {
+      if (!hasPermission(requiredPermission)) {
+          notify('No tienes permisos para acceder a esta página', 'error');
+          navigate('/');
+      }
+  }, [hasPermission, navigate, notify]);
 
   const fetchData = async () => {
     try {

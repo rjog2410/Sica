@@ -8,6 +8,9 @@ import { useNotification } from '../../providers/NotificationProvider';
 import BodyHeader from '../../components/base/BodyHeader';
 import ComboBox from '@/components/base/tabla/Combobox';
 
+import useAuthStore from '../../store/authStore'; //para permisos
+import { useNavigate } from 'react-router-dom'; //para permisos
+
 const TraductorPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -35,6 +38,16 @@ const TraductorPage: React.FC = () => {
 
 
   const { notify } = useNotification();
+  const navigate = useNavigate();
+  const { hasPermission } = useAuthStore();
+  console.log(hasPermission);
+  const requiredPermission = '/sica/procesos/traductor';
+  useEffect(() => {
+      if (!hasPermission(requiredPermission)) {
+          notify('No tienes permisos para acceder a esta página', 'error');
+          navigate('/');
+      }
+  }, [hasPermission, navigate, notify]);
   useEffect(() => {
     const fetchData = async () => {
       try {

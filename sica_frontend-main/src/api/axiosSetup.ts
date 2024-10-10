@@ -3,8 +3,11 @@ import axios, { AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'ax
 import useAuthStore from '../store/authStore';
 
 export const axiosInstance = axios.create({
-  baseURL: 'http://127.0.0.1:8000/', // Asegúrate de que esta URL sea correcta
-  timeout: 5000, // Timeout para las peticiones
+  baseURL: 'http://localhost:8080', // Asegúrate de que esta URL sea correcta
+  timeout: 10000, // Timeout para las peticiones
+  headers : {
+    'Content-Type' : 'application/json',
+  }
 });
 
 // api/axiosSetup.ts
