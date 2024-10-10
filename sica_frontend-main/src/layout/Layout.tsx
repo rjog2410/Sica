@@ -32,6 +32,7 @@ const Layout: React.FC<LayoutProps> = ({ routes }) => {
   // const userHasPermissionForRoute = (routePath: string) => {
   //   return user?.permissions.includes(routePath); // Filtramos rutas según los permisos
   // };
+
   const userHasPermissionForRoute = (routePath: string, subroutes: { path: string }[] | undefined) => {
     const { user } = useAuthStore.getState();
 

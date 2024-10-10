@@ -10,6 +10,7 @@ import CuentaPage from './pages/Catalogos/CuentaPage.tsx';
 import ModulosPage from './pages/Catalogos/ModulosPage';
 import SistemasPage from './pages/Catalogos/SistemasPage';
 import ConciliacionSaldosPage from './pages/Consultas/ConciliacionSaldosPage';
+import UsuariosPage from './pages/Autenticacion/Usuarios/UsuariosPage.tsx'
 // import ConsultaDetallePage from './pages/Consultas/ConsultaDetallePage';
 import Home from './pages/Home';
 import ExtraccionSIFPage from './pages/Procesos/ExtraccionSIFPage';
@@ -27,7 +28,14 @@ const routes = [
     path: '/auth',
     name: 'Auth',
     component: Auth,  // Define que el componente Auth se renderice en esta ruta
-    hidden: true
+    hidden: true,
+    subroutes: [
+      {
+        path: '/sica/Autenticacion/usuarios',
+        name: 'Usuarios',
+        component: UsuariosPage // Ejemplo de subruta con componente
+      }
+    ]
   },
   {
     path: '/sica/catalogos',
