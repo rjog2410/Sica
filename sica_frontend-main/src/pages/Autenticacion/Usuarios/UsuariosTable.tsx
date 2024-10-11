@@ -26,6 +26,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
+import {fetchUsuarioPermisos} from "@/pages/Autenticacion/Usuarios/Service.tsx";
 
 
 interface Props {
@@ -38,19 +39,19 @@ interface Props {
 
 type Order = 'asc' | 'desc';
 
-const UsuariosTable = forwardRef(({ data,onSelectionChange,onUpdateUsuario,onDeleteUsuario }: Props) => {
+const UsuariosTable = forwardRef(({ data,onSelectionChange,onUpdateUsuario,onDeleteUsuario,pantallas }: Props) => {
 
     const [order, setOrder] = useState<Order>('asc');
     const [orderBy, setOrderBy] = useState<any>('id');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [isOpen, setIsOpen] = useState<boolean>(false);
-    const [currentUser, setCurrentUser] = useState<any>(null);
-    const [detailData, setDetailData] = useState<any>(null);
+    const [currentUser, setCurrentUser] = useState<Usuario>(null);
     const [selected, setSelected] = useState<number[]>([]);
-    const [openRoles, setOpenRoles] = React.useState(true);
-    const [openPer, setOpenPer] = React.useState(true);
-
+    const [openRoles, setOpenRoles] = React.useState(false);
+    const [openPer, setOpenPer] = React.useState(false);
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const [currentPer, setCurrentPer] = useState<Pantalla[]>([]);
 
 
     const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,11 +100,17 @@ const UsuariosTable = forwardRef(({ data,onSelectionChange,onUpdateUsuario,onDel
         onSelectionChange([])
     }, [paginatedData]);
 
-    /*useEffect(() => {
+    useEffect(() => {
         if (!!currentUser) {
-
+            fetchUsuarioPermisos(currentUser?.id).then(resp => {
+                if(resp?.status === 200){
+                    setCurrentPer(pantallas?.filter(pant => resp?.data?.includes(pant.id_pantalla)))
+                }else{
+                    setCurrentPer([])
+                }
+            })
         }
-    }, [currentUser]);*/
+    }, [currentUser]);
 
     const handleClick = () => {
         setOpenRoles(!openRoles);
@@ -112,6 +119,8 @@ const UsuariosTable = forwardRef(({ data,onSelectionChange,onUpdateUsuario,onDel
         setOpenPer(!openPer);
     };
     const isSelected = (id: number) => selected.indexOf(id) !== -1;
+
+
 
     return (
         <Box>
@@ -181,7 +190,7 @@ const UsuariosTable = forwardRef(({ data,onSelectionChange,onUpdateUsuario,onDel
                                         <IconButton onClick={(e) => {
                                         e.stopPropagation();
                                         setIsOpen(!isOpen);
-                                        setCurrentUser(row)
+                                        setCurrentUser(row);
                                     }} aria-label="view">
                                         🔎
                                     </IconButton></TableCell>
@@ -219,9 +228,9 @@ const UsuariosTable = forwardRef(({ data,onSelectionChange,onUpdateUsuario,onDel
             >
                 <DialogContent>
                     <Grid container spacing={1} display="flex" justifyContent="center" alignItems="center">
-                        <Grid item xs={3}>
+                        <Grid item xs={12}>
                             <List
-                                sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper', height:'100%'}}
+                                sx={{ width: '100%', bgcolor: 'background.paper', height:'100%'}}
                                 component="nav"
                                 aria-labelledby="nested-list-subheader"
                                 subheader={
@@ -230,20 +239,45 @@ const UsuariosTable = forwardRef(({ data,onSelectionChange,onUpdateUsuario,onDel
                                     </ListSubheader>
                                 }
                             >
-                                <ListItem disablePadding>
-                                    <ListItemText primary={`Usuario: ${currentUser?.username}`} />
+                                <ListItem  >
+                                    <TextField
+                                        fullWidth
+                                        label="Usuario"
+                                        value={currentUser?.username}
+                                        disabled={true}
+                                    />
                                 </ListItem>
-                                <ListItem disablePadding>
-                                    <ListItemText primary={`Nombre: ${currentUser?.nombre}`} />
+                                <ListItem >
+                                    <TextField
+                                        fullWidth
+                                        label="Nombre"
+                                        value={currentUser?.nombre}
+                                        disabled={true}
+                                    />
                                 </ListItem>
-                                <ListItem disablePadding>
-                                    <ListItemText primary={`Ubicación: ${currentUser?.ubicacion}`} />
+                                <ListItem >
+                                    <TextField
+                                        fullWidth
+                                        label="Ubicacion"
+                                        value={currentUser?.ubicacion}
+                                        disabled={true}
+                                    />
                                 </ListItem>
-                                <ListItem disablePadding>
-                                    <ListItemText primary={`Teléfono: ${currentUser?.telefono}`} />
+                                <ListItem >
+                                    <TextField
+                                        fullWidth
+                                        label="Telefono"
+                                        value={currentUser?.telefono}
+                                        disabled={true}
+                                    />
                                 </ListItem>
-                                <ListItem disablePadding>
-                                    <ListItemText primary={`Transferencia: ${currentUser?.transferencia}`} />
+                                <ListItem >
+                                    <TextField
+                                        fullWidth
+                                        label="Transferencia"
+                                        value={currentUser?.transferencia}
+                                        disabled={true}
+                                    />
                                 </ListItem>
                                 <ListItemButton onClick={handleClick}>
                                     <ListItemText primary="Roles" />
@@ -253,9 +287,9 @@ const UsuariosTable = forwardRef(({ data,onSelectionChange,onUpdateUsuario,onDel
                                     <List component="div" disablePadding>
                                         {
                                             currentUser?.roles?.map((role) => (
-                                                <ListItemButton sx={{ pl: 4 }}>
+                                                <ListItem sx={{ pl: 4 }}>
                                                     <ListItemText primary={role?.nombre_rol} />
-                                                </ListItemButton>
+                                                </ListItem>
                                             ))
                                         }
 
@@ -267,9 +301,13 @@ const UsuariosTable = forwardRef(({ data,onSelectionChange,onUpdateUsuario,onDel
                                 </ListItemButton>
                                 <Collapse in={openPer} timeout="auto" unmountOnExit>
                                     <List component="div" disablePadding>
-                                        <ListItemButton sx={{ pl: 4 }}>
-                                            <ListItemText primary="Starred" />
-                                        </ListItemButton>
+                                        {
+                                            currentPer?.map(per =>
+                                                <ListItem sx={{ pl: 4 }}>
+                                                    <ListItemText primary={per?.nombre_pantalla} />
+                                                </ListItem>
+                                            )
+                                        }
                                     </List>
                                 </Collapse>
                             </List>

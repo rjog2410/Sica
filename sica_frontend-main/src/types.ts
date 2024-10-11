@@ -281,7 +281,7 @@ export interface Usuario {
   telefono: number,
   ubicacion?: string,
   transferencia?: string,
-  roles: Rol,
+  roles: Rol[],
   rolesString: string
 }
 
