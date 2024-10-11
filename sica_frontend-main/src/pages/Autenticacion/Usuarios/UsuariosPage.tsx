@@ -170,11 +170,11 @@ const UsuariosPage: React.FC = () => {
                         notify(resp?.message,"success")
                         const per = currentPer?.map(per => per.id_pantalla)
                         fetchAssignUsuario(resp?.data?.id,per).then(respP=>{
-                            if(resp?.status === 200){
-                                notify(resp?.message,"success")
+                            if(respP?.status === 200){
+                                notify(respP?.message,"success")
                                 getAll()
                             } else {
-                                notify(resp?.message,"error")
+                                notify(respP?.message,"error")
                             }
                         })
                     }else {
@@ -187,11 +187,11 @@ const UsuariosPage: React.FC = () => {
                         notify(resp?.message,"success")
                         const per = currentPer?.map(per => per.id_pantalla)
                         fetchAssignUsuario(resp?.data?.id,per).then(respP=>{
-                            if(resp?.status === 200){
-                                notify(resp?.message,"success")
+                            if(respP?.status === 200){
+                                notify(respP?.message,"success")
                                 getAll()
                             } else {
-                                notify(resp?.message,"error")
+                                notify(respP?.message,"error")
                             }
                         })
                     }else {
