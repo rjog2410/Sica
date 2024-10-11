@@ -268,3 +268,27 @@ export interface FiltrosConsultaBatch {
   fecha_ini: string,
   fecha_fin: string,
 }
+
+export interface Rol {
+  id: number,
+  nombre_rol: string,
+}
+
+export interface Usuario {
+  id: number,
+  username: string,
+  nombre: string,
+  telefono: number,
+  ubicacion?: string,
+  transferencia?: string,
+  roles: Rol,
+  rolesString: string
+}
+
+export interface Pantalla {
+  id_pantalla: number,
+  nombre_pantalla: string,
+  nombre_menu: string,
+  id_menu: number,
+}
+

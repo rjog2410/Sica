@@ -1,6 +1,6 @@
 import axios from "axios";
 import {ReporteConciliacion, ReporteConciliacionFiltros} from "./interfaces";
-import {ConciliacionCuenta, ConciliacionCuentaDetalle} from "@/types.ts";
+import { ConciliacionCuentaDetalle} from "@/types.ts";
 
 const BASE_URL = 'http://localhost:8080';
 

@@ -51,9 +51,9 @@ const ConciliacionTable = forwardRef(({ data }: Props, ref) => {
     }, [sortedData, page, rowsPerPage]);
 
 
-    const totalSif = data.reduce((acc, row) => acc + (parseFloat(row.con_importe_sif.replace(",", "")) || 0), 0);
-    const totalAo = data.reduce((acc, row) => acc + (parseFloat(row.con_importe_ao.replace(",", "")) || 0), 0);
-    const totalDif = data.reduce((acc, row) => acc + (parseFloat(row.con_dif.replace(",", "")) || 0), 0);
+    const totalSif = data.reduce((acc, row) => acc + (parseFloat(row.con_importe_sif?.replace(",", "")) || 0), 0);
+    const totalAo = data.reduce((acc, row) => acc + (parseFloat(row.con_importe_ao?.replace(",", "")) || 0), 0);
+    const totalDif = data.reduce((acc, row) => acc + (parseFloat(row.con_dif?.replace(",", "")) || 0), 0);
 
     // Formateo de los totales con comas y 2 decimales
     const formattedTotalSif = totalSif.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
