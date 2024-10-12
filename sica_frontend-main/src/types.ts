@@ -272,6 +272,7 @@ export interface FiltrosConsultaBatch {
 export interface Rol {
   id: number,
   nombre_rol: string,
+  pantallasId: number[],
 }
 
 export interface Usuario {
@@ -291,4 +292,3 @@ export interface Pantalla {
   nombre_menu: string,
   id_menu: number,
 }
-

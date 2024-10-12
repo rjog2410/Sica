@@ -10,7 +10,8 @@ import CuentaPage from './pages/Catalogos/CuentaPage.tsx';
 import ModulosPage from './pages/Catalogos/ModulosPage';
 import SistemasPage from './pages/Catalogos/SistemasPage';
 import ConciliacionSaldosPage from './pages/Consultas/ConciliacionSaldosPage';
-import UsuariosPage from './pages/Autenticacion/Usuarios/UsuariosPage.tsx'
+import UsuariosPage from './pages/Autenticacion/Usuarios/UsuariosPage.tsx';
+import RolesPage from './pages/Autenticacion/Roles/RolesPage.tsx';
 // import ConsultaDetallePage from './pages/Consultas/ConsultaDetallePage';
 import Home from './pages/Home';
 import ExtraccionSIFPage from './pages/Procesos/ExtraccionSIFPage';
@@ -34,7 +35,12 @@ const routes = [
         path: '/sica/Autenticacion/usuarios',
         name: 'Usuarios',
         component: UsuariosPage // Ejemplo de subruta con componente
-      }
+      },
+      {
+        path: '/sica/autenticacion/rol',
+        name: 'Roles',
+        component: RolesPage 
+      },
     ]
   },
   {
