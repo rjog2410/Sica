@@ -12,6 +12,7 @@ import * as serviceConsultaBatch from '../Administracion/selectores/selectorCons
 
 import useAuthStore from '../../store/authStore'; //para permisos
 import { useNavigate } from 'react-router-dom'; //para permisos
+import * as serviceInfo from '@/pages/CommonServices/commonService';
 
 
 const ConsultaBatchPage: React.FC = () => {
@@ -32,21 +33,35 @@ const ConsultaBatchPage: React.FC = () => {
   const [selectedSistema, setSelectedSistema] = useState<string>('');
   const [selectedModulo, setSelectedModulo] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
-
+  const [infoData, setInfoData] = useState<string>('');
   const navigate = useNavigate();
   const { hasPermission } = useAuthStore();
-  console.log(hasPermission);
+  const { token } = useAuthStore();
   const requiredPermission = '/sica/administración/consulta-bach';
   useEffect(() => {
-      if (!hasPermission(requiredPermission)) {
-          notify('No tienes permisos para acceder a esta página', 'error');
-          navigate('/');
-      }
+    if (!hasPermission(requiredPermission)) {
+      notify('No tienes permisos para acceder a esta página', 'error');
+      navigate('/');
+    }
   }, [hasPermission, navigate, notify]);
+
+  useEffect(() => {
+    const getInfo = async () => {
+      try {
+        const data = await serviceInfo.getInfoPantalla(requiredPermission, token);
+        setInfoData(data);
+
+      } catch (error) {
+        notify('Error al cargar los datos de la pantalla', 'error');
+      }
+    };
+
+    getInfo();
+  }, [notify]);
 
   const fetchData = async () => {
     try {
-      const dataSist = await serviceSistema.fetchSistemas();
+      const dataSist = await serviceSistema.fetchSistemas(token);
       if (!!dataSist && dataSist.length > 0) {
         console.log("sistemas recuperados: ", dataSist);
         // setSistemas(dataSist);
@@ -71,7 +86,7 @@ const ConsultaBatchPage: React.FC = () => {
 
   const fetchDataMOduloByClaveSistema = async () => {
     try {
-      const dataModXSist = await serviceModulo.fetchModuloByClave(selectedSistema);
+      const dataModXSist = await serviceModulo.fetchModuloByClave(selectedSistema,token);
       if (!dataModXSist || dataModXSist.length == 0) {
         setModulos([]);
         setSelectedModulo('');
@@ -92,7 +107,7 @@ const ConsultaBatchPage: React.FC = () => {
   useEffect(() => {
     if (!!selectedSistema && selectedSistema !== '' && selectedSistema != "TODOS") {
       fetchDataMOduloByClaveSistema();
-    } else{
+    } else {
       setModulos(['TODOS']);
       setSelectedModulo('TODOS');
     }
@@ -147,7 +162,7 @@ const ConsultaBatchPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      serviceConsultaBatch.saveBatchProcess(filtros).then(resp => {
+      serviceConsultaBatch.saveBatchProcess(filtros,token).then(resp => {
         console.log("respuesta: ", resp);
         if (!!resp && resp.status == 200) {
           notify('Proceso Batch ' + filtros.proceso + ' guardado correctamente.', 'success');
@@ -178,7 +193,7 @@ const ConsultaBatchPage: React.FC = () => {
       <BodyHeader
         headerRoute="Administración / Parametrización de Procesos Batch"
         TitlePage="Parametrización de Procesos Batch"
-        tooltipProps={{ title: 'Parametriza los procesos Batch diarios' }}
+        tooltipProps={{ title: infoData }}
         typographyPropsRoute={{ variant: 'h6' }}
         typographyPropsTitle={{ variant: 'h3' }}
       />

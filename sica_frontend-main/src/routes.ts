@@ -11,6 +11,8 @@ import ModulosPage from './pages/Catalogos/ModulosPage';
 import SistemasPage from './pages/Catalogos/SistemasPage';
 import ConciliacionSaldosPage from './pages/Consultas/ConciliacionSaldosPage';
 import UsuariosPage from './pages/Autenticacion/Usuarios/UsuariosPage.tsx';
+import MenuPage from './pages/Autenticacion/Menu/MenuPage.tsx';
+import PantallasPage from './pages/Autenticacion/Pantallas/PantallasPage.tsx';
 import RolesPage from './pages/Autenticacion/Roles/RolesPage.tsx';
 // import ConsultaDetallePage from './pages/Consultas/ConsultaDetallePage';
 import Home from './pages/Home';
@@ -31,16 +33,7 @@ const routes = [
     component: Auth,  // Define que el componente Auth se renderice en esta ruta
     hidden: true,
     subroutes: [
-      {
-        path: '/sica/Autenticacion/usuarios',
-        name: 'Usuarios',
-        component: UsuariosPage // Ejemplo de subruta con componente
-      },
-      {
-        path: '/sica/autenticacion/rol',
-        name: 'Roles',
-        component: RolesPage 
-      },
+      
     ]
   },
   {
@@ -137,7 +130,34 @@ const routes = [
         component: ConsultaBatchPage
       }
     ]
-  }
+  },
+  {
+    path: '/seguridad',
+    name: 'Seguridad',
+    menuOnly: true, // Añade la propiedad menuOnly para rutas que solo actúan como menú
+    subroutes: [
+      {
+        path: '/sica/seguridad/usuarios',
+        name: 'Usuarios',
+        component: UsuariosPage // Ejemplo de subruta con componente
+      },
+      {
+        path: '/sica/seguridad/rol',
+        name: 'Roles',
+        component: RolesPage 
+      },
+      {
+        path: '/sica/seguridad/pantallas',
+        name: 'Pantallas',
+        component: PantallasPage 
+      },
+      {
+        path: '/sica/seguridad/menus',
+        name: 'Menus',
+        component: MenuPage 
+      },
+    ]
+  },
 ];
 
 export default routes;

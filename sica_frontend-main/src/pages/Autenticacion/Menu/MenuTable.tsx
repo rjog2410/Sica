@@ -21,49 +21,44 @@ import {
     ListItemButton,
     ListItemIcon, ListItemText, Collapse, ListItem,
 } from '@mui/material';
-import {Pantalla, Usuario} from "@/types.ts";
+import {Menu} from "@/types.ts";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import {fetchUsuarioPermisos} from "@/pages/Autenticacion/Usuarios/Service.tsx";
 
 
 interface Props {
-    data: Usuario[];
-    pantallas: Pantalla[];
+    data: Menu[];
     onSelectionChange: (selectedIds: number[]) => void;
-    onUpdateUsuario: (cuenta: Usuario) => void;
-    onDeleteUsuario: (id: number) => void;
+    onUpdateMenu: (cuenta: Menu) => void;
+    onDeleteMenu: (id: number) => void;
 }
 
 type Order = 'asc' | 'desc';
 
-// const UsuariosTable = forwardRef(({ data,onSelectionChange,onUpdateUsuario,onDeleteUsuario,pantallas }: Props) => {
+// const MenuTable = forwardRef(({ data,onSelectionChange,onUpdateMenu,onDeleteMenu,pantallas }: Props) => {
 
 //     const [order, setOrder] = useState<Order>('asc');
 //     const [orderBy, setOrderBy] = useState<any>('id');
 //     const [page, setPage] = useState(0);
 //     const [rowsPerPage, setRowsPerPage] = useState(10);
 //     const [isOpen, setIsOpen] = useState<boolean>(false);
-//     const [currentUser, setCurrentUser] = useState<Usuario>(null);
+//     const [currentMenu, setCurrentMenu] = useState<Menu>(null);
 //     const [selected, setSelected] = useState<number[]>([]);
 //     const [openRoles, setOpenRoles] = React.useState(false);
 //     const [openPer, setOpenPer] = React.useState(false);
 //     const [errors, setErrors] = useState<{ [key: string]: string }>({});
-//     const [currentPer, setCurrentPer] = useState<Pantalla[]>([]);
-const UsuariosTable = forwardRef<HTMLDivElement, Props>(({ data, onSelectionChange, onUpdateUsuario, onDeleteUsuario, pantallas }, ref) => {
+//     const [currentPer, setCurrentPer] = useState<Menu[]>([]);
+const MenuTable = forwardRef<HTMLDivElement, Props>(({ data, onSelectionChange, onUpdateMenu, onDeleteMenu }, ref) => {
     const [order, setOrder] = useState<Order>('asc');
     const [orderBy, setOrderBy] = useState<any>('id');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [isOpen, setIsOpen] = useState<boolean>(false);
-    const [currentUser, setCurrentUser] = useState<Usuario>(null);
+    const [currentMenu, setCurrentMenu] = useState<Menu>(null);
     const [selected, setSelected] = useState<number[]>([]);
-    const [openRoles, setOpenRoles] = React.useState(false);
-    const [openPer, setOpenPer] = React.useState(false);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
-    const [currentPer, setCurrentPer] = useState<Pantalla[]>([]);
 
     const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked) {
@@ -76,7 +71,7 @@ const UsuariosTable = forwardRef<HTMLDivElement, Props>(({ data, onSelectionChan
         onSelectionChange([]);
     };
 
-    const handleRequestSort = (property: keyof Usuario) => {
+    const handleRequestSort = (property: keyof Menu) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
         setOrderBy(property);
@@ -111,27 +106,8 @@ const UsuariosTable = forwardRef<HTMLDivElement, Props>(({ data, onSelectionChan
         onSelectionChange([])
     }, [paginatedData]);
 
-    useEffect(() => {
-        if (!!currentUser) {
-            fetchUsuarioPermisos(currentUser?.id).then(resp => {
-                if(resp?.status === 200){
-                    setCurrentPer(pantallas?.filter(pant => resp?.data?.includes(pant.id_pantalla)))
-                }else{
-                    setCurrentPer([])
-                }
-            })
-        }
-    }, [currentUser]);
 
-    const handleClick = () => {
-        setOpenRoles(!openRoles);
-    };
-    const handleClickPermi = () => {
-        setOpenPer(!openPer);
-    };
     const isSelected = (id: number) => selected.indexOf(id) !== -1;
-
-
 
     return (
         <Box>
@@ -153,14 +129,9 @@ const UsuariosTable = forwardRef<HTMLDivElement, Props>(({ data, onSelectionChan
                                     direction={orderBy === 'id' ? order : 'asc'}
                                     onClick={() => handleRequestSort('id')}
                                 />
-                                Id Usuario
+                                Id Menu
                             </TableCell>
-                            <TableCell>Username</TableCell>
-                            <TableCell>Nombre</TableCell>
-                            <TableCell>Teléfono</TableCell>
-                            <TableCell>Ubicación</TableCell>
-                            <TableCell>Transferencia</TableCell>
-                            <TableCell>Roles</TableCell>
+                            <TableCell>Nombre de Menu</TableCell>
                             <TableCell>Acciones</TableCell>
                         </TableRow>
                     </TableHead>
@@ -183,28 +154,17 @@ const UsuariosTable = forwardRef<HTMLDivElement, Props>(({ data, onSelectionChan
                                         />
                                     </TableCell>
                                     <TableCell>{row.id}</TableCell>
-                                    <TableCell>{row.username}</TableCell>
                                     <TableCell>{row.nombre}</TableCell>
-                                    <TableCell>{row.telefono}</TableCell>
-                                    <TableCell>{row.ubicacion}</TableCell>
-                                    <TableCell>{row.transferencia}</TableCell>
-                                    <TableCell>{row.rolesString}</TableCell>
                                     <TableCell>
                                         <IconButton onClick={() => {
-                                            onUpdateUsuario(row);
+                                            onUpdateMenu(row);
                                         }} aria-label="edit">
                                             <EditIcon />
                                         </IconButton>
-                                        <IconButton onClick={() => onDeleteUsuario(row.id!)} aria-label="delete">
+                                        <IconButton onClick={() => onDeleteMenu(row.id!)} aria-label="delete">
                                             <DeleteIcon />
                                         </IconButton>
-                                        <IconButton onClick={(e) => {
-                                        e.stopPropagation();
-                                        setIsOpen(!isOpen);
-                                        setCurrentUser(row);
-                                    }} aria-label="view">
-                                        🔎
-                                    </IconButton></TableCell>
+                                        </TableCell>
                                 </TableRow>
                             )
                         })}
@@ -224,7 +184,7 @@ const UsuariosTable = forwardRef<HTMLDivElement, Props>(({ data, onSelectionChan
                 open={isOpen}
                 onClose={() => {
                     setIsOpen(!isOpen)
-                    setCurrentUser(null)
+                    setCurrentMenu(null)
                 }}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
@@ -246,81 +206,35 @@ const UsuariosTable = forwardRef<HTMLDivElement, Props>(({ data, onSelectionChan
                                 aria-labelledby="nested-list-subheader"
                                 subheader={
                                     <ListSubheader component="div" id="nested-list-subheader">
-                                        Información de usuario
+                                        Información de las pantallas
                                     </ListSubheader>
                                 }
                             >
-                                <ListItem  >
-                                    <TextField
-                                        fullWidth
-                                        label="Usuario"
-                                        value={currentUser?.username}
-                                        disabled={true}
-                                    />
-                                </ListItem>
                                 <ListItem >
                                     <TextField
                                         fullWidth
                                         label="Nombre"
-                                        value={currentUser?.nombre}
+                                        value={currentMenu?.nombre}
                                         disabled={true}
                                     />
                                 </ListItem>
                                 <ListItem >
                                     <TextField
                                         fullWidth
-                                        label="Ubicacion"
-                                        value={currentUser?.ubicacion}
+                                        label="Tipo"
+                                        value={currentMenu?.tipo}
                                         disabled={true}
                                     />
                                 </ListItem>
                                 <ListItem >
                                     <TextField
                                         fullWidth
-                                        label="Telefono"
-                                        value={currentUser?.telefono}
+                                        label="URL"
+                                        value={currentMenu?.url}
                                         disabled={true}
                                     />
                                 </ListItem>
-                                <ListItem >
-                                    <TextField
-                                        fullWidth
-                                        label="Transferencia"
-                                        value={currentUser?.transferencia}
-                                        disabled={true}
-                                    />
-                                </ListItem>
-                                <ListItemButton onClick={handleClick}>
-                                    <ListItemText primary="Roles" />
-                                    {openRoles ? <ExpandLess /> : <ExpandMore />}
-                                </ListItemButton>
-                                <Collapse in={openRoles} timeout="auto" unmountOnExit>
-                                    <List component="div" disablePadding>
-                                        {
-                                            currentUser?.roles?.map((role) => (
-                                                <ListItem sx={{ pl: 4 }}>
-                                                    <ListItemText primary={role?.nombre_rol} />
-                                                </ListItem>
-                                            ))
-                                        }
-
-                                    </List>
-                                </Collapse>
-                                <ListItemButton onClick={handleClickPermi}>
-                                    <ListItemText primary="Permisos" />
-                                    {openPer ? <ExpandLess /> : <ExpandMore />}
-                                </ListItemButton>
-                                <Collapse in={openPer} timeout="auto" unmountOnExit>
-                                    <List component="div" disablePadding>
-                                        {
-                                            currentPer?.map(per =>
-                                                <ListItem sx={{ pl: 4 }}>
-                                                    <ListItemText primary={per?.nombre_pantalla} />
-                                                </ListItem>
-                                            )
-                                        }
-                                    </List>
-                                </Collapse>
+                               
                             </List>
                         </Grid>
                     </Grid>
@@ -330,4 +244,4 @@ const UsuariosTable = forwardRef<HTMLDivElement, Props>(({ data, onSelectionChan
     );
 });
 
-export default UsuariosTable;
+export default MenuTable;

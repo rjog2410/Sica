@@ -11,7 +11,7 @@ import * as serviceSistema from './selectores/serviceSelectorSistemas';
 import * as serviceModulo from './selectores/serviceSelectorModulos';
 import useAuthStore from '../../store/authStore'; //para permisos
 import { useNavigate } from 'react-router-dom'; //para permisos
-
+import * as serviceInfo from '@/pages/CommonServices/commonService'
 const ColumnasPage: React.FC = () => {
   const [sistemas, setSistemas] = useState<Sistema[]>([]);
   const [modulos, setModulos] = useState<String[]>([]);
@@ -28,8 +28,9 @@ const ColumnasPage: React.FC = () => {
   //ajuste permisos start
   const navigate = useNavigate();
   const { hasPermission } = useAuthStore(); 
-  console.log(hasPermission);
   const requiredPermission = '/sica/catalogos/columna';
+  const [infoData, setInfoData] = useState<string>(''); 
+  const { token } = useAuthStore();
     useEffect(() => {
       if (!hasPermission(requiredPermission)) {
         notify('No tienes permisos para acceder a esta página', 'error');
@@ -40,23 +41,12 @@ const ColumnasPage: React.FC = () => {
     //ajustes permisos end
 
   useEffect(() => {
-    console.log("selectedSistema: ", selectedSistema);
+    // console.log("selectedSistema: ", selectedSistema);
     setColumnas([]);
     setModulos([]);
-    serviceSistema.fetchSistemas().then(resp => {
+    serviceSistema.fetchSistemas(token).then(resp => {
       if (!!resp && resp.length > 0) {
         setSistemas(resp);
-        /*
-        serviceColumna.fetchColumnas().then(resp => {
-          console.log(resp);
-          setColumnas(resp); 
-          setSelectedModulo('TODOS');
-          notify("consultando todas las columnas", 'success');              
-        }).catch(resp =>{
-          console.error('Error al cargar los datos de columnas para todos los sistemas', error);
-        notify('Error al cargar los datos de columnas para todos los sistemas', 'error');
-        });
-        */
 
       }
     }).catch(error => {
@@ -65,14 +55,27 @@ const ColumnasPage: React.FC = () => {
     })
   }, []);
 
+  useEffect(() => {
+    const getInfo = async () =>
+    { 
+      try {
+        const data = await serviceInfo.getInfoPantalla(requiredPermission,token);
+        setInfoData(data);
+      } catch (error) {
+        setInfoData('Sin Información.');
+      }
+    };
+    getInfo();
+  }, []);
+
   const fetchDataMOduloByClaveSis = async () => {
     try {
       setColumnas([]);
       let dataMod = null;
       if (!!selectedSistema && selectedSistema !== 'TODOS') {
-        dataMod = await serviceModulo.fetchModuloByClave(selectedSistema);
+        dataMod = await serviceModulo.fetchModuloByClave(selectedSistema,token);
       } else {
-        dataMod = await serviceModulo.fetchModulos();
+        dataMod = await serviceModulo.fetchModulos(token);
       }
 
       if (!!dataMod && dataMod.length > 0) {
@@ -80,7 +83,7 @@ const ColumnasPage: React.FC = () => {
         setModulos(['TODOS', ...Array.from(new Set(dataMod.map(obj => obj?.mod_clave)))]);
         setSelectedModulo('TODOS');
 
-        serviceColumna.fetchColumnaByCveSistema(selectedSistema).then(resp => {
+        serviceColumna.fetchColumnaByCveSistema(selectedSistema,token).then(resp => {
           console.log(resp);
           setColumnas(resp);
           notify("consultando columnas por sistema: " + selectedSistema, 'success');
@@ -111,7 +114,7 @@ const ColumnasPage: React.FC = () => {
 
     } else {
       console.log("consultando all columnas");
-      serviceColumna.fetchColumnas().then(resp => {
+      serviceColumna.fetchColumnas(token).then(resp => {
         setColumnas(resp);
         setSelectedModulo('TODOS');
         notify("consultando todas las columnas", 'success');
@@ -129,7 +132,7 @@ const ColumnasPage: React.FC = () => {
       console.log("consultando columnas por sistema: " + selectedSistema);
 
       console.log("consultando columnas por sistema: " + selectedSistema + ' y modulo: ' + selectedModulo);
-      serviceColumna.fetchColumnasBySisCveAndModCve(selectedSistema, selectedModulo).then(resp => {
+      serviceColumna.fetchColumnasBySisCveAndModCve(selectedSistema, selectedModulo,token).then(resp => {
         console.log(resp);
         setColumnas(resp);
         notify("consultando columnas por sistema: " + selectedSistema + ' y modulo: ' + selectedModulo, 'success');
@@ -173,7 +176,7 @@ const ColumnasPage: React.FC = () => {
       if (editingColumna != null) {
 
         console.log("editando col: ", newColumna);
-        serviceColumna.createOrUpdateColumna(newColumna, true).then(resp => {
+        serviceColumna.createOrUpdateColumna(newColumna, true,token).then(resp => {
           if (resp?.data?.status == 200) {
             setColumnas(columnas.map((columna) =>
               (columna.numero_columna === editingColumna.numero_columna && columna.clave_sistema === editingColumna.clave_sistema && columna.clave_modulo === editingColumna.clave_modulo) ? newColumna : columna
@@ -191,7 +194,7 @@ const ColumnasPage: React.FC = () => {
 
       } else {
         // console.log("nueva col: ");
-        serviceColumna.createOrUpdateColumna(newColumna).then(resp => {
+        serviceColumna.createOrUpdateColumna(newColumna,false,token).then(resp => {
           // console.log("respuesta agregar columna: ",resp);
 
           if (resp?.data?.status == 200) {
@@ -228,7 +231,7 @@ const ColumnasPage: React.FC = () => {
 
     setConfirmAction(() => async () => {
       try {
-        await serviceColumna.deleteColumna(columnaToDelete);  // Aquí pasamos el objeto Columna completo
+        await serviceColumna.deleteColumna(columnaToDelete,token);  // Aquí pasamos el objeto Columna completo
         setColumnas(columnas.filter(columna => columna.numero_columna !== numero_columna));
         notify('Columna eliminada correctamente', 'success');
       } catch (error) {
@@ -246,7 +249,7 @@ const ColumnasPage: React.FC = () => {
     setConfirmAction(() => async () => {
       try {
         // console.log("columnas a eliminar: ",columnasToDelete);
-        await serviceColumna.deleteMultipleColumnas(columnasToDelete).then(resp => {
+        await serviceColumna.deleteMultipleColumnas(columnasToDelete,token).then(resp => {
           if (resp.status === 200) {
             consultaCols();
             notify(resp.message, 'success');
@@ -289,7 +292,7 @@ const ColumnasPage: React.FC = () => {
       <BodyHeader
         headerRoute="Catálogos / Columnas"
         TitlePage="Columnas"
-        tooltipProps={{ title: "Información sobre la Gestión de Columnas" }}
+        tooltipProps={{ title: infoData }}
         typographyPropsRoute={{ variant: "h6" }}
         typographyPropsTitle={{ variant: "h3" }}
       />

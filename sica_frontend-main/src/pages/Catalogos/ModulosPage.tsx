@@ -10,7 +10,7 @@ import AddModuloModal from './modales/AddModuloModal';
 import ConfirmDialog from '../../components/base/ConfirmDialog';
 import useAuthStore from '../../store/authStore'; //para permisos
 import { useNavigate } from 'react-router-dom'; //para permisos
-
+import * as serviceInfo from '@/pages/CommonServices/commonService';
 
 
 const ModulosPage: React.FC = () => {
@@ -39,13 +39,12 @@ const ModulosPage: React.FC = () => {
   const [editando, setEditando] = useState<boolean>(false);
   var [eliminados, setEliminados] = useState<number>(0);
   const [filterValue, setFilterValue] = useState<string>('TODOS');
-
-
+  const [infoData, setInfoData] = useState<string>(''); 
+  const { token } = useAuthStore();
   const { notify } = useNotification();
 
   const navigate = useNavigate();
   const { hasPermission } = useAuthStore();
-  console.log(hasPermission);
   const requiredPermission = '/sica/catalogos/modulos';
   useEffect(() => {
     if (!hasPermission(requiredPermission)) {
@@ -54,14 +53,39 @@ const ModulosPage: React.FC = () => {
     }
   }, [hasPermission, navigate, notify]);
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const data = await service.fetchModulos();
+  //       setModulos(data);
+  //       notify('Módulos cargados', 'info');
+  //     } catch (error) {
+  //       notify('Error al cargar los datos de módulos', 'error');
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, [notify]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await service.fetchModulos();
-        setModulos(data);
+        // Ejecutar ambas promesas en paralelo
+        const [ModulosData, data] = await Promise.all([
+          service.fetchModulos(token),
+          serviceInfo.getInfoPantalla(requiredPermission, token)
+        ]);
+
+        // Actualizar los estados con los datos obtenidos
+        setModulos(ModulosData);
+        // console.log(infoData);
+        setInfoData(data);
+
         notify('Módulos cargados', 'info');
       } catch (error) {
-        notify('Error al cargar los datos de módulos', 'error');
+        notify('Error al cargar los datos', 'error');
       } finally {
         setLoading(false);
       }
@@ -108,7 +132,7 @@ const ModulosPage: React.FC = () => {
 
   const handleSaveModulo = async (newModulo: Modulo) => {
     try {
-      await service.createOrUpdateModulo(newModulo, editando).then(resp => {
+      await service.createOrUpdateModulo(newModulo, editando, token).then(resp => {
         if (resp?.status === 200) {
 
           if (editando) {
@@ -150,7 +174,7 @@ const ModulosPage: React.FC = () => {
     // console.log("handleDeleteModulo")
     setConfirmAction(() => async () => {
       try {
-        await service.deleteModulo(clave_modulo).then(resp => {
+        await service.deleteModulo(clave_modulo, token).then(resp => {
           if (resp.status === 200) {
             setModulos(modulos.filter((modulo) => modulo.clave_modulo !== clave_modulo));
             notify('Módulo eliminado correctamente', 'success');
@@ -183,7 +207,7 @@ const ModulosPage: React.FC = () => {
     }
     setConfirmAction(() => async () => {
       try {
-        await service.deleteMultipleModulos(clave_modulos).then(resp => {
+        await service.deleteMultipleModulos(clave_modulos, token).then(resp => {
           if (resp.status === 200) {
             setModulos(modulos.filter((modulo) => !clave_modulos.includes(modulo.clave_modulo)));
             notify('Módulo eliminado correctamente', 'success');
@@ -232,7 +256,7 @@ const ModulosPage: React.FC = () => {
       <BodyHeader
         headerRoute="Catálogos / Módulos"
         TitlePage="Módulos"
-        tooltipProps={{ title: "Información sobre la Gestión de Módulos" }}
+        tooltipProps={{ title: infoData }}
         typographyPropsRoute={{ variant: "h6" }}
         typographyPropsTitle={{ variant: "h3" }}
       />

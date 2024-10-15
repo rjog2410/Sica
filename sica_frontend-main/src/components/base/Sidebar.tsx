@@ -117,18 +117,3 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, routes }) => {
 };
 
 export default Sidebar;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

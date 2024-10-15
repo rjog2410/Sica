@@ -292,3 +292,23 @@ export interface Pantalla {
   nombre_menu: string,
   id_menu: number,
 }
+
+export interface Pantallas {
+  id_pantalla: number;
+  nombre_pantalla: string;
+  id: number;
+  nombre: string;
+  tipo: string;
+  url: string;
+  id_menu: number;
+  nombre_menu: string;
+}
+
+
+export interface Menu {
+  id:number;
+  nombre: string;
+  orden: string;
+  tipo: string;
+  url: string;
+}

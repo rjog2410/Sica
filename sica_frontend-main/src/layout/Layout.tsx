@@ -32,7 +32,6 @@ const Layout: React.FC<LayoutProps> = ({ routes }) => {
   // const userHasPermissionForRoute = (routePath: string) => {
   //   return user?.permissions.includes(routePath); // Filtramos rutas según los permisos
   // };
-
   const userHasPermissionForRoute = (routePath: string, subroutes: { path: string }[] | undefined) => {
     const { user } = useAuthStore.getState();
 
@@ -59,71 +58,71 @@ const Layout: React.FC<LayoutProps> = ({ routes }) => {
 
 
 //   //VERSION FINAL
-//   return (
-//     <Box sx={{ display: 'flex', height: '100vh', padding: 3, backgroundColor: '#00708F' }}>
-//       <Header handleDrawerToggle={handleDrawerToggle} />
-//       <Sidebar
-//         collapsed={collapsed}
-//         routes={routes
-//           .filter(route => userHasPermissionForRoute(route.path, route.subroutes)) // Filtrar rutas principales
-//           .map(route => ({
-//             ...route,
-//             subroutes: filterSubroutesWithPermissions(route.subroutes || []), // Filtrar subrutas permitidas
-//           }))}
-//       />
-//       <Content>
-//         {routes.map((route) => (
-//           <React.Fragment key={route.path}>
-//             <Route path={route.path}>
-//               {() => {
-//                 const Component = route.component;
-//                 return Component ? <Component /> : null;
-//               }}
-//             </Route>
-//             {route.subroutes?.map((subroute) => (
-//               <Route key={subroute.path} path={subroute.path}>
-//                 {() => {
-//                   const SubComponent = subroute.component;
-//                   return SubComponent ? <SubComponent /> : null;
-//                 }}
-//               </Route>
-//             ))}
-//           </React.Fragment>
-//         ))}
-//       </Content>
-//     </Box>
-//   );
-// };
-
-// export default Layout;
-
-
-return (
-  <Box sx={{ display: 'flex', height: '100vh', padding:3, backgroundColor:'#00708F' }}>
-    <Header handleDrawerToggle={handleDrawerToggle} />
-    <Sidebar collapsed={collapsed} routes={routes} />
-    <Content>
-      {routes.map((route) => (
-        <React.Fragment key={route.path}>
-          <Route path={route.path}>
-            {() => {
-              const Component = route.component;
-              return Component ? <Component /> : null;
-            }}
-          </Route>
-          {route.subroutes?.map((subroute) => (
-            <Route key={subroute.path} path={subroute.path}>
+  return (
+    <Box sx={{ display: 'flex', height: '100vh', padding: 3, backgroundColor: '#00708F' }}>
+      <Header handleDrawerToggle={handleDrawerToggle} />
+      <Sidebar
+        collapsed={collapsed}
+        routes={routes
+          .filter(route => userHasPermissionForRoute(route.path, route.subroutes)) // Filtrar rutas principales
+          .map(route => ({
+            ...route,
+            subroutes: filterSubroutesWithPermissions(route.subroutes || []), // Filtrar subrutas permitidas
+          }))}
+      />
+      <Content>
+        {routes.map((route) => (
+          <React.Fragment key={route.path}>
+            <Route path={route.path}>
               {() => {
-                const SubComponent = subroute.component;
-                return SubComponent ? <SubComponent /> : null;
+                const Component = route.component;
+                return Component ? <Component /> : null;
               }}
             </Route>
-          ))}
-        </React.Fragment>
-      ))}
-    </Content>
-  </Box>
-);
+            {route.subroutes?.map((subroute) => (
+              <Route key={subroute.path} path={subroute.path}>
+                {() => {
+                  const SubComponent = subroute.component;
+                  return SubComponent ? <SubComponent /> : null;
+                }}
+              </Route>
+            ))}
+          </React.Fragment>
+        ))}
+      </Content>
+    </Box>
+  );
 };
 
 export default Layout;
+
+
+// return (
+//   <Box sx={{ display: 'flex', height: '100vh', padding:3, backgroundColor:'#00708F' }}>
+//     <Header handleDrawerToggle={handleDrawerToggle} />
+//     <Sidebar collapsed={collapsed} routes={routes} />
+//     <Content>
+//       {routes.map((route) => (
+//         <React.Fragment key={route.path}>
+//           <Route path={route.path}>
+//             {() => {
+//               const Component = route.component;
+//               return Component ? <Component /> : null;
+//             }}
+//           </Route>
+//           {route.subroutes?.map((subroute) => (
+//             <Route key={subroute.path} path={subroute.path}>
+//               {() => {
+//                 const SubComponent = subroute.component;
+//                 return SubComponent ? <SubComponent /> : null;
+//               }}
+//             </Route>
+//           ))}
+//         </React.Fragment>
+//       ))}
+//     </Content>
+//   </Box>
+// );
+// };
+
+// export default Layout;

@@ -15,6 +15,7 @@ import * as serviceModulo from '../Catalogos/selectores/serviceSelectorModulos';
 import { Sistema } from '@/types';
 import useAuthStore from '../../store/authStore'; //para permisos
 import { useNavigate } from 'react-router-dom'; //para permisos
+import * as serviceInfo from '@/pages/CommonServices/commonService';
 
 const ReporteConciliacionSaldosPage: React.FC = () => {
 
@@ -25,17 +26,33 @@ const ReporteConciliacionSaldosPage: React.FC = () => {
   const [modulos, setModulos] = useState<String[]>([]);
   const [selectedSistema, setSelectedSistema] = useState<string>('');
   const [selectedModulo, setSelectedModulo] = useState<string>('');
-
+  const [infoData, setInfoData] = useState<string>('');
   const navigate = useNavigate();
   const { hasPermission } = useAuthStore();
-  console.log(hasPermission);
+  const { token } = useAuthStore();
   const requiredPermission = '/sica/reportes/conciliacion-saldos';
   useEffect(() => {
-      if (!hasPermission(requiredPermission)) {
-          notify('No tienes permisos para acceder a esta página', 'error');
-          navigate('/');
-      }
+    if (!hasPermission(requiredPermission)) {
+      notify('No tienes permisos para acceder a esta página', 'error');
+      navigate('/');
+    }
   }, [hasPermission, navigate, notify]);
+
+
+  useEffect(() => {
+    const getInfo = async () => {
+      try {
+        const data = await serviceInfo.getInfoPantalla(requiredPermission, token);
+        setInfoData(data);
+
+      } catch (error) {
+        notify('Error al cargar los datos de sistemas', 'error');
+      }
+    };
+
+    getInfo();
+  }, [notify]);
+
 
   const [filtros, setFiltros] = useState<ReporteConciliacionFiltros>({
     sistema: '',
@@ -46,7 +63,7 @@ const ReporteConciliacionSaldosPage: React.FC = () => {
   const [reporteData, setReporteData] = useState<ReporteConciliacion[]>([]);
   const fetchData = async () => {
     try {
-      const dataSist = await serviceSistema.fetchSistemas();
+      const dataSist = await serviceSistema.fetchSistemas(token);
       if (!!dataSist && dataSist.length > 0) {
         //console.log("sistemas recuperados: ",dataSist);
         setSistemas(dataSist);
@@ -73,7 +90,7 @@ const ReporteConciliacionSaldosPage: React.FC = () => {
 
   const fetchDataMOduloByClaveSistema = async () => {
     try {
-      const dataModXSist = await serviceModulo.fetchModuloByClave(selectedSistema);
+      const dataModXSist = await serviceModulo.fetchModuloByClave(selectedSistema,token);
       if (!dataModXSist || dataModXSist.length == 0) {
         setModulos([]);
         setSelectedModulo('');
@@ -138,7 +155,7 @@ const ReporteConciliacionSaldosPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const res = await service.fetchReporteConciliacionSaldos(filtros);
+      const res = await service.fetchReporteConciliacionSaldos(filtros,token);
       if (res.status === 200) {
         const blob = new Blob([res.data]);
         const filename = `Reporte_Conciliacion.pdf`;
@@ -191,7 +208,7 @@ const ReporteConciliacionSaldosPage: React.FC = () => {
       <BodyHeader
         headerRoute="Reportes / Conciliación de Saldos"
         TitlePage="Reporte Conciliación de Saldos"
-        tooltipProps={{ title: "Genera el reporte de conciliación de saldos" }}
+        tooltipProps={{ title: infoData }}
         typographyPropsRoute={{ variant: "h6" }}
         typographyPropsTitle={{ variant: "h3" }}
       />

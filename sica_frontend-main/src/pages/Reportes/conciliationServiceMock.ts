@@ -1,8 +1,6 @@
 import axios from 'axios';
 import { ReporteConciliacion, ReporteConciliacionFiltros } from './interfaces';
-import pdfMake from 'pdfmake/build/pdfmake';
-import { link } from 'fs';
-
+const { protocol, hostname, port } = window.location;
 const mockData: ReporteConciliacion[] = [
   {
     sistema: 'SIF',
@@ -95,25 +93,29 @@ const mockData: ReporteConciliacion[] = [
   // Agrega más datos simulados si es necesario...
 ];
 
-const API_URL = 'http://localhost:8080/reportes/reporte';
-
+// const API_URL = 'http://localhost:8080/reportes/reporte';
+const API_URL = process.env.ENVIROMENT === 'LOCAL' ? process.env.BASE_API_URL : `${protocol}//${hostname}${port ? `:${port}` : ''}`;
 export const fetchReporteConciliacionSaldos = async (
-  filtros: ReporteConciliacionFiltros
+  filtros: ReporteConciliacionFiltros, token: string | null
 ): Promise<String> => {
   try {
-    var fecha =filtros.fecha?.split("-");
-  filtros.fecha=fecha[2]+"/"+fecha[1]+"/"+fecha[0];
+    var fecha = filtros.fecha?.split("-");
+    filtros.fecha = fecha[2] + "/" + fecha[1] + "/" + fecha[0];
     /*const response = await axios.post(API_URL, params);*/
-   return await axios.post(`${API_URL}`,filtros,{responseType:"arraybuffer"});
-    
+    return await axios.post(`${API_URL}/reportes/reporte`, filtros, {
+      responseType: "arraybuffer", headers: {
+        'Authorization': `Bearer ${token}`,  // Agregar el JWT al header
+      }
+    });
+
   } catch (error) {
-    console.error('Error ejecutando la extracción SIF:', error);
+    // console.error('Error ejecutando la extracción SIF:', error);
     throw error; // Esto permite capturar el error en la UI y manejarlo apropiadamente
   }
-  
+
 };
 
-export const getDistinctValues = async (key: keyof ReporteConciliacion): Promise<string[]> => {
+export const getDistinctValues = async (key: keyof ReporteConciliacion, token: string | null): Promise<string[]> => {
   const values = Array.from(new Set(mockData.map(item => item[key] as string)));
   return ['TODOS', ...values];
 };

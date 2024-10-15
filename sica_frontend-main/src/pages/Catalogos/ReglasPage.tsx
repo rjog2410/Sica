@@ -9,7 +9,7 @@ import { useNotification } from '../../providers/NotificationProvider';
 import ConfirmDialog from '../../components/base/ConfirmDialog';
 import AddReglaModal from './modales/AddCuentaRegla';
 import ReglasSubpantallaModal from './modales/ReglasSubpantallaModal';
-
+import useAuthStore from '../../store/authStore'; //para permisos
 const CuentaReglaPage: React.FC = () => {
     const originalObject: Regla = {
         id: 0,
@@ -35,16 +35,15 @@ const CuentaReglaPage: React.FC = () => {
     const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
     const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
-
     const { notify } = useNotification();
     const tableRef = useRef<any>(null);
-
+    const { token } = useAuthStore();
     useEffect(() => {
         const fetchData = async () => {
             try {
                 // get reglas
             } catch (error) {
-                console.error('Error al cargar los datos de cuentas:', error);
+                // console.error('Error al cargar los datos de cuentas:', error);
                 notify('Error al cargar los datos de cuentas', 'error');
             }
         };
@@ -90,13 +89,13 @@ const CuentaReglaPage: React.FC = () => {
     const handleSaveRegla = async (newRegla: Regla) => {
         try {
             if (editingRegla) {
-                await service.createOrUpdateRegla(newRegla, true);
+                await service.createOrUpdateRegla(newRegla, true,token);
                 setReglas(reglas.map((regla) =>
                     regla.reg_cuc_clave === editingRegla.reg_cuc_clave ? newRegla : regla
                 ));
                 notify('Regla actualizada correctamente', 'success');
             } else {
-                await service.createOrUpdateRegla(newRegla, false);
+                await service.createOrUpdateRegla(newRegla, false,token);
                 setReglas([...reglas, newRegla]);
                 notify('Regla agregada correctamente', 'success');
             }
@@ -104,19 +103,6 @@ const CuentaReglaPage: React.FC = () => {
             notify('No es posible guardar el registro.', 'error');
         }
         handleCloseModal();
-    };
-
-    const handleViewRules = (id: number) => {
-        // const cuentaSeleccionada = cuentas.find(cuenta => cuenta.id === id);
-        //
-        // if (!cuentaSeleccionada) {
-        //   notify('Cuenta no encontrada', 'error');
-        //   return;
-        // }
-        //
-        // const reglasAsociadas = reglas.filter(regla => regla.clave_regla === cuentaSeleccionada.clave_regla);
-        // setCurrentReglas(reglasAsociadas);
-        // setIsSubpantallaOpen(true);
     };
 
     const handleDeleteRegla = (id: number) => {

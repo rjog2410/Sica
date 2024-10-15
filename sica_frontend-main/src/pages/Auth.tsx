@@ -76,8 +76,7 @@ const Auth: React.FC = () => {
   useEffect(() => {
     const verifyAndNavigate = async () => {
       const searchParams = new URLSearchParams(location.search);  // Usar location.search para obtener los query params
-      const jwt = searchParams.get('jwt');
-
+      const jwt = searchParams.get('xcz');
       if (jwt) {
         // Si hay un JWT, intenta verificarlo
         const isValid = await verifyToken(jwt, notify);

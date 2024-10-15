@@ -12,7 +12,7 @@ import {
 import {Cuenta, ModuloO, Sistema} from '@/types';
 import {fetchSistemas} from "@/pages/Catalogos/selectores/serviceSelectorSistemas.ts";
 import {fetchModuloByClave} from "@/pages/Catalogos/selectores/serviceSelectorModulos.ts";
-
+import useAuthStore from '@/store/authStore'; //para permisos
 
 interface AddCuentaModalProps {
     open: boolean;
@@ -48,22 +48,21 @@ const AddCuentaModal: React.FC<AddCuentaModalProps> = ({open, onClose, onSave, i
     const [sistemas, setSistemas] = useState<Sistema[]>([]);
     const [modulos, setModulos] = useState<ModuloO[]>([]);
     const [isUpdate, setIsUpdate] = useState<boolean>(false);
-
+    const { token } = useAuthStore();
     useEffect(() => {
-        fetchSistemas().then(resp => {
+        fetchSistemas(token).then(resp => {
             setSistemas(resp);
         })
     }, []);
 
     useEffect(() => {
-        fetchModuloByClave(cuentaData?.cuc_mod_sis_clave).then(resp => {
+        fetchModuloByClave(cuentaData?.cuc_mod_sis_clave,token).then(resp => {
             setModulos(resp)
         })
     }, [cuentaData?.cuc_mod_sis_clave]);
 
     useEffect(() => {
-        if (initialData.cuc_clave !== 0) {
-            console.log("InitialData: ", initialData)
+        if (initialData?.cuc_clave !== 0) {
             setIsUpdate(true)
             setCuentaData({
                 ...initialData,

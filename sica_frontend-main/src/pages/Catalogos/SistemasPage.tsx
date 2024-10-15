@@ -10,6 +10,7 @@ import ComboBox from '../../components/base/tabla/Combobox';
 import ConfirmDialog from '../../components/base/ConfirmDialog';
 import useAuthStore from '../../store/authStore'; //para permisos
 import { useNavigate } from 'react-router-dom'; //para permisos
+import * as serviceInfo from '@/pages/CommonServices/commonService';
 
 
 const SistemasPage: React.FC = () => {
@@ -23,28 +24,37 @@ const SistemasPage: React.FC = () => {
   const [editingSistema, setEditingSistema] = useState<Sistema | null>(originalObject);
   const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
   const [editando, setEditando] = useState<boolean>(false);
-  const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
+  const [confirmAction, setConfirmAction] = useState<() => void>(() => { });
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [infoData, setInfoData] = useState<string>(''); 
 
   const { notify } = useNotification();
   const navigate = useNavigate();
   const { hasPermission } = useAuthStore();
   const requiredPermission = '/sica/catalogos/sistemas';
+  const { token } = useAuthStore();
   useEffect(() => {
-      if (!hasPermission(requiredPermission)) {
-          notify('No tienes permisos para acceder a esta página', 'error');
-          navigate('/');
-      }
+    if (!hasPermission(requiredPermission)) {
+      notify('No tienes permisos para acceder a esta página', 'error');
+      navigate('/');
+    }
   }, [hasPermission, navigate, notify]);
+
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await service.fetchSistemas();
-        setSistemas(data);
+        const [sistemasData, data] = await Promise.all([
+          service.fetchSistemas(token),
+          serviceInfo.getInfoPantalla(requiredPermission, token)
+        ]);
+
+        setSistemas(sistemasData);
+        setInfoData(data);
+
         notify('Sistemas cargados', 'info');
       } catch (error) {
-        notify('Error al cargar los datos de sistemas', 'error');
+        notify('Error al cargar los datos', 'error');
       } finally {
         setLoading(false);
       }
@@ -52,6 +62,20 @@ const SistemasPage: React.FC = () => {
 
     fetchData();
   }, [notify]);
+
+//   useEffect(() => {
+//     const getInfo = async () => {
+//         try {
+//             const data = await serviceInfo.getInfoPantalla(requiredPermission, token);
+//             setInfoData(data);
+
+//         } catch (error) {
+//             notify('Error al cargar los datos de la pantalla', 'error');
+//         }
+//     };
+
+//     getInfo();
+// }, [notify]);
 
   const handleSistemaSelect = (sistema: Sistema | null) => {
     setSelectedSistema(sistema);
@@ -72,16 +96,16 @@ const SistemasPage: React.FC = () => {
   const handleSaveSistema = async (newSistema: Sistema) => {
     try {
       // Llamada al servicio para guardar o actualizar el sistema
-      const responseMessage = await service.createOrUpdateSistema(newSistema,editando);
+      const responseMessage = await service.createOrUpdateSistema(newSistema, editando,token);
       if (editando) {
         // Actualizar el sistema en el estado local
         setSistemas(sistemas.map((sistema) =>
           sistema.sis_clave === editingSistema.sis_clave ? newSistema : sistema
         ));
-        notify( 'Sistema actualizado correctamente', 'success');
-      } else if(responseMessage.status=='400'){
-        notify(responseMessage.message,'warning');
-      }else{
+        notify('Sistema actualizado correctamente', 'success');
+      } else if (responseMessage.status == '400') {
+        notify(responseMessage.message, 'warning');
+      } else {
         setSistemas([...sistemas, newSistema]);
         notify('Sistema agregado correctamente', 'success');
       }
@@ -104,18 +128,18 @@ const SistemasPage: React.FC = () => {
     console.log("handleDeleteSistema")
     setConfirmAction(() => async () => {
       try {
-      const responseMessage = await service.deleteSistema(sis_clave);
-      console.log (responseMessage);
-      if(responseMessage?.status=='200'){
-        setSistemas(sistemas.filter((sistema) => sistema.sis_clave !== sis_clave));
+        const responseMessage = await service.deleteSistema(sis_clave,token);
+        console.log(responseMessage);
+        if (responseMessage?.status == '200') {
+          setSistemas(sistemas.filter((sistema) => sistema.sis_clave !== sis_clave));
 
-        notify('Sistema eliminado correctamente', 'success');
-      }else{
-        notify(responseMessage.message, 'warning');
+          notify('Sistema eliminado correctamente', 'success');
+        } else {
+          notify(responseMessage.message, 'warning');
+        }
+      } catch (error) {
+        notify('No es posible eliminar el registro.', 'error');
       }
-    } catch (error) {
-      notify('No es posible eliminar el registro.', 'error');
-    }
     });
     setConfirmOpen(true);
   };
@@ -125,18 +149,18 @@ const SistemasPage: React.FC = () => {
     console.log(sis_claves)
     setConfirmAction(() => async () => {
       try {
-      const responseMessage = await service.deleteMultipleSistemas(sis_claves);
-      console.log("-----"+responseMessage?.status);
-      if(responseMessage?.status=='200'){
-        setSistemas(sistemas.filter((sistema) => !sis_claves.includes(sistema.sis_clave)));
-        setSelectedIds([]);        
-        notify('Sistemas eliminados correctamente', 'success');
-        }else{
-        notify(responseMessage.message, 'warning');
+        const responseMessage = await service.deleteMultipleSistemas(sis_claves,token);
+        console.log("-----" + responseMessage?.status);
+        if (responseMessage?.status == '200') {
+          setSistemas(sistemas.filter((sistema) => !sis_claves.includes(sistema.sis_clave)));
+          setSelectedIds([]);
+          notify('Sistemas eliminados correctamente', 'success');
+        } else {
+          notify(responseMessage.message, 'warning');
+        }
+      } catch (error) {
+        notify('No es posible eliminar los registros.', 'error');
       }
-    } catch (error) {
-      notify('No es posible eliminar los registros.', 'error');
-    }
     });
     setConfirmOpen(true);
   };
@@ -162,7 +186,7 @@ const SistemasPage: React.FC = () => {
       <BodyHeader
         headerRoute="Catálogos / Sistemas"
         TitlePage="Sistemas"
-        tooltipProps={{ title: "Información sobre la Gestión de Sistemas" }}
+        tooltipProps={{ title: infoData }}
         typographyPropsRoute={{ variant: "h6" }}
         typographyPropsTitle={{ variant: "h3" }}
       />
@@ -171,7 +195,7 @@ const SistemasPage: React.FC = () => {
       ) : (
         <>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={2} >
-            <Box sx={{width:250}}>
+            <Box sx={{ width: 250 }}>
               <ComboBox
                 options={sistemas}
                 onSelect={handleSistemaSelect}

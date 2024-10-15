@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
     Autocomplete,
     Box,
@@ -21,7 +21,7 @@ import { useNotification } from "@/providers/NotificationProvider.tsx";
 
 import useAuthStore from '../../store/authStore'; //para permisos
 import { useNavigate } from 'react-router-dom'; //para permisos
-
+import * as serviceInfo from '@/pages/CommonServices/commonService';
 
 
 
@@ -45,9 +45,10 @@ const ConciliacionSaldosPage: React.FC = () => {
 
     const tableRef = useRef<any>(null);
 
+    const [infoData, setInfoData] = useState<string>('');
+    const { token } = useAuthStore();
     const navigate = useNavigate();
     const { hasPermission } = useAuthStore();
-    console.log(hasPermission);
     const requiredPermission = '/sica/consulta/conciliacion-saldos';
     useEffect(() => {
         if (!hasPermission(requiredPermission)) {
@@ -57,9 +58,9 @@ const ConciliacionSaldosPage: React.FC = () => {
     }, [hasPermission, navigate, notify]);
 
     useEffect(() => {
-        fetchSistemas().then(resp => {
-            fetchMonedas().then(respCurr => {
-                fetchOficinas().then(offices => {
+        fetchSistemas(token).then(resp => {
+            fetchMonedas(token).then(respCurr => {
+                fetchOficinas(token).then(offices => {
                     setData({ ...data, sistemas: resp, monedas: respCurr, oficinas: offices })
                     setFiltros({
                         ...filtros,
@@ -73,12 +74,27 @@ const ConciliacionSaldosPage: React.FC = () => {
 
     useEffect(() => {
         if (!!filtros?.sistema) {
-            fetchModulosBySistema(filtros?.sistema).then(resp => {
+            fetchModulosBySistema(filtros?.sistema, token).then(resp => {
                 setData({ ...data, modulos: resp })
                 setFiltros({ ...filtros, modulo: '' })
             })
         }
     }, [filtros?.sistema]);
+
+
+    useEffect(() => {
+        const getInfo = async () => {
+            try {
+                const data = await serviceInfo.getInfoPantalla(requiredPermission, token);
+                setInfoData(data);
+
+            } catch (error) {
+                notify('Error al cargar los datos de sistemas', 'error');
+            }
+        };
+
+        getInfo();
+    }, [notify]);
 
 
     const handleFiltroChange = (name: string, value: any) => {
@@ -93,14 +109,14 @@ const ConciliacionSaldosPage: React.FC = () => {
                     ...filtros,
                     oficina: filtros.oficina.clave_particular,
                     moneda: filtros.moneda.mon_clave
-                });
+                }, token);
 
                 if (resp?.status !== 200) {
                     notify(resp?.message, "error");
                 } else if (resp?.status === 200) {
-                    if(resp?.data.length > 0){
+                    if (resp?.data.length > 0) {
                         setData({ ...data, info: resp?.data });
-                    }else{
+                    } else {
                         notify('No existe información para los criterios de búsqueda seleccionados.', 'info');
                     }
                 }
@@ -108,8 +124,8 @@ const ConciliacionSaldosPage: React.FC = () => {
                 notify("Los campos de oficina y moneda son requeridos", "error");
                 notify("Buscando con valores por defecto", "warning");
 
-                const resp = await fetchReporteConciliacionSaldos({ ...filtros, oficina: 90, moneda: 1 });
-                console.log("Response: ", resp);
+                const resp = await fetchReporteConciliacionSaldos({ ...filtros, oficina: 90, moneda: 1 }, token);
+                // console.log("Response: ", resp);
             }
         } catch (error) {
             notify("Error en la consulta de saldos", "error");
@@ -118,10 +134,10 @@ const ConciliacionSaldosPage: React.FC = () => {
         }
     };
 
-    const handleExportModule = () => {
-        // Implementar la lógica para exportar por módulo
-        console.log('Generando archivo por módulo con filtros:', filtros);
-    };
+    // const handleExportModule = () => {
+    //     // Implementar la lógica para exportar por módulo
+    //     console.log('Generando archivo por módulo con filtros:', filtros);
+    // };
 
     const handleExportFile = async () => {
         if (tableRef.current) {
@@ -143,7 +159,7 @@ const ConciliacionSaldosPage: React.FC = () => {
             <BodyHeader
                 headerRoute="Consultas / Conciliación de Saldos"
                 TitlePage="Conciliación de Saldos"
-                tooltipProps={{ title: "Consulta de Conciliación de Saldos" }}
+                tooltipProps={{ title: infoData }}
                 typographyPropsRoute={{ variant: "h6" }}
                 typographyPropsTitle={{ variant: "h3" }}
             />

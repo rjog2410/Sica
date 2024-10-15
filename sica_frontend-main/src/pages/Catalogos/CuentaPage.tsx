@@ -23,7 +23,7 @@ import {
 } from "@/pages/Catalogos/servicios/cuentasReglaService.ts"; // Asumiendo que tienes este modal para manejar las reglas
 import useAuthStore from '../../store/authStore'; //para permisos
 import { useNavigate } from 'react-router-dom'; //para permisos
-
+import * as serviceInfo from '@/pages/CommonServices/commonService';
 const CuentaPage: React.FC = () => {
 
     const originalObject: Cuenta = {
@@ -77,15 +77,15 @@ const CuentaPage: React.FC = () => {
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
     const [cuentaInfo, setCuentaInfo] = useState<Cuenta>(originalObject);
-
+    const [infoData, setInfoData] = useState<string>(''); 
 
     const { notify } = useNotification();
     const tableRef = useRef<any>(null);
 
     const navigate = useNavigate();
     const { hasPermission } = useAuthStore();
-    console.log(hasPermission);
     const requiredPermission = '/sica/catalogos/cuentas';
+    const { token } = useAuthStore();
     useEffect(() => {
         if (!hasPermission(requiredPermission)) {
             notify('No tienes permisos para acceder a esta página', 'error');
@@ -94,7 +94,7 @@ const CuentaPage: React.FC = () => {
     }, [hasPermission, navigate, notify]);
 
     useEffect(() => {
-        serviceSistema.fetchSistemas().then(resp => {
+        serviceSistema.fetchSistemas(token).then(resp => {
             if (!!resp && resp.length > 0) {
                 setSistemas(resp);
             }
@@ -104,10 +104,24 @@ const CuentaPage: React.FC = () => {
         })
     }, []);
 
+     useEffect(() => {
+    const getInfo = async () => {
+      try {
+        const data = await serviceInfo.getInfoPantalla(requiredPermission,token);
+       setInfoData(data);
+
+      } catch (error) {
+        notify('Error al cargar los datos de sistemas', 'error');
+      }
+    };
+
+    getInfo();
+  }, [notify]);
+
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const cuentasData: Cuenta[] = await service.getAllCuentas();
+                const cuentasData: Cuenta[] = await service.getAllCuentas(token);
                 setCuentas(cuentasData);
             } catch (error) {
                 console.error('Error al cargar los datos de cuentas:', error);
@@ -120,17 +134,17 @@ const CuentaPage: React.FC = () => {
 
     useEffect(() => {
         if (!!selectedSistema && selectedSistema !== 'TODOS') {
-            fetchModuloByClave(selectedSistema).then(resp => {
+            fetchModuloByClave(selectedSistema,token).then(resp => {
                 setModulos(['TODOS', ...Array.from(new Set(resp?.map(modulo => modulo?.mod_clave)))]);
             });
-            getCuentasBySistema(selectedSistema).then(resp => {
+            getCuentasBySistema(selectedSistema,token).then(resp => {
                 setFilteredCuentas(resp);
             })
         } else {
-            fetchModulos().then(resp => {
+            fetchModulos(token).then(resp => {
                 setModulos(['TODOS', ...Array.from(new Set(resp?.map(modulo => modulo?.clave_modulo)))]);
             });
-            getAllCuentas().then(resp => {
+            getAllCuentas(token).then(resp => {
                 setFilteredCuentas(resp);
             })
         }
@@ -139,15 +153,15 @@ const CuentaPage: React.FC = () => {
 
     useEffect(() => {
         if (!!selectedModulo && selectedModulo !== 'TODOS' && !!selectedSistema && selectedSistema !== 'TODOS') {
-            getCuentasBySistemaAndModulo(selectedSistema, selectedModulo).then(resp => {
+            getCuentasBySistemaAndModulo(selectedSistema, selectedModulo,token).then(resp => {
                 setFilteredCuentas(resp);
             })
         } else if (!!selectedSistema && selectedSistema !== 'TODOS') {
-            getCuentasBySistema(selectedSistema).then(resp => {
+            getCuentasBySistema(selectedSistema,token).then(resp => {
                 setFilteredCuentas(resp);
             })
         } else {
-            getAllCuentas().then(resp => {
+            getAllCuentas(token).then(resp => {
                 setFilteredCuentas(resp);
             })
         }
@@ -166,7 +180,7 @@ const CuentaPage: React.FC = () => {
     const handleSaveRegla = async (newRegla: Regla) => {
         try {
             if (newRegla.id <= currentReglas?.length) {
-                await service.createOrUpdateRegla(newRegla, false).then(resp => {
+                await service.createOrUpdateRegla(newRegla, false,token).then(resp => {
                     if (resp?.data?.status === 400) {
                         notify(resp?.data?.message?.msg, 'error');
                     } else {
@@ -177,7 +191,7 @@ const CuentaPage: React.FC = () => {
                     }
                 });
             } else {
-                await service.createOrUpdateRegla(newRegla, true).then(resp => {
+                await service.createOrUpdateRegla(newRegla, true,token).then(resp => {
                     if (resp?.data?.status === 400) {
                         notify(resp?.data?.message?.msg, 'error');
                     } else {
@@ -192,14 +206,14 @@ const CuentaPage: React.FC = () => {
             notify('No es posible guardar el registro.', 'error');
         }
 
-        getReglas(cuentaInfo?.cuc_clave).then(resp => setCurrentReglas(resp?.map((reg, i) => ({ ...reg, id: i }))))
+        getReglas(cuentaInfo?.cuc_clave,token).then(resp => setCurrentReglas(resp?.map((reg, i) => ({ ...reg, id: i }))))
 
     };
 
     const handleSaveFormula = async (newFormula: Formula, isUpdate: boolean) => {
         console.log("newFormula: ", newFormula)
         try {
-            await createFormula(newFormula, isUpdate).then(resp => {
+            await createFormula(newFormula, isUpdate,token).then(resp => {
                 if (resp?.data?.status === 400) {
                     notify(resp?.data?.message?.msg, 'error');
                 } else {
@@ -210,7 +224,7 @@ const CuentaPage: React.FC = () => {
             notify('No es posible guardar el registro.', 'error');
         }
 
-        getFormulas(cuentaInfo?.cuc_clave).then(resp => setCurrentFormulas(resp?.map((form, index) => ({
+        getFormulas(cuentaInfo?.cuc_clave,token).then(resp => setCurrentFormulas(resp?.map((form, index) => ({
             ...form,
             id: index
         }))))
@@ -231,14 +245,14 @@ const CuentaPage: React.FC = () => {
     const handleSaveCuenta = async (cuenta: Cuenta, isUpdate: boolean) => {
         try {
             if (!isUpdate) {
-                await service.createOrUpdateCuentaRegla(cuenta).then(resp => {
+                await service.createOrUpdateCuentaRegla(cuenta,token).then(resp => {
                     if (resp?.data?.status === 200) {
                         setCuentas([...cuentas, cuenta]);
                         notify("Cuenta creada exitosamente.", 'success');
                     }
                 });
             } else {
-                await updateCuenta(cuenta).then(resp => {
+                await updateCuenta(cuenta,token).then(resp => {
                     if (resp?.data?.status === 200) {
                         setCuentas(cuentas.map(c => (c.cuc_clave === cuenta.cuc_clave ? cuenta : c)));
                         notify("Cuenta actualizada correctamente.", 'success');
@@ -249,7 +263,7 @@ const CuentaPage: React.FC = () => {
             notify('No es posible guardar el registro.', 'error');
         }
         setIsCuentaModalOpen(false);
-        getAllCuentas().then(resp => {
+        getAllCuentas(token).then(resp => {
             setFilteredCuentas(resp);
         })
     };
@@ -266,9 +280,9 @@ const CuentaPage: React.FC = () => {
             notify('Cuenta no encontrada', 'error');
             return;
         } else {
-            fetchReglas(cuentaSeleccionada?.cuc_clave).then(resp => {
+            fetchReglas(cuentaSeleccionada?.cuc_clave,token).then(resp => {
 
-                getFormulas(cuentaSeleccionada?.cuc_clave).then(respF => {
+                getFormulas(cuentaSeleccionada?.cuc_clave,token).then(respF => {
                     setCurrentFormulas(respF?.map((form, index) => ({
                         ...form,
                         id: index
@@ -296,7 +310,7 @@ const CuentaPage: React.FC = () => {
 
         setConfirmAction(() => async () => {
             try {
-                await service.removeRegla(reglaToDelete).then(resp => {
+                await service.removeRegla(reglaToDelete,token).then(resp => {
                     console.log("DeleteReg: ", resp)
                     if (resp?.status === 200) {
                         setCurrentReglas(currentReglas.filter(regla => reglaToDelete?.id !== regla.id))
@@ -323,7 +337,7 @@ const CuentaPage: React.FC = () => {
 
         setConfirmAction(() => async () => {
             try {
-                await service.removeCuenta(cuentaToDelete?.cuc_clave).then(resp => {
+                await service.removeCuenta(cuentaToDelete?.cuc_clave,token).then(resp => {
                     if (resp?.status === 200) {
                         notify("Cuenta eliminada exitosamente.", 'success');
                         setFilteredCuentas(filteredCuentas?.filter(cuenta => cuenta.cuc_clave !== id))
@@ -348,7 +362,7 @@ const CuentaPage: React.FC = () => {
         }
         setConfirmAction(() => async () => {
             try {
-                await service.removeMultipleCuentas(ids).then(res => {
+                await service.removeMultipleCuentas(ids,token).then(res => {
                     if (res?.status === 200) {
                         setFilteredCuentas(filteredCuentas?.filter(cuenta => !ids?.includes(cuenta?.cuc_clave)))
                         notify('Cuentas eliminadas correctamente', 'success');
@@ -374,7 +388,7 @@ const CuentaPage: React.FC = () => {
 
         setConfirmAction(() => async () => {
             try {
-                await service.removeMultipleReglas(reglasToDelete).then(resp => {
+                await service.removeMultipleReglas(reglasToDelete,token).then(resp => {
                     if (resp?.status === 200) {
                         setCurrentReglas(currentReglas.filter(regla => !ids.includes(regla.id)))
                         notify("Reglas eliminadas exitosamente.", 'success');
@@ -400,10 +414,10 @@ const CuentaPage: React.FC = () => {
 
         setConfirmAction(() => async () => {
             try {
-                await deleteFormula(formulaToDelete).then(resp => {
+                await deleteFormula(formulaToDelete,token).then(resp => {
                     console.log("DeleteFormula: ", resp)
                     if (resp?.status === 200) {
-                        getFormulas(cuentaInfo?.cuc_clave).then(resp => setCurrentFormulas(resp?.map((form, index) => ({
+                        getFormulas(cuentaInfo?.cuc_clave,token).then(resp => setCurrentFormulas(resp?.map((form, index) => ({
                             ...form,
                             id: index
                         }))))
@@ -429,7 +443,7 @@ const CuentaPage: React.FC = () => {
 
         setConfirmAction(() => async () => {
             try {
-                await deleteMultipleFormula(formulasToDelete).then(resp => {
+                await deleteMultipleFormula(formulasToDelete,token).then(resp => {
                     if (resp?.status === 200) {
                         setCurrentFormulas(currentFormulas.filter(form => !ids.includes(form?.id)))
                         notify("Formulas eliminadas exitosamente.", 'success');
@@ -465,7 +479,7 @@ const CuentaPage: React.FC = () => {
             <BodyHeader
                 headerRoute="Catálogos / Cuentas y Reglas"
                 TitlePage="Cuentas y Reglas"
-                tooltipProps={{ title: "Información sobre la Gestión de Cuentas y Reglas" }}
+                tooltipProps={{ title: infoData }}
                 typographyPropsRoute={{ variant: "h6" }}
                 typographyPropsTitle={{ variant: "h3" }}
             />

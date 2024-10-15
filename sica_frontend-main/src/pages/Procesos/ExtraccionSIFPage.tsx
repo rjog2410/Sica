@@ -9,7 +9,7 @@ import { Modulo } from '@/utils/types';
 import ComboBox from '@/components/base/tabla/Combobox';
 import useAuthStore from '../../store/authStore'; //para permisos
 import { useNavigate } from 'react-router-dom'; //para permisos
-
+import * as serviceInfo from '@/pages/CommonServices/commonService';
 
 const ExtraccionSIFPage: React.FC = () => {
   const originalObject = {
@@ -34,35 +34,52 @@ const ExtraccionSIFPage: React.FC = () => {
   const [selectedSistema, setSelectedSistema] = useState<string | null>('TODOS');
   const [secondFilterOptions, setSecondFilterOptions] = useState<string[]>([]);
   const [selectedModulo, setSelectedModulo] = useState<string>('TODOS');
-  
-  const [filterValue, setFilterValue] = useState<string>('TODOS');
 
+  const [filterValue, setFilterValue] = useState<string>('TODOS');
+  const [infoData, setInfoData] = useState<string>('');
   const { notify } = useNotification();
 
   const navigate = useNavigate();
   const { hasPermission } = useAuthStore();
-  console.log(hasPermission);
+  const { token } = useAuthStore();
   const requiredPermission = '/sica/procesos/extraccionsif';
   useEffect(() => {
-      if (!hasPermission(requiredPermission)) {
-          notify('No tienes permisos para acceder a esta página', 'error');
-          navigate('/');
-      }
+    if (!hasPermission(requiredPermission)) {
+      notify('No tienes permisos para acceder a esta página', 'error');
+      navigate('/');
+    }
   }, [hasPermission, navigate, notify]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await service.fetchModulos()
+        const data = await service.fetchModulos(token)
         setModulos(data);
         notify('Datos de Extracción SIF Cargados', 'info');
       } catch (error) {
         notify('Error al cargar los datos de Extracción SIF', 'error');
-      } 
+      }
     };
+
+  
+
 
 
     fetchData();
+  }, [notify]);
+
+  useEffect(() => {
+    const getInfo = async () => {
+      try {
+        const data = await serviceInfo.getInfoPantalla(requiredPermission, token);
+        setInfoData(data);
+
+      } catch (error) {
+        notify('Error al cargar los datos de sistemas', 'error');
+      }
+    };
+
+    getInfo();
   }, [notify]);
 
   const handleSistemaSelect = (sistema: string | null) => {
@@ -70,18 +87,19 @@ const ExtraccionSIFPage: React.FC = () => {
     if (sistema && sistema !== 'TODOS') {
       const filteredModules = modulos.filter(m => m.clave_sistema === sistema);
       const newOptions = ['TODOS', ...new Set(filteredModules.map(m => m.clave_modulo))];
-      params.sistema=sistema;
+      params.sistema = sistema;
       setSecondFilterOptions(newOptions);
       setSelectedModulo('TODOS');
     } else {
+      setSelectedSistema('TODOS');
       setSecondFilterOptions([]);
       setSelectedModulo('TODOS');
     }
   };
 
   const handleModuloSelect = (modulo: string | null) => {
-    
-    params.modulo=modulo;
+
+    params.modulo = modulo;
     setSelectedModulo(modulo || 'TODOS');
     setFilterValue(modulo ? modulo : 'TODOS');
 
@@ -103,10 +121,9 @@ const ExtraccionSIFPage: React.FC = () => {
 
 
   const validateParams = (): boolean => {
-    var fecha =params.fecha_inicial?.split("-");
-    
+    var fecha = params.fecha_inicial?.split("-");
 
-    console.log(fecha[2])
+
 
     if (fecha[2] !== '01') {
       notify('La fecha de inicio debe ser el primer día del mes', 'error');
@@ -124,26 +141,24 @@ const ExtraccionSIFPage: React.FC = () => {
   const handleExecute = async () => {
     if (!validateParams()) return;
     setIsLoading(true);
-      await service.executeExtraccionSIF(params).then(resp =>{
-        console.log("",resp)
-        if(resp.status === 200){
+    // notify('Ejecutando proceso...','info');
+    await service.executeExtraccionSIF(params,token).then(resp => {
+      if (resp.status === 200) {
 
-            notify('Módulo agregado correctamente', 'success');
-          
+        notify('Extraccion SIF se ha ejecutado correctamente.', 'success');
 
-        }else{
-          notify(resp.message, 'info');
-          console.log("ocurrio un error: ",resp.message);
-        }
-         }).catch(error =>{
-        notify(error.response.data.message, 'error');
-        console.log("ocurrio un error",error.response.data.message);
-      }) 
-     setParams(originalObject);
-     setSelectedSistema('TODOS');
-     setSecondFilterOptions([]);
-     setSelectedModulo('TODOS');
-     setIsLoading(false);
+
+      } else {
+        notify(resp.message, 'info');
+      }
+    }).catch(error => {
+      notify(error.response.data.message, 'error');
+    })
+    setParams(originalObject);
+    setSelectedSistema('TODOS');
+    setSecondFilterOptions([]);
+    setSelectedModulo('TODOS');
+    setIsLoading(false);
 
   };
 
@@ -157,99 +172,99 @@ const ExtraccionSIFPage: React.FC = () => {
 
 
   return (
-    
+
     <Box sx={{ p: 3 }}>
       <BodyHeader
         headerRoute="Procesos / Extracción SIF"
         TitlePage="Extracción SIF"
-        tooltipProps={{ title: "Información sobre la ejecución del proceso de Extracción SIF" }}
+        tooltipProps={{ title: infoData }}
         typographyPropsRoute={{ variant: "h6" }}
         typographyPropsTitle={{ variant: "h3" }}
       />
- <Box mb={2}>
-            <ComboBox
-              options={['TODOS', ...Array.from(new Set(modulos.map(modulo => modulo.clave_sistema)))]}
-              onSelect={handleSistemaSelect}
-              label="Seleccione un Sistema"
-              value={selectedSistema}
-              getOptionLabel={(option: string) => option}
-            />
-          </Box>
-          <Box mb={2}>
-            <ComboBox
-              options={secondFilterOptions}
-              onSelect={handleModuloSelect}
-              label="Filtrar por Clave de Módulo"
-              getOptionLabel={(option: string) => option}
-              disabled={selectedSistema === 'TODOS' || secondFilterOptions.length === 0}
-            />
-          </Box>
-          <Box mb={2}>
-          <TextField
-            select
-            label="Tipo Información"
-            name="tipo_informacion"
-            required 
+      <Box mb={2}>
+        <ComboBox
+          options={['TODOS', ...Array.from(new Set(modulos.map(modulo => modulo.clave_sistema)))]}
+          onSelect={handleSistemaSelect}
+          label="Seleccione un Sistema"
+          value={selectedSistema}
+          getOptionLabel={(option: string) => option}
+        />
+      </Box>
+      <Box mb={2}>
+        <ComboBox
+          options={secondFilterOptions}
+          onSelect={handleModuloSelect}
+          label="Filtrar por Clave de Módulo"
+          getOptionLabel={(option: string) => option}
+          disabled={selectedSistema === 'TODOS' || secondFilterOptions.length === 0}
+        />
+      </Box>
+      <Box mb={2}>
+        <TextField
+          select
+          label="Tipo Información"
+          name="tipo_informacion"
+          required
 
           value={params.tipo_informacion}
-            onChange={handleSelectChange}
-            fullWidth
-          >
-             <MenuItem value="S">Saldos</MenuItem>
-             <MenuItem value="M">Movimientos</MenuItem>
-          </TextField>
-        </Box>
-        <Box mb={2}>
+          onChange={handleSelectChange}
+          fullWidth
+        >
+          <MenuItem value="S">Saldos</MenuItem>
+          <MenuItem value="M">Movimientos</MenuItem>
+        </TextField>
+      </Box>
+      <Box mb={2}>
         <TextField
-        label="Fecha Inicio"
-        type="date"
-        name="fecha_inicial"
-        required 
-        value={params.fecha_inicial}
-        onChange={handleInputChange}
-        InputLabelProps={{ shrink: true }}
-        fullWidth
-        margin="normal"
-      />
-        </Box>
-        <Box mb={2}>
+          label="Fecha Inicio"
+          type="date"
+          name="fecha_inicial"
+          required
+          value={params.fecha_inicial}
+          onChange={handleInputChange}
+          InputLabelProps={{ shrink: true }}
+          fullWidth
+          margin="normal"
+        />
+      </Box>
+      <Box mb={2}>
         <TextField
-        label="Fecha Fin"
-        type="date"
-        name="fecha_final"
-        value={params.fecha_final}
-        onChange={handleInputChange}
-        InputLabelProps={{ shrink: true }}
-        fullWidth
-        required 
-        margin="normal"
-      />
-      
-        </Box>
-        <Box mb={2}>
-          <TextField
-            select
-            label="Borrar Información"
-            name="borrar_info"
-            value={params.borrar_info}
-            required 
+          label="Fecha Fin"
+          type="date"
+          name="fecha_final"
+          value={params.fecha_final}
+          onChange={handleInputChange}
+          InputLabelProps={{ shrink: true }}
+          fullWidth
+          required
+          margin="normal"
+        />
 
-            onChange={handleSelectChange}
-            fullWidth
-          >
-              <MenuItem value="S">Si</MenuItem>
-              <MenuItem value="N">No</MenuItem>
-          </TextField>
-        </Box>
-      
+      </Box>
+      <Box mb={2}>
+        <TextField
+          select
+          label="Borrar Información"
+          name="borrar_info"
+          value={params.borrar_info}
+          required
+
+          onChange={handleSelectChange}
+          fullWidth
+        >
+          <MenuItem value="S">Si</MenuItem>
+          <MenuItem value="N">No</MenuItem>
+        </TextField>
+      </Box>
+
       <Box sx={{ mt: 3 }}>
-        <Button 
-        variant="contained" 
-        color="primary" 
-        onClick={handleExecute}
-        disabled={isLoading}
->
-{isLoading ? 'Ejecutando...' : 'Ejecutar'}
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleExecute}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Ejecutando...' : 'Ejecutar'}
         </Button>
       </Box>
     </Box>
